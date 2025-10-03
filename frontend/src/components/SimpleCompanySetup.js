@@ -175,15 +175,36 @@ const SimpleCompanySetup = ({ user, onComplete }) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Industry</label>
-              <input
-                type="text"
+              <select
                 name="industry"
                 value={formData.industry}
                 onChange={handleChange}
-                placeholder="e.g., Technology, Manufacturing, Services"
                 className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
                 required
-              />
+              >
+                <option value="">Select Industry</option>
+                <option value="Technology">Technology</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Financial Services">Financial Services</option>
+                <option value="Retail & E-commerce">Retail & E-commerce</option>
+                <option value="Real Estate">Real Estate</option>
+                <option value="Education">Education</option>
+                <option value="Consulting">Consulting</option>
+                <option value="Marketing & Advertising">Marketing & Advertising</option>
+                <option value="Food & Beverage">Food & Beverage</option>
+                <option value="Transportation & Logistics">Transportation & Logistics</option>
+                <option value="Construction">Construction</option>
+                <option value="Energy & Utilities">Energy & Utilities</option>
+                <option value="Media & Entertainment">Media & Entertainment</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Pharmaceuticals">Pharmaceuticals</option>
+                <option value="Telecommunications">Telecommunications</option>
+                <option value="Travel & Tourism">Travel & Tourism</option>
+                <option value="Government">Government</option>
+                <option value="Non-Profit">Non-Profit</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
 
             <div>
