@@ -589,7 +589,12 @@ const CompanySetup = () => {
                 </div>
 
                 <div className="md:col-span-2 flex gap-2">
-                  <Button type="button" onClick={addSisterCompany} disabled={loading}>
+                  <Button 
+                    type="button" 
+                    onClick={addSisterCompany} 
+                    disabled={loading}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
                     {loading ? 
                       (editingSisterCompanyId ? 'Updating...' : 'Adding...') : 
                       (editingSisterCompanyId ? 'Update Company' : 'Add Company')
