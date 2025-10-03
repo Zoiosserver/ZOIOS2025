@@ -518,6 +518,7 @@ const CompanySetup = () => {
                   <Label htmlFor="sister_company_name">Company Name *</Label>
                   <Input
                     id="sister_company_name"
+                    tabIndex={1}
                     value={sisterCompanyForm.company_name}
                     onChange={(e) => setSisterCompanyForm(prev => ({...prev, company_name: e.target.value}))}
                     placeholder="Enter sister company name"
