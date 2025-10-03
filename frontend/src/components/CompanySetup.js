@@ -1011,7 +1011,7 @@ const CompanySetup = () => {
         <div className="flex justify-between mt-8">
           <Button
             variant="outline"
-            tabIndex={10}
+            tabIndex={100}
             onClick={handlePrevious}
             disabled={currentStep === 1}
             className="flex items-center"
@@ -1021,14 +1021,14 @@ const CompanySetup = () => {
           </Button>
 
           {currentStep < 3 ? (
-            <Button onClick={handleNext} tabIndex={11} className="flex items-center bg-blue-600 hover:bg-blue-700 text-white">
+            <Button onClick={handleNext} tabIndex={101} className="flex items-center bg-blue-600 hover:bg-blue-700 text-white">
               Next
               <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
             <Button 
               onClick={handleSubmit} 
-              tabIndex={11}
+              tabIndex={101}
               disabled={loading}
               className="flex items-center bg-blue-600 hover:bg-blue-700 text-white"
             >
