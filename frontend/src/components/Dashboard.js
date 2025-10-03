@@ -18,7 +18,7 @@ import { Users, Building2, Phone, Mail, TrendingUp, Activity } from 'lucide-reac
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = window.location.origin.replace(':3000', '');
 const API = `${BACKEND_URL}/api`;
 
 const COLORS = {
