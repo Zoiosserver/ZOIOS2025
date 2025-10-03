@@ -38,6 +38,8 @@ const Dashboard = () => {
   
   useEffect(() => {
     fetchDashboardStats();
+    fetchCompanySetup();
+    fetchSisterCompanies();
   }, []);
   
   const fetchDashboardStats = async () => {
