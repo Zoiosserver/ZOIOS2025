@@ -314,10 +314,12 @@ const CompanySetup = () => {
       company_name: '',
       country_code: '',
       base_currency: '',
+      accounting_system: '',
       business_type: '',
       industry: '',
       ownership_percentage: 100
     });
+    setSisterCompanyAccountingSystem(null);
     setShowSisterCompanyForm(false);
   };
 
