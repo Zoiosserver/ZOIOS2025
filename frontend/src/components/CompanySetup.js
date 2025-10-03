@@ -960,6 +960,7 @@ const CompanySetup = () => {
           ) : (
             <Button 
               onClick={handleSubmit} 
+              tabIndex={11}
               disabled={loading}
               className="flex items-center bg-blue-600 hover:bg-blue-700 text-white"
             >
