@@ -152,4 +152,4 @@ async def create_default_admin():
         }
         prepared_admin = prepare_user_for_mongo(admin_user)
         await db.users.insert_one(prepared_admin)
-        print("✅ Default admin user created: admin@outreachpulse.com / admin123")
+        print("✅ Default admin user created: admin@zoios.com / admin123")
