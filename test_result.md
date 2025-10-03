@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix remaining issues in ZOIOS ERP: 1) Currency Exchange Rates - 'Updated undefined exchange rates' persists and currency loading fails, enable editing additional currencies, 2) INR currency symbol displays $ instead of ₹ in currency management and company accounts, 3) Account Code Auto-Generation shows '1000' for Asset type even when exists instead of next available code, 4) User Deletion - admin@zoios.com delete button not working, 5) Granular Permission System - implement menu hiding when permissions are 'No'. All test data has been cleaned for fresh testing."
+user_problem_statement: "Complete fresh implementation with enhanced currency management: 1) All databases completely cleaned including protected admins for fresh start, 2) Enhanced additional currency selection in company setup with popular currencies section, visual improvements, and remove functionality, 3) All previous backend fixes validated and working (Currency Exchange Rate undefined fix, User Deletion cross-database lookup, Granular Permission System), 4) Frontend currency symbol display and account code auto-generation needs testing, 5) Full clean slate testing environment established."
 
 backend:
   - task: "Company Setup Step 1 API"
