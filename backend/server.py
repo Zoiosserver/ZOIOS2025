@@ -23,6 +23,10 @@ from accounting_systems import (
     get_accounting_system, get_chart_of_accounts, get_currency_info, 
     get_country_info, get_available_countries, get_available_currencies
 )
+from currency_service import (
+    CurrencyService, ExchangeRate, CurrencyRateUpdate, 
+    get_currency_service, format_currency_amount
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
