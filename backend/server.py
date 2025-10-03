@@ -910,6 +910,16 @@ async def get_consolidated_accounts(current_user: UserInDB = Depends(get_current
             sister_companies_data=[]
         )
         
+        # Add main company data
+        main_company_data = {
+            "company_id": company_setup["id"],
+            "company_name": company_setup["company_name"],
+            "balance": parent_account.get("current_balance", 0.0),
+            "ownership_percentage": 100.0
+        }
+        consolidated_account.sister_companies_data.append(main_company_data)
+        consolidated_account.consolidated_balance += main_company_data["balance"]
+        
         # Find matching accounts in sister companies
         for sister_company in sister_companies:
             sister_account = await db_to_use.chart_of_accounts.find_one({
@@ -922,10 +932,13 @@ async def get_consolidated_accounts(current_user: UserInDB = Depends(get_current
                 sister_data = {
                     "company_id": sister_company["id"],
                     "company_name": sister_company["company_name"],
-                    "balance": 0.0,  # This would come from actual accounting entries
+                    "balance": sister_account.get("current_balance", 0.0),
                     "ownership_percentage": sister_company.get("ownership_percentage", 100.0)
                 }
                 consolidated_account.sister_companies_data.append(sister_data)
+                # Add weighted balance based on ownership percentage
+                weighted_balance = sister_data["balance"] * (sister_data["ownership_percentage"] / 100.0)
+                consolidated_account.consolidated_balance += weighted_balance
         
         consolidated_accounts.append(consolidated_account)
     
