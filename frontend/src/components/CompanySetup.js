@@ -486,6 +486,9 @@ const CompanySetup = () => {
           {/* Sister Company Form */}
           {showSisterCompanyForm && (
             <Card className="p-4">
+              <h4 className="text-md font-semibold text-gray-900 mb-4">
+                {editingSisterCompanyId ? 'Edit Sister Company' : 'Add New Sister Company'}
+              </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="sister_company_name">Company Name *</Label>
