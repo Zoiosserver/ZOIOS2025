@@ -829,7 +829,7 @@ async def delete_sister_company(
         raise HTTPException(status_code=404, detail="Company setup not found")
     
     # Verify the sister company belongs to this group
-    sister_company = await db.sister_companies.find_one({
+    sister_company = await db_to_use.sister_companies.find_one({
         "id": sister_company_id,
         "group_company_id": company_setup["id"]
     })
@@ -838,7 +838,7 @@ async def delete_sister_company(
         raise HTTPException(status_code=404, detail="Sister company not found")
     
     # Soft delete
-    await db.sister_companies.update_one(
+    await db_to_use.sister_companies.update_one(
         {"id": sister_company_id},
         {"$set": {"is_active": False, "updated_at": datetime.now(timezone.utc).isoformat()}}
     )
