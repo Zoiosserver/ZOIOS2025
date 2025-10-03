@@ -637,6 +637,7 @@ const CompanySetup = () => {
                 <div className="md:col-span-2 flex gap-2">
                   <Button 
                     type="button" 
+                    tabIndex={6}
                     onClick={addSisterCompany} 
                     disabled={loading}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -648,6 +649,7 @@ const CompanySetup = () => {
                   </Button>
                   <Button
                     type="button"
+                    tabIndex={7}
                     variant="outline"
                     onClick={cancelEdit}
                   >
