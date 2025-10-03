@@ -401,12 +401,49 @@ const CompanyAccounts = () => {
                         </div>
                         <div>
                           <Label htmlFor="category">Category</Label>
-                          <Input
-                            id="category"
-                            value={newAccount.category}
-                            onChange={(e) => setNewAccount({...newAccount, category: e.target.value})}
-                            placeholder="e.g., Current Assets"
-                          />
+                          <Select value={newAccount.category} onValueChange={(value) => setNewAccount({...newAccount, category: value})}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {newAccount.account_type === 'Asset' && (
+                                <>
+                                  <SelectItem value="Current Assets">Current Assets</SelectItem>
+                                  <SelectItem value="Fixed Assets">Fixed Assets</SelectItem>
+                                  <SelectItem value="Non-Current Assets">Non-Current Assets</SelectItem>
+                                  <SelectItem value="Intangible Assets">Intangible Assets</SelectItem>
+                                </>
+                              )}
+                              {newAccount.account_type === 'Liability' && (
+                                <>
+                                  <SelectItem value="Current Liabilities">Current Liabilities</SelectItem>
+                                  <SelectItem value="Long-term Liabilities">Long-term Liabilities</SelectItem>
+                                  <SelectItem value="Non-Current Liabilities">Non-Current Liabilities</SelectItem>
+                                </>
+                              )}
+                              {newAccount.account_type === 'Equity' && (
+                                <>
+                                  <SelectItem value="Share Capital">Share Capital</SelectItem>
+                                  <SelectItem value="Retained Earnings">Retained Earnings</SelectItem>
+                                  <SelectItem value="Other Equity">Other Equity</SelectItem>
+                                </>
+                              )}
+                              {newAccount.account_type === 'Revenue' && (
+                                <>
+                                  <SelectItem value="Operating Revenue">Operating Revenue</SelectItem>
+                                  <SelectItem value="Non-Operating Revenue">Non-Operating Revenue</SelectItem>
+                                  <SelectItem value="Other Income">Other Income</SelectItem>
+                                </>
+                              )}
+                              {newAccount.account_type === 'Expense' && (
+                                <>
+                                  <SelectItem value="Operating Expenses">Operating Expenses</SelectItem>
+                                  <SelectItem value="Administrative Expenses">Administrative Expenses</SelectItem>
+                                  <SelectItem value="Cost of Goods Sold">Cost of Goods Sold</SelectItem>
+                                </>
+                              )}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
                           <Label htmlFor="opening_balance">Opening Balance</Label>
