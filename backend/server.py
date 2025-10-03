@@ -13,7 +13,7 @@ from datetime import datetime, timezone, timedelta
 from enum import Enum
 from auth import (
     get_current_active_user, get_admin_user, create_access_token, 
-    authenticate_user, get_password_hash, set_database, create_default_admin,
+    authenticate_user, hash_password, set_database, create_default_admin,
     User, UserCreate, UserLogin, Token, UserInDB, prepare_user_for_mongo, parse_user_from_mongo
 )
 
