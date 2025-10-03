@@ -45,9 +45,10 @@ const Signup = ({ onBackToLogin }) => {
     }
 
     try {
-      // Simple hardcoded URL for now
-      const BACKEND_URL = 'http://localhost:8001';
-      console.log('Using backend URL:', BACKEND_URL);
+      // Use the same domain as frontend
+      const BACKEND_URL = window.location.origin.replace(':3000', '');
+      console.log('Frontend origin:', window.location.origin);
+      console.log('Backend URL:', BACKEND_URL);
       
       const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
         method: 'POST',
