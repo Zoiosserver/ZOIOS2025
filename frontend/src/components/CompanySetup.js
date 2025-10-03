@@ -861,15 +861,33 @@ const CompanySetup = () => {
           ))}
         </div>
         {formData.additional_currencies.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1">
-            {formData.additional_currencies.map(code => {
-              const currency = currencies.find(c => c.code === code);
-              return (
-                <Badge key={code} variant="secondary" className="text-xs break-words max-w-full">
-                  <span className="truncate">{code} ({currency?.symbol})</span>
-                </Badge>
-              );
-            })}
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="text-sm font-medium text-blue-800 mb-2">
+              Selected Additional Currencies ({formData.additional_currencies.length})
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {formData.additional_currencies.map(code => {
+                const currency = currencies.find(c => c.code === code);
+                return (
+                  <div key={code} className="flex items-center gap-1 bg-white px-2 py-1 rounded border">
+                    <span className="text-sm font-medium">{currency?.symbol} {code}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCurrencyToggle(code)}
+                      className="text-red-500 hover:text-red-700 ml-1"
+                      title="Remove currency"
+                    >
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="text-xs text-blue-600 mt-2">
+              💡 You can manage exchange rates for these currencies in the Currency Management section after setup.
+            </div>
           </div>
         )}
       </div>
