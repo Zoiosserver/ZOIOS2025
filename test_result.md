@@ -268,6 +268,9 @@ test_plan:
         - working: true
           agent: "testing"
           comment: "✅ CURRENCY DISPLAY WORKING CORRECTLY: Comprehensive testing shows INR (Indian Rupee) displays properly throughout the company setup wizard. VERIFIED: 1) Country dropdown shows 'India (INR)' correctly without truncation 2) Accounting system info displays 'Indian GAAP / Ind AS' and 'Base Currency: INR' properly 3) When India is selected, system automatically sets INR as base currency 4) All currency information renders without text truncation or overflow issues 5) Step 1 to Step 2 navigation works correctly 6) Currency sections display full information. The reported issue could not be reproduced - INR currency displays correctly in all tested scenarios. This may have been a browser-specific, resolution-specific, or already-resolved issue."
+        - working: false
+          agent: "user"
+          comment: "User confirms issue still exists: 'indian rupee still shows half not fully'. Testing agent findings don't match user's actual experience - there is still a display truncation issue with INR currency that needs to be addressed."
 
 agent_communication:
     - agent: "main"
