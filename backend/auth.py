@@ -171,3 +171,44 @@ async def create_default_admin():
         prepared_admin = prepare_user_for_mongo(admin_user)
         await db.users.insert_one(prepared_admin)
         print("✅ Default admin user created: admin@zoios.com / admin123")
+
+# Password reset token utilities
+def generate_reset_token():
+    """Generate a secure random token for password reset"""
+    return secrets.token_urlsafe(32)
+
+async def create_password_reset_token(user_id: str):
+    """Create and store a password reset token"""
+    token = generate_reset_token()
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=24)  # 24 hours expiry
+    
+    reset_token = PasswordResetToken(
+        user_id=user_id,
+        token=token,
+        expires_at=expires_at
+    )
+    
+    prepared_token = prepare_user_for_mongo(reset_token.dict())
+    await db.password_reset_tokens.insert_one(prepared_token)
+    
+    return token
+
+async def verify_reset_token(token: str):
+    """Verify and return the reset token if valid"""
+    reset_token = await db.password_reset_tokens.find_one({
+        "token": token,
+        "used": False,
+        "expires_at": {"$gt": datetime.now(timezone.utc).isoformat()}
+    })
+    
+    if not reset_token:
+        return None
+    
+    return parse_user_from_mongo(reset_token)
+
+async def use_reset_token(token: str):
+    """Mark a reset token as used"""
+    await db.password_reset_tokens.update_one(
+        {"token": token},
+        {"$set": {"used": True}}
+    )
