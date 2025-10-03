@@ -337,7 +337,8 @@ const CompanySetup = () => {
         accounting_system: companyToEdit.accounting_system || '',
         business_type: companyToEdit.business_type,
         industry: companyToEdit.industry,
-        ownership_percentage: companyToEdit.ownership_percentage
+        ownership_percentage: companyToEdit.ownership_percentage,
+        fiscal_year_start: companyToEdit.fiscal_year_start || ''
       });
       
       // If there's a country code, fetch the accounting system
