@@ -1210,61 +1210,83 @@ async def get_user_company_assignments(current_user: UserInDB = Depends(get_curr
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
     
-    # Get tenant database for user
-    tenant_service = await get_tenant_service(mongo_url)
-    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
-    
-    if tenant_db is None:
-        db_to_use = db
-    else:
-        db_to_use = tenant_db
-    
-    # Get all users in this tenant
-    users_cursor = db_to_use.users.find({})
-    users = await users_cursor.to_list(length=None)
-    users = [parse_from_mongo(user) for user in users]
-    
-    # Get company setup
-    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
-    if not company_setup:
-        raise HTTPException(status_code=404, detail="Company setup not found")
-    
-    # Get sister companies
-    sister_companies = await db_to_use.sister_companies.find({
-        "group_company_id": company_setup["id"],
-        "is_active": True
-    }).to_list(length=None)
-    
-    companies = [parse_from_mongo(company_setup)] + [parse_from_mongo(sc) for sc in sister_companies]
-    
-    user_assignments = []
-    for user in users:
-        user_data = {
-            "id": str(user.get("id", "")),
-            "email": str(user.get("email", "")),
-            "full_name": str(user.get("name", user.get("full_name", "Unknown User"))),
-            "role": str(user.get("role", "user")),
-            "is_active": bool(user.get("is_active", True)),
-            "company_assignments": []
+    try:
+        # Get tenant database for user
+        tenant_service = await get_tenant_service(mongo_url)
+        tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+        
+        if tenant_db is None:
+            db_to_use = db
+        else:
+            db_to_use = tenant_db
+        
+        # Get all users in this tenant
+        users_raw = await db_to_use.users.find({}).to_list(length=None)
+        
+        # Get company setup
+        company_setup_raw = await db_to_use.company_setups.find_one({"user_id": current_user.id})
+        if not company_setup_raw:
+            raise HTTPException(status_code=404, detail="Company setup not found")
+        
+        # Parse company setup
+        company_setup = {
+            "id": str(company_setup_raw.get("id", "")),
+            "company_name": str(company_setup_raw.get("company_name", "Unknown")),
+            "business_type": str(company_setup_raw.get("business_type", "")),
+            "country_code": str(company_setup_raw.get("country_code", "")),
+            "base_currency": str(company_setup_raw.get("base_currency", ""))
         }
         
-        # Check which companies this user has access to
-        for company in companies:
-            # For now, all users in tenant have access to all companies
-            # This can be enhanced with specific role-based access
-            user_data["company_assignments"].append({
-                "company_id": str(company.get("id", "")),
-                "company_name": str(company.get("company_name", "Unknown")),
-                "role": str("viewer" if user.get("role") != "admin" else "admin"),
-                "can_edit": bool(user.get("role") == "admin")
+        # Get sister companies
+        sister_companies_raw = await db_to_use.sister_companies.find({
+            "group_company_id": company_setup["id"],
+            "is_active": True
+        }).to_list(length=None)
+        
+        # Parse sister companies
+        sister_companies = []
+        for sc in sister_companies_raw:
+            sister_companies.append({
+                "id": str(sc.get("id", "")),
+                "company_name": str(sc.get("company_name", "Unknown")),
+                "business_type": str(sc.get("business_type", "")),
+                "country_code": str(sc.get("country_code", "")),
+                "base_currency": str(sc.get("base_currency", ""))
             })
         
-        user_assignments.append(user_data)
+        companies = [company_setup] + sister_companies
+        
+        # Parse users
+        user_assignments = []
+        for user_raw in users_raw:
+            user_data = {
+                "id": str(user_raw.get("id", "")),
+                "email": str(user_raw.get("email", "")),
+                "full_name": str(user_raw.get("name", user_raw.get("full_name", "Unknown User"))),
+                "role": str(user_raw.get("role", "user")),
+                "is_active": bool(user_raw.get("is_active", True)),
+                "company_assignments": []
+            }
+            
+            # Add company assignments
+            for company in companies:
+                user_data["company_assignments"].append({
+                    "company_id": company["id"],
+                    "company_name": company["company_name"],
+                    "role": "admin" if user_raw.get("role") == "admin" else "viewer",
+                    "can_edit": bool(user_raw.get("role") == "admin")
+                })
+            
+            user_assignments.append(user_data)
+        
+        return {
+            "users": user_assignments,
+            "companies": companies
+        }
     
-    return {
-        "users": user_assignments,
-        "companies": [parse_from_mongo(comp) for comp in companies]
-    }
+    except Exception as e:
+        print(f"Error in user assignments: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @api_router.post("/users/{user_id}/role")
 async def update_user_role(
