@@ -685,14 +685,23 @@ async def update_exchange_rates(current_user: UserInDB = Depends(get_current_act
         return {"success": True, "message": "No additional currencies configured"}
     
     currency_service = await get_currency_service(db_to_use)
-    result = await currency_service.update_company_rates(
-        company_id=company_setup["id"],
-        base_currency=base_currency,
-        target_currencies=additional_currencies,
-        source="online"
-    )
     
-    return result
+    try:
+        result = await currency_service.update_company_rates(
+            company_id=company_setup["id"],
+            base_currency=base_currency,
+            target_currencies=additional_currencies,
+            source="online"
+        )
+        return result
+    except Exception as e:
+        # Return a user-friendly error message
+        return {
+            "success": False,
+            "error": f"Failed to update exchange rates: {str(e)}",
+            "updated_rates": 0,
+            "failed_rates": additional_currencies
+        }
 
 @api_router.post("/currency/set-manual-rate")
 async def set_manual_exchange_rate(
