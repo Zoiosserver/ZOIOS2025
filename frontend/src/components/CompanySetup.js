@@ -330,10 +330,17 @@ const CompanySetup = () => {
         company_name: companyToEdit.company_name,
         country_code: companyToEdit.country_code,
         base_currency: companyToEdit.base_currency,
+        accounting_system: companyToEdit.accounting_system || '',
         business_type: companyToEdit.business_type,
         industry: companyToEdit.industry,
         ownership_percentage: companyToEdit.ownership_percentage
       });
+      
+      // If there's a country code, fetch the accounting system
+      if (companyToEdit.country_code) {
+        fetchSisterCompanyAccountingSystem(companyToEdit.country_code);
+      }
+      
       setEditingSisterCompanyId(companyId);
       setShowSisterCompanyForm(true);
     }
