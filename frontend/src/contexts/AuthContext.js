@@ -11,7 +11,7 @@ export const useAuth = () => {
   return context;
 };
 
-const BACKEND_URL = window.location.protocol + '//' + window.location.hostname + ':8001'; // Dynamic host
+const BACKEND_URL = window.location.origin.replace(':3000', '');
 const API = `${BACKEND_URL}/api`;
 console.log('AuthContext - BACKEND_URL:', BACKEND_URL, 'API:', API);
 
