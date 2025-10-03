@@ -15,21 +15,26 @@ import './App.css';
 function App() {
   return (
     <div className="App">
-      <Router>
-        <div className="flex min-h-screen bg-gray-50">
-          <Sidebar />
-          <main className="flex-1 ml-64 p-6">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/contacts" element={<Contacts />} />
-              <Route path="/companies" element={<Companies />} />
-              <Route path="/call-logs" element={<CallLogs />} />
-              <Route path="/email-responses" element={<EmailResponses />} />
-            </Routes>
-          </main>
-        </div>
-        <Toaster position="top-right" />
-      </Router>
+      <AuthProvider>
+        <Router>
+          <ProtectedRoute>
+            <div className="flex min-h-screen bg-gray-50">
+              <Sidebar />
+              <main className="flex-1 ml-64 p-6">
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/contacts" element={<Contacts />} />
+                  <Route path="/companies" element={<Companies />} />
+                  <Route path="/call-logs" element={<CallLogs />} />
+                  <Route path="/email-responses" element={<EmailResponses />} />
+                  <Route path="/users" element={<UserManagement />} />
+                </Routes>
+              </main>
+            </div>
+          </ProtectedRoute>
+          <Toaster position="top-right" />
+        </Router>
+      </AuthProvider>
     </div>
   );
 }
