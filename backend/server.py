@@ -529,6 +529,20 @@ async def setup_company(
     if accounts_to_create:
         await db.chart_of_accounts.insert_many(accounts_to_create)
     
+    # Set up initial currency exchange rates if additional currencies are configured
+    if company_data.additional_currencies:
+        try:
+            currency_service = await get_currency_service(db)
+            await currency_service.update_company_rates(
+                company_id=company_setup.id,
+                base_currency=company_data.base_currency,
+                target_currencies=company_data.additional_currencies,
+                source="online"
+            )
+        except Exception as e:
+            # Log error but don't fail the setup process
+            logger.warning(f"Failed to fetch initial currency rates: {e}")
+    
     # Update user onboarding status
     await db.users.update_one(
         {"id": current_user.id},
