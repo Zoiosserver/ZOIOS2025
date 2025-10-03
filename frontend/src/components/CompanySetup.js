@@ -463,7 +463,7 @@ const CompanySetup = () => {
         <div className="md:col-span-2">
           <Label htmlFor="industry">Industry *</Label>
           <Select value={formData.industry} onValueChange={(value) => setFormData(prev => ({...prev, industry: value}))}>
-            <SelectTrigger>
+            <SelectTrigger tabIndex={4}>
               <SelectValue placeholder="Select your industry" />
             </SelectTrigger>
             <SelectContent>
