@@ -56,11 +56,10 @@ const Signup = ({ onBackToLogin }) => {
       const { access_token, user: userData } = response.data;
       localStorage.setItem('token', access_token);
       
-      // Redirect to login page and let user login manually to avoid state issues
-      toast.success('Account created successfully! Please log in with your credentials.');
-      if (onBackToLogin) {
-        onBackToLogin();
-      }
+      toast.success('Account created successfully! Redirecting to setup...');
+      
+      // Force page reload to trigger authentication check
+      window.location.href = '/';
     } catch (error) {
       console.error('Signup error:', error);
       console.error('Error details:', error.response?.data);
