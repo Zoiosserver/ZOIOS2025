@@ -1235,7 +1235,7 @@ async def get_user_company_assignments(current_user: UserInDB = Depends(get_curr
         "is_active": True
     }).to_list(length=None)
     
-    companies = [company_setup] + sister_companies
+    companies = [parse_from_mongo(company_setup)] + [parse_from_mongo(sc) for sc in sister_companies]
     
     user_assignments = []
     for user in users:
