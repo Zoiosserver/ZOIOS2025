@@ -891,9 +891,6 @@ async def get_consolidated_accounts(current_user: UserInDB = Depends(get_current
         "is_active": True
     }).to_list(length=None)
     
-    if not sister_companies:
-        return []
-    
     # Get parent company chart of accounts
     parent_accounts = await db_to_use.chart_of_accounts.find({
         "company_id": company_setup["id"],
