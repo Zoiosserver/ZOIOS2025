@@ -192,11 +192,116 @@ def parse_from_mongo(item):
                     pass  # Keep original value if parsing fails
     return item
 
-# Routes
+# Helper function to get data filter based on user role
+def get_user_filter(current_user: UserInDB):
+    """Returns MongoDB filter based on user role"""
+    if current_user.role == "admin":
+        return {}  # Admin sees all data
+    else:
+        return {"user_id": current_user.id}  # Regular user sees only their data
+
+# Authentication Routes
+@api_router.post("/auth/register", response_model=Token)
+async def register(user_data: UserCreate, current_user: UserInDB = Depends(get_admin_user)):
+    """Admin-only endpoint to create new users"""
+    # Check if user already exists
+    existing_user = await db.users.find_one({"email": user_data.email})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Create new user
+    hashed_password = get_password_hash(user_data.password)
+    user = {
+        "id": str(uuid.uuid4()),
+        "email": user_data.email,
+        "hashed_password": hashed_password,
+        "name": user_data.name,
+        "company": user_data.company,
+        "role": user_data.role,
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    prepared_user = prepare_user_for_mongo(user)
+    await db.users.insert_one(prepared_user)
+    
+    # Create access token
+    access_token_expires = timedelta(minutes=30)
+    access_token = create_access_token(
+        data={"sub": user["email"]}, expires_delta=access_token_expires
+    )
+    
+    user_response = User(
+        id=user["id"],
+        email=user["email"],
+        name=user["name"],
+        company=user["company"],
+        role=user["role"],
+        is_active=user["is_active"],
+        created_at=user["created_at"]
+    )
+    
+    return Token(access_token=access_token, token_type="bearer", user=user_response)
+
+@api_router.post("/auth/login", response_model=Token)
+async def login(user_credentials: UserLogin):
+    """User login endpoint"""
+    user = await authenticate_user(user_credentials.email, user_credentials.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token_expires = timedelta(minutes=30)
+    access_token = create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
+    
+    user_response = User(
+        id=user.id,
+        email=user.email,
+        name=user.name,
+        company=user.company,
+        role=user.role,
+        is_active=user.is_active,
+        created_at=user.created_at
+    )
+    
+    return Token(access_token=access_token, token_type="bearer", user=user_response)
+
+@api_router.get("/auth/me", response_model=User)
+async def get_current_user_info(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get current user information"""
+    return User(
+        id=current_user.id,
+        email=current_user.email,
+        name=current_user.name,
+        company=current_user.company,
+        role=current_user.role,
+        is_active=current_user.is_active,
+        created_at=current_user.created_at
+    )
+
+# Admin Routes
+@api_router.get("/admin/users", response_model=List[User])
+async def get_all_users(current_user: UserInDB = Depends(get_admin_user)):
+    """Admin-only endpoint to get all users"""
+    users = await db.users.find().to_list(length=None)
+    return [User(**parse_user_from_mongo(user)) for user in users]
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(user_id: str, current_user: UserInDB = Depends(get_admin_user)):
+    """Admin-only endpoint to delete a user"""
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User deleted successfully"}
 
 # Dashboard and Analytics
 @api_router.get("/dashboard/stats")
-async def get_dashboard_stats():
+async def get_dashboard_stats(current_user: UserInDB = Depends(get_current_active_user)):
     """Get key statistics for the dashboard"""
     # Count totals
     total_contacts = await db.contacts.count_documents({})
