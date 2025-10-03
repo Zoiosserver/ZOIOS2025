@@ -992,13 +992,10 @@ const CompanySetup = () => {
     <>
       <style>
         {`
-          .no-truncate, .no-truncate * {
-            overflow: visible !important;
+          .currency-no-truncate {
             text-overflow: unset !important;
             white-space: nowrap !important;
-            word-wrap: normal !important;
-            max-width: none !important;
-            width: auto !important;
+            overflow: visible !important;
           }
           [data-radix-select-content] {
             min-width: 600px !important;
@@ -1008,15 +1005,10 @@ const CompanySetup = () => {
             overflow: visible !important;
             white-space: nowrap !important;
           }
-          .alert-no-truncate {
-            max-width: none !important;
-            width: 100% !important;
-          }
-          .alert-no-truncate * {
-            overflow: visible !important;
-            text-overflow: unset !important;
-            white-space: nowrap !important;
-            max-width: none !important;
+          .alert-wrap {
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
           }
         `}
       </style>
