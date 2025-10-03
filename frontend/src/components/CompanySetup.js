@@ -860,11 +860,13 @@ const CompanySetup = () => {
       </div>
 
       {accountingSystem && (
-        <Alert>
+        <Alert className="w-full no-truncate">
           <Settings className="h-4 w-4" />
-          <AlertDescription>
-            Your chart of accounts will be automatically created based on <strong>{accountingSystem.name}</strong> standards.
-            This includes standard asset, liability, equity, revenue, and expense accounts for your country.
+          <AlertDescription className="w-full no-truncate">
+            <div className="no-truncate">
+              Your chart of accounts will be automatically created based on <strong className="no-truncate">{accountingSystem.name}</strong> standards.
+              This includes standard asset, liability, equity, revenue, and expense accounts for your country.
+            </div>
           </AlertDescription>
         </Alert>
       )}
