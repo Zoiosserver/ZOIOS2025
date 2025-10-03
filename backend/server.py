@@ -914,6 +914,134 @@ async def get_consolidated_accounts(current_user: UserInDB = Depends(get_current
     
     return consolidated_accounts
 
+@api_router.get("/company/{company_id}/chart-of-accounts")
+async def get_company_chart_of_accounts(
+    company_id: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Get chart of accounts for a specific company"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        # Fallback to main database
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Verify user has access to this company
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    # Check if this is the main company or a sister company
+    if company_id == company_setup["id"]:
+        # Main company
+        company_name = company_setup["company_name"]
+        company_info = {
+            "id": company_setup["id"],
+            "name": company_setup["company_name"],
+            "business_type": company_setup["business_type"],
+            "country_code": company_setup["country_code"],
+            "base_currency": company_setup["base_currency"],
+            "is_main_company": True
+        }
+    else:
+        # Check if it's a sister company
+        sister_company = await db_to_use.sister_companies.find_one({
+            "id": company_id,
+            "group_company_id": company_setup["id"],
+            "is_active": True
+        })
+        
+        if not sister_company:
+            raise HTTPException(status_code=403, detail="Access denied to this company")
+        
+        company_info = {
+            "id": sister_company["id"],
+            "name": sister_company["company_name"],
+            "business_type": sister_company["business_type"],
+            "country_code": sister_company["country_code"],
+            "base_currency": sister_company["base_currency"],
+            "is_main_company": False,
+            "ownership_percentage": sister_company.get("ownership_percentage", 100.0)
+        }
+    
+    # Get chart of accounts for this company
+    chart_accounts = await db_to_use.chart_of_accounts.find({
+        "company_id": company_id,
+        "is_active": True
+    }).to_list(length=None)
+    
+    # Group accounts by category
+    accounts_by_category = {}
+    for account in chart_accounts:
+        category = account.get("category", "Other")
+        if category not in accounts_by_category:
+            accounts_by_category[category] = []
+        accounts_by_category[category].append({
+            "id": account["id"],
+            "code": account["code"],
+            "name": account["name"],
+            "account_type": account["account_type"],
+            "category": account["category"],
+            "balance": 0.0  # This would come from actual transactions
+        })
+    
+    return {
+        "company": company_info,
+        "accounts_by_category": accounts_by_category,
+        "total_accounts": len(chart_accounts)
+    }
+
+@api_router.get("/company/list")
+async def get_accessible_companies(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get list of companies user can access"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        # Fallback to main database
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Get main company
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    companies = [{
+        "id": company_setup["id"],
+        "name": company_setup["company_name"],
+        "business_type": company_setup["business_type"],
+        "country_code": company_setup["country_code"],
+        "base_currency": company_setup["base_currency"],
+        "is_main_company": True
+    }]
+    
+    # Get sister companies if this is a group company
+    if company_setup.get("business_type") == "Group Company":
+        sister_companies = await db_to_use.sister_companies.find({
+            "group_company_id": company_setup["id"],
+            "is_active": True
+        }).to_list(length=None)
+        
+        for sister_company in sister_companies:
+            companies.append({
+                "id": sister_company["id"],
+                "name": sister_company["company_name"],
+                "business_type": sister_company["business_type"],
+                "country_code": sister_company["country_code"],
+                "base_currency": sister_company["base_currency"],
+                "is_main_company": False,
+                "ownership_percentage": sister_company.get("ownership_percentage", 100.0)
+            })
+    
+    return companies
+
 # Dashboard and Analytics
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(current_user: UserInDB = Depends(get_current_active_user)):
