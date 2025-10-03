@@ -1076,6 +1076,7 @@ const CompanySetup = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
