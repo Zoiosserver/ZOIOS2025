@@ -325,7 +325,15 @@ const CompanyAccounts = () => {
                     <div className="text-sm text-gray-600">Categories</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900">{selectedCompany.base_currency}</div>
+                    <div className="text-2xl font-bold text-gray-900">
+                      {selectedCompany.base_currency === 'INR' && '₹'}
+                      {selectedCompany.base_currency === 'USD' && '$'}
+                      {selectedCompany.base_currency === 'EUR' && '€'}
+                      {selectedCompany.base_currency === 'GBP' && '£'}
+                      {selectedCompany.base_currency === 'JPY' && '¥'}
+                      {!['INR', 'USD', 'EUR', 'GBP', 'JPY'].includes(selectedCompany.base_currency) && selectedCompany.base_currency}
+                      {['INR', 'USD', 'EUR', 'GBP', 'JPY'].includes(selectedCompany.base_currency) && ` ${selectedCompany.base_currency}`}
+                    </div>
                     <div className="text-sm text-gray-600">Base Currency</div>
                   </div>
                 </div>
