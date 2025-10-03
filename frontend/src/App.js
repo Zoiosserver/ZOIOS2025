@@ -12,6 +12,7 @@ import UserManagement from './components/UserManagement';
 import CurrencyManagement from './components/CurrencyManagement';
 import ConsolidatedAccounts from './components/ConsolidatedAccounts';
 import CompanyAccounts from './components/CompanyAccounts';
+import UserAssignments from './components/UserAssignments';
 import ResetPassword from './components/ResetPassword';
 import Sidebar from './components/Sidebar';
 import './App.css';
