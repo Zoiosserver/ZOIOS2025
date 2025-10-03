@@ -26,8 +26,9 @@ const Login = () => {
     setError('');
 
     try {
-      // Use same host as frontend but port 8001  
-      const BACKEND_URL = window.location.origin.replace(':3000', ':8001').replace('https://', 'https://').replace('http://', 'https://');
+      // Use the same domain as frontend
+      const BACKEND_URL = window.location.origin.replace(':3000', '');
+      console.log('Login - Backend URL:', BACKEND_URL);
       console.log('Login - Using backend URL:', BACKEND_URL);
       
       const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
