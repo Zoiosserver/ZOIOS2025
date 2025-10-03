@@ -4,18 +4,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { BarChart3, Mail, AlertCircle, ArrowLeft, CheckCircle } from 'lucide-react';
+import { BarChart3, ArrowLeft, Mail, CheckCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = window.location.origin.replace(':3000', '');
 const API = `${BACKEND_URL}/api`;
 
 const ForgotPassword = ({ onBackToLogin }) => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,157 +23,130 @@ const ForgotPassword = ({ onBackToLogin }) => {
     setError('');
 
     try {
-      const response = await axios.post(`${API}/auth/forgot-password`, null, {
-        params: { email }
-      });
-
-      setSuccess(true);
-      toast.success('Password reset instructions sent!');
+      await axios.post(`${API}/auth/forgot-password`, { email });
+      setSent(true);
+      toast.success('Password reset link sent to your email!');
     } catch (error) {
-      console.error('Forgot password error:', error);
-      setError(error.response?.data?.detail || 'Failed to send reset instructions');
-      toast.error('Failed to send reset instructions');
+      const errorMessage = error.response?.data?.detail || 'Failed to send reset email';
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
     
     setLoading(false);
   };
 
-  if (success) {
+  if (sent) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          {/* Logo and Title */}
-          <div className="text-center mb-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center">
             <div className="flex justify-center mb-4">
               <img 
-                src="https://customer-assets.emergentagent.com/job_outreach-pulse-3/artifacts/5adajuhk_Zoios.png" 
+                src="https://cdn.prod.website-files.com/66ba43c0b9849f6f8cb92768/66ba5d35ec7fdb4a95626a94_Zoios.png" 
                 alt="ZOIOS Logo" 
-                className="object-contain"
-                style={{width: '150px', height: '150px'}}
+                className="w-[150px] h-[150px] object-contain"
               />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Check Your Email</h1>
-            <p className="text-gray-600">Password reset instructions have been sent</p>
-          </div>
-
-          {/* Success Message */}
-          <Card className="shadow-xl border-0">
-            <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Instructions Sent!</h3>
-              <p className="text-gray-600 mb-6">
-                If an account with that email exists, we've sent password reset instructions to:
-              </p>
-              <p className="font-medium text-gray-900 mb-6">{email}</p>
-              <p className="text-sm text-gray-500 mb-6">
-                Please check your email and follow the instructions to reset your password.
-              </p>
-              
-              <Button
-                onClick={onBackToLogin}
-                variant="outline"
-                className="w-full"
-                data-testid="back-to-login-from-success-btn"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Login
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Footer */}
-          <div className="text-center mt-8">
-            <p className="text-xs text-gray-500">
-              © 2025 ZOIOS. Advanced ERP Platform.
+            <h2 className="text-3xl font-extrabold text-gray-900">Check Your Email</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              We've sent a password reset link to {email}
             </p>
           </div>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-center">
+                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <p className="text-gray-600 mb-6">
+                  Please check your email and click the reset link to set a new password.
+                </p>
+                <Button 
+                  onClick={onBackToLogin}
+                  variant="outline" 
+                  className="w-full"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Login
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo and Title */}
-        <div className="text-center mb-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
           <div className="flex justify-center mb-4">
             <img 
-              src="https://customer-assets.emergentagent.com/job_outreach-pulse-3/artifacts/5adajuhk_Zoios.png" 
+              src="https://cdn.prod.website-files.com/66ba43c0b9849f6f8cb92768/66ba5d35ec7fdb4a95626a94_Zoios.png" 
               alt="ZOIOS Logo" 
-              className="object-contain"
-              style={{width: '150px', height: '150px'}}
+              className="w-[150px] h-[150px] object-contain"
             />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Forgot Password?</h1>
-          <p className="text-gray-600">Enter your email to receive reset instructions</p>
+          <h2 className="text-3xl font-extrabold text-gray-900">Forgot Password?</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Enter your email address and we'll send you a reset link
+          </p>
         </div>
 
-        {/* Forgot Password Form */}
-        <Card className="shadow-xl border-0">
-          <CardHeader className="space-y-1 pb-6">
-            <CardTitle className="text-2xl font-semibold text-center">Reset Password</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <Card>
+          <CardContent className="p-6">
+            {error && (
+              <Alert className="mb-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
             <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <Alert variant="destructive" className="mb-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-              
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="Enter your email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                    data-testid="forgot-password-email"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="email">Email address</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  className="mt-1"
+                />
               </div>
-              
+
               <Button 
                 type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5"
                 disabled={loading}
-                data-testid="forgot-password-submit-btn"
+                className="w-full bg-blue-600 hover:bg-blue-700"
               >
-                {loading ? 'Sending Instructions...' : 'Send Reset Instructions'}
+                {loading ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Sending...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <Mail className="w-4 h-4 mr-2" />
+                    Send Reset Link
+                  </div>
+                )}
               </Button>
 
-              <div className="text-center pt-4">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={onBackToLogin}
-                  className="text-sm text-gray-600 hover:text-gray-900"
-                  data-testid="back-to-login-btn"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Login
-                </Button>
-              </div>
+              <Button 
+                type="button"
+                onClick={onBackToLogin}
+                variant="outline" 
+                className="w-full"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Login
+              </Button>
             </form>
           </CardContent>
         </Card>
-
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-xs text-gray-500">
-            © 2025 ZOIOS. Advanced ERP Platform.
-          </p>
-        </div>
       </div>
     </div>
   );
