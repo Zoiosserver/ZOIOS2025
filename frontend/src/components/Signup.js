@@ -9,7 +9,7 @@ import { BarChart3, User, Mail, Lock, Building, AlertCircle, ArrowLeft } from 'l
 import { toast } from 'sonner';
 import axios from 'axios';
 
-const BACKEND_URL = 'http://localhost:8001'; // Hardcoded for debugging
+const BACKEND_URL = window.location.protocol + '//' + window.location.hostname + ':8001'; // Dynamic host
 const API = `${BACKEND_URL}/api`;
 console.log('Signup component - BACKEND_URL:', BACKEND_URL, 'API:', API);
 
