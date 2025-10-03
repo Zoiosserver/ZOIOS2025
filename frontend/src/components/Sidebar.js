@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 
 const Sidebar = () => {
   const location = useLocation();
+  const { user, logout, isAdmin } = useAuth();
   
   const menuItems = [
     { path: '/', label: 'Dashboard', icon: Home },
@@ -25,6 +26,11 @@ const Sidebar = () => {
     { path: '/call-logs', label: 'Call Logs', icon: Phone },
     { path: '/email-responses', label: 'Email Responses', icon: Mail },
   ];
+
+  // Add admin-only menu items
+  if (isAdmin()) {
+    menuItems.push({ path: '/users', label: 'User Management', icon: Shield });
+  }
   
   return (
     <div className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-sm z-10">
