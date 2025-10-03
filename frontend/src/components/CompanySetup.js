@@ -469,11 +469,17 @@ const CompanySetup = () => {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => setShowSisterCompanyForm(!showSisterCompanyForm)}
+              onClick={() => {
+                if (editingSisterCompanyId) {
+                  cancelEdit();
+                } else {
+                  setShowSisterCompanyForm(!showSisterCompanyForm);
+                }
+              }}
               className="flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              Add Sister Company
+              {editingSisterCompanyId ? 'Cancel Edit' : 'Add Sister Company'}
             </Button>
           </div>
 
