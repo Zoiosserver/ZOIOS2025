@@ -1121,6 +1121,7 @@ async def add_account_to_company(
         "category": account_data.get("category"),
         "opening_balance": account_data.get("opening_balance", 0.0),
         "current_balance": account_data.get("opening_balance", 0.0),
+        "balance": account_data.get("opening_balance", 0.0),  # Add balance field for compatibility
         "is_active": True,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "created_by": current_user.id
