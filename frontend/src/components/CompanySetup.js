@@ -766,8 +766,19 @@ const CompanySetup = () => {
       <div>
         <Label htmlFor="base_currency">Base Currency *</Label>
         <Select value={formData.base_currency} onValueChange={(value) => setFormData(prev => ({...prev, base_currency: value}))}>
-          <SelectTrigger tabIndex={1}>
-            <SelectValue placeholder="Select base currency" />
+          <SelectTrigger tabIndex={1} className="w-full">
+            <SelectValue placeholder="Select base currency">
+              {formData.base_currency ? (
+                <div className="flex items-center w-full">
+                  <span className="font-medium flex-shrink-0">{formData.base_currency}</span>
+                  <span className="ml-2 text-gray-600 truncate">
+                    {currencies.find(c => c.code === formData.base_currency)?.symbol} - {currencies.find(c => c.code === formData.base_currency)?.name}
+                  </span>
+                </div>
+              ) : (
+                "Select base currency"
+              )}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent className="min-w-[400px] w-auto max-h-[300px] overflow-y-auto">
             {currencies.map(currency => (
