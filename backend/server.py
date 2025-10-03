@@ -429,6 +429,7 @@ async def get_current_user_info(current_user: UserInDB = Depends(get_current_act
         company=current_user.company,
         role=current_user.role,
         is_active=current_user.is_active,
+        onboarding_completed=current_user.onboarding_completed,
         created_at=current_user.created_at
     )
 
