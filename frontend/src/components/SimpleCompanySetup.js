@@ -4,16 +4,6 @@ const SimpleCompanySetup = ({ user, onComplete }) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [countries, setCountries] = useState([]);
-  const [currencies, setCurrencies] = useState([]);
-  const [accountingSystems, setAccountingSystems] = useState([]);
-  const [addressData, setAddressData] = useState({
-    street_address: '',
-    city: '',
-    state: '',
-    postal_code: '',
-    country: ''
-  });
   
   const [formData, setFormData] = useState({
     company_name: user?.company || '',
