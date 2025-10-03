@@ -68,6 +68,7 @@ const CompanySetup = () => {
     'Limited Liability Company (LLC)',
     'Corporation',
     'S Corporation',
+    'Group Company',
     'Nonprofit Organization',
     'Other'
   ];
