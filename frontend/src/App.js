@@ -41,7 +41,7 @@ function App() {
                       <Route path="/currency" element={<CurrencyManagement />} />
                       <Route path="/consolidated-accounts" element={<ConsolidatedAccounts />} />
                       <Route path="/company-accounts" element={<CompanyAccounts />} />
-                      <Route path="/user-assignments" element={<UserManagement />} />
+                      <Route path="/user-assignments" element={<UserAssignments />} />
                     </Routes>
                   </main>
                 </div>
