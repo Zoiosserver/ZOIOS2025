@@ -44,6 +44,15 @@ const Login = () => {
     });
   };
 
+  // Show different views based on current state
+  if (currentView === 'signup') {
+    return <Signup onBackToLogin={() => setCurrentView('login')} />;
+  }
+
+  if (currentView === 'forgot-password') {
+    return <ForgotPassword onBackToLogin={() => setCurrentView('login')} />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
