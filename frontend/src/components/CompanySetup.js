@@ -893,6 +893,7 @@ const CompanySetup = () => {
           <Label htmlFor="registration_number">Registration Number</Label>
           <Input
             id="registration_number"
+            tabIndex={9}
             value={formData.registration_number}
             onChange={(e) => setFormData(prev => ({...prev, registration_number: e.target.value}))}
             placeholder="Enter business registration number"
