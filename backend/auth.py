@@ -142,7 +142,7 @@ async def create_default_admin():
         admin_user = {
             "id": str(uuid.uuid4()),
             "email": "admin@zoios.com",
-            "hashed_password": get_password_hash("admin123"),
+            "hashed_password": hash_password("admin123"),
             "name": "Admin User",
             "company": "ZOIOS",
             "role": "admin",
