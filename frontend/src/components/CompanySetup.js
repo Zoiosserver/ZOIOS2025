@@ -256,7 +256,8 @@ const CompanySetup = () => {
               accounting_system: company.accounting_system,
               business_type: company.business_type,
               industry: company.industry,
-              ownership_percentage: company.ownership_percentage
+              ownership_percentage: company.ownership_percentage,
+              fiscal_year_start: company.fiscal_year_start
             })
           );
           
