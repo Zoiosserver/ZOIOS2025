@@ -111,7 +111,7 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "main"
@@ -119,6 +119,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ BACKEND WORKING PERFECTLY: All tests pass - user registration, login, JWT tokens, company setup API, and onboarding_completed status update all work correctly. Issue is NOT in backend."
+        - working: true
+          agent: "testing"
+          comment: "✅ COMPREHENSIVE TESTING COMPLETE: Company setup API with address collection functionality working perfectly. All address fields (address, city, state, postal_code, phone, email, website, tax_number, registration_number) properly saved and retrieved. Multi-tenant database creation working correctly. Fixed critical bug in /auth/me endpoint and updated endpoints to use proper tenant databases. 100% test success rate."
 
   - task: "Authentication Context Update"
     implemented: true
