@@ -1253,10 +1253,10 @@ async def get_user_company_assignments(current_user: UserInDB = Depends(get_curr
             # For now, all users in tenant have access to all companies
             # This can be enhanced with specific role-based access
             user_data["company_assignments"].append({
-                "company_id": company["id"],
-                "company_name": company.get("company_name", "Unknown"),
-                "role": "viewer" if user.get("role") != "admin" else "admin",
-                "can_edit": user.get("role") == "admin"
+                "company_id": str(company.get("id", "")),
+                "company_name": str(company.get("company_name", "Unknown")),
+                "role": str("viewer" if user.get("role") != "admin" else "admin"),
+                "can_edit": bool(user.get("role") == "admin")
             })
         
         user_assignments.append(user_data)
