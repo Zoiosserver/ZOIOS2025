@@ -997,6 +997,8 @@ const CompanySetup = () => {
             text-overflow: unset !important;
             white-space: nowrap !important;
             word-wrap: normal !important;
+            max-width: none !important;
+            width: auto !important;
           }
           [data-radix-select-content] {
             min-width: 600px !important;
@@ -1005,6 +1007,16 @@ const CompanySetup = () => {
           [data-radix-select-item] {
             overflow: visible !important;
             white-space: nowrap !important;
+          }
+          .alert-no-truncate {
+            max-width: none !important;
+            width: 100% !important;
+          }
+          .alert-no-truncate * {
+            overflow: visible !important;
+            text-overflow: unset !important;
+            white-space: nowrap !important;
+            max-width: none !important;
           }
         `}
       </style>
