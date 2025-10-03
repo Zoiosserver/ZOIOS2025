@@ -1289,6 +1289,41 @@ async def update_user_role(
     
     return {"success": True, "message": "User role updated successfully"}
 
+@api_router.delete("/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Delete a user (admin only)"""
+    # Only admin users can delete users
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
+    
+    # Prevent deleting super admin (admin@zoios.com)
+    if user_id == "8f32f2f1-6320-4cf5-ba57-f2dea535a372":  # admin@zoios.com ID
+        raise HTTPException(status_code=403, detail="Cannot delete super admin user")
+    
+    # Prevent users from deleting themselves
+    if user_id == current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot delete your own account")
+    
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Delete the user
+    result = await db_to_use.users.delete_one({"id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"success": True, "message": "User deleted successfully"}
+
 # Dashboard and Analytics
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(current_user: UserInDB = Depends(get_current_active_user)):
