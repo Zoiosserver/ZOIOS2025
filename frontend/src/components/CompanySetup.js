@@ -555,7 +555,7 @@ const CompanySetup = () => {
                       }));
                     }}
                   >
-                    <SelectTrigger className="w-full" tabIndex={2}>
+                    <SelectTrigger className="w-full" tabIndex={7}>
                       <div className="flex items-center justify-between w-full">
                         {sisterCompanyForm.country_code ? (
                           <>
