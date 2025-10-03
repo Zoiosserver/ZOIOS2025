@@ -63,8 +63,12 @@ const Signup = ({ onBackToLogin }) => {
       }
     } catch (error) {
       console.error('Signup error:', error);
-      setError(error.response?.data?.detail || 'Signup failed');
-      toast.error(error.response?.data?.detail || 'Signup failed');
+      console.error('Error details:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('Full error:', error.message);
+      const errorMessage = error.response?.data?.detail || error.message || 'Signup failed';
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
     
     setLoading(false);
