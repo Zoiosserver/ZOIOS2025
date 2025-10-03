@@ -1,59 +1,130 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Toaster } from '@/components/ui/sonner';
-import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import Dashboard from './components/Dashboard';
-import Contacts from './components/Contacts';
-import Companies from './components/Companies';
-import CallLogs from './components/CallLogs';
-import EmailResponses from './components/EmailResponses';
-import UserManagement from './components/UserManagement';
-import CurrencyManagement from './components/CurrencyManagement';
-import ConsolidatedAccounts from './components/ConsolidatedAccounts';
-import CompanyAccounts from './components/CompanyAccounts';
-import UserAssignments from './components/UserAssignments';
-import ResetPassword from './components/ResetPassword';
-import Sidebar from './components/Sidebar';
+import React, { useState, useEffect } from 'react';
+import SimpleLogin from './components/SimpleLogin';
+import SimpleSignup from './components/SimpleSignup';
+import SimpleCompanySetup from './components/SimpleCompanySetup';
+import SimpleDashboard from './components/SimpleDashboard';
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <AuthProvider>
-        <Router>
-          <Routes>
-            {/* Public route for password reset */}
-            <Route path="/reset-password" element={<ResetPassword />} />
-            
-            {/* Protected routes */}
-            <Route path="/*" element={
-              <ProtectedRoute>
-                <div className="flex min-h-screen bg-gray-50">
-                  <Sidebar />
-                  <main className="flex-1 ml-64 p-6">
-                    <Routes>
-                      <Route path="/" element={<Dashboard />} />
-                      <Route path="/contacts" element={<Contacts />} />
-                      <Route path="/companies" element={<Companies />} />
-                      <Route path="/call-logs" element={<CallLogs />} />
-                      <Route path="/email-responses" element={<EmailResponses />} />
-                      <Route path="/users" element={<UserManagement />} />
-                      <Route path="/currency" element={<CurrencyManagement />} />
-                      <Route path="/consolidated-accounts" element={<ConsolidatedAccounts />} />
-                      <Route path="/company-accounts" element={<CompanyAccounts />} />
-                      <Route path="/user-assignments" element={<UserAssignments />} />
-                    </Routes>
-                  </main>
-                </div>
-              </ProtectedRoute>
-            } />
-          </Routes>
-          <Toaster position="top-right" />
-        </Router>
-      </AuthProvider>
-    </div>
-  );
+  const [currentView, setCurrentView] = useState('login');
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const checkAuthStatus = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const backendUrl = window.location.origin;
+      const response = await fetch(`${backendUrl}/api/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+        
+        if (!userData.onboarding_completed) {
+          setCurrentView('company-setup');
+        } else {
+          setCurrentView('dashboard');
+        }
+      } else {
+        localStorage.removeItem('token');
+      }
+    } catch (err) {
+      localStorage.removeItem('token');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+    if (!userData.onboarding_completed) {
+      setCurrentView('company-setup');
+    } else {
+      setCurrentView('dashboard');
+    }
+  };
+
+  const handleSignup = (userData) => {
+    setUser(userData);
+    setCurrentView('company-setup');
+  };
+
+  const handleCompanySetupComplete = () => {
+    setUser(prev => ({ ...prev, onboarding_completed: true }));
+    setCurrentView('dashboard');
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setCurrentView('login');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentView === 'login') {
+    return (
+      <div>
+        <SimpleLogin onLogin={handleLogin} />
+        <div className="fixed bottom-4 right-4">
+          <button
+            onClick={() => setCurrentView('signup')}
+            className="text-blue-600 hover:text-blue-800 underline"
+          >
+            Need an account? Sign up
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentView === 'signup') {
+    return (
+      <SimpleSignup 
+        onSignup={handleSignup}
+        onSwitchToLogin={() => setCurrentView('login')}
+      />
+    );
+  }
+
+  if (currentView === 'company-setup') {
+    return (
+      <SimpleCompanySetup 
+        user={user}
+        onComplete={handleCompanySetupComplete}
+      />
+    );
+  }
+
+  if (currentView === 'dashboard') {
+    return (
+      <SimpleDashboard 
+        user={user}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  return null;
 }
 
 export default App;
