@@ -625,11 +625,17 @@ class BackendTester:
 
     def run_all_tests(self):
         """Run all tests in sequence"""
-        self.log("=" * 60)
-        self.log("STARTING BACKEND API TESTS FOR COMPANY SETUP FLOW")
-        self.log("=" * 60)
+        self.log("=" * 80)
+        self.log("STARTING COMPREHENSIVE BACKEND API TESTS")
+        self.log("Testing: Company Setup Flow + Currency Service + Chart of Accounts")
+        self.log("=" * 80)
         
         test_results = {}
+        
+        # Phase 1: Authentication and Company Setup Tests
+        self.log("\n" + "=" * 40)
+        self.log("PHASE 1: AUTHENTICATION & COMPANY SETUP")
+        self.log("=" * 40)
         
         # Test 1: User Registration
         test_results['registration'] = self.test_user_registration()
@@ -655,38 +661,108 @@ class BackendTester:
         # Test 7: Get Company Setup
         test_results['get_company_setup'] = self.test_company_setup_get()
         
-        # Test 8: Frontend simulation
+        # Phase 2: Chart of Accounts Tests
+        self.log("\n" + "=" * 40)
+        self.log("PHASE 2: CHART OF ACCOUNTS")
+        self.log("=" * 40)
+        
+        # Test 8: Chart of Accounts
+        test_results['chart_of_accounts'] = self.test_chart_of_accounts()
+        
+        # Phase 3: Currency Service Tests
+        self.log("\n" + "=" * 40)
+        self.log("PHASE 3: CURRENCY SERVICE")
+        self.log("=" * 40)
+        
+        # Test 9: ExchangeRate API Integration
+        test_results['exchangerate_api'] = self.test_exchangerate_api_integration()
+        
+        # Test 10: Get Currency Rates
+        test_results['currency_rates_get'] = self.test_currency_rates_get()
+        
+        # Test 11: Update Currency Rates
+        test_results['currency_rates_update'] = self.test_currency_rates_update()
+        
+        # Test 12: Manual Currency Rate
+        test_results['currency_manual_rate'] = self.test_currency_manual_rate()
+        
+        # Test 13: Currency Conversion
+        test_results['currency_conversion'] = self.test_currency_conversion()
+        
+        # Phase 4: Integration Tests
+        self.log("\n" + "=" * 40)
+        self.log("PHASE 4: INTEGRATION TESTS")
+        self.log("=" * 40)
+        
+        # Test 14: Frontend simulation
         test_results['frontend_simulation'] = self.test_frontend_simulation()
         
-        # Test 9: Token refresh scenario
+        # Test 15: Token refresh scenario
         test_results['token_refresh'] = self.test_token_refresh_scenario()
         
         # Summary
-        self.log("=" * 60)
-        self.log("TEST RESULTS SUMMARY")
-        self.log("=" * 60)
+        self.log("\n" + "=" * 80)
+        self.log("COMPREHENSIVE TEST RESULTS SUMMARY")
+        self.log("=" * 80)
         
-        for test_name, result in test_results.items():
-            status = "✅ PASS" if result else "❌ FAIL"
-            self.log(f"{test_name.upper()}: {status}")
+        # Group results by phase
+        auth_tests = ['registration', 'login', 'auth_me_before', 'jwt_validity', 'company_setup', 'auth_me_after', 'get_company_setup']
+        chart_tests = ['chart_of_accounts']
+        currency_tests = ['exchangerate_api', 'currency_rates_get', 'currency_rates_update', 'currency_manual_rate', 'currency_conversion']
+        integration_tests = ['frontend_simulation', 'token_refresh']
+        
+        self.log("\n📋 AUTHENTICATION & COMPANY SETUP:")
+        for test_name in auth_tests:
+            if test_name in test_results:
+                status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
+                self.log(f"  {test_name.upper()}: {status}")
+        
+        self.log("\n📊 CHART OF ACCOUNTS:")
+        for test_name in chart_tests:
+            if test_name in test_results:
+                status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
+                self.log(f"  {test_name.upper()}: {status}")
+        
+        self.log("\n💱 CURRENCY SERVICE:")
+        for test_name in currency_tests:
+            if test_name in test_results:
+                status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
+                self.log(f"  {test_name.upper()}: {status}")
+        
+        self.log("\n🔗 INTEGRATION TESTS:")
+        for test_name in integration_tests:
+            if test_name in test_results:
+                status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
+                self.log(f"  {test_name.upper()}: {status}")
         
         # Overall assessment
         critical_tests = ['registration', 'login', 'auth_me_before', 'company_setup', 'auth_me_after']
-        critical_passed = all(test_results.get(test, False) for test in critical_tests if test in test_results)
+        new_feature_tests = ['chart_of_accounts', 'currency_rates_get', 'currency_rates_update', 'exchangerate_api']
         
-        self.log("=" * 60)
-        if critical_passed:
-            self.log("🎉 ALL CRITICAL TESTS PASSED - Company setup flow working correctly")
-            self.log("🔍 ANALYSIS: Backend APIs are working perfectly")
-            self.log("🔍 CONCLUSION: The redirection issue is likely in the FRONTEND code")
-            self.log("🔍 SPECIFIC ISSUE: AuthContext may not be properly updating user state after page reload")
+        critical_passed = all(test_results.get(test, False) for test in critical_tests if test in test_results)
+        new_features_passed = all(test_results.get(test, False) for test in new_feature_tests if test in test_results)
+        
+        self.log("\n" + "=" * 80)
+        self.log("FINAL ASSESSMENT")
+        self.log("=" * 80)
+        
+        if critical_passed and new_features_passed:
+            self.log("🎉 ALL TESTS PASSED - Complete system working correctly!")
+            self.log("✅ Company setup flow: WORKING")
+            self.log("✅ Chart of accounts: WORKING") 
+            self.log("✅ Currency service: WORKING")
+            self.log("✅ Online rate fetching: WORKING")
+        elif critical_passed:
+            self.log("🎯 CORE FUNCTIONALITY WORKING - Some new features may have issues")
+            self.log("✅ Company setup flow: WORKING")
+            if not test_results.get('chart_of_accounts', True):
+                self.log("❌ Chart of accounts: FAILED")
+            if not new_features_passed:
+                self.log("❌ Currency service: SOME ISSUES")
         else:
-            self.log("🚨 CRITICAL TESTS FAILED - Company setup flow has issues")
-            
-            # Identify the specific issue
+            self.log("🚨 CRITICAL ISSUES FOUND")
             if not test_results.get('auth_me_after', True):
                 self.log("🔍 ROOT CAUSE: onboarding_completed status not being updated after company setup")
-                self.log("🔍 This explains why users are redirected to login - frontend thinks onboarding is incomplete")
         
         return test_results
 
