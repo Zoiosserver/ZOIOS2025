@@ -27,6 +27,9 @@ const Sidebar = () => {
   const [crmMenuOpen, setCrmMenuOpen] = React.useState(
     ['/contacts', '/companies', '/call-logs', '/email-responses'].includes(location.pathname)
   );
+  const [companyMenuOpen, setCompanyMenuOpen] = React.useState(
+    ['/currency', '/consolidated-accounts', '/company-accounts', '/users', '/user-assignments'].includes(location.pathname)
+  );
   
   React.useEffect(() => {
     const fetchCompanySetup = async () => {
