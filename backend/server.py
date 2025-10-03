@@ -675,10 +675,16 @@ async def add_sister_company(
     # Get company setup to verify it's a group company
     company_setup = await db.company_setups.find_one({"user_id": current_user.id})
     if not company_setup:
-        raise HTTPException(status_code=404, detail="Company setup not found")
+        raise HTTPException(
+            status_code=404, 
+            detail="Please complete your main company setup before adding sister companies"
+        )
     
     if company_setup.get("business_type") != "Group Company":
-        raise HTTPException(status_code=400, detail="Only group companies can add sister companies")
+        raise HTTPException(
+            status_code=400, 
+            detail="Only group companies can add sister companies. Your business type is: " + company_setup.get("business_type", "Unknown")
+        )
     
     # Create sister company
     sister_company_data = SisterCompany(
