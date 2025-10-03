@@ -1186,6 +1186,10 @@ async def update_account_opening_balance(
 @api_router.get("/users/company-assignments")
 async def get_user_company_assignments(current_user: UserInDB = Depends(get_current_active_user)):
     """Get user company assignments and roles"""
+    # Only admin users can access this endpoint
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
+    
     # Get tenant database for user
     tenant_service = await get_tenant_service(mongo_url)
     tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
@@ -1239,6 +1243,40 @@ async def get_user_company_assignments(current_user: UserInDB = Depends(get_curr
         "users": user_assignments,
         "companies": companies
     }
+
+@api_router.post("/users/{user_id}/role")
+async def update_user_role(
+    user_id: str,
+    role_data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Update user role"""
+    # Only admin users can update roles
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
+    
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    new_role = role_data.get("role")
+    if new_role not in ["admin", "user", "viewer"]:
+        raise HTTPException(status_code=400, detail="Invalid role")
+    
+    result = await db_to_use.users.update_one(
+        {"id": user_id},
+        {"$set": {"role": new_role, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"success": True, "message": "User role updated successfully"}
 
 # Dashboard and Analytics
 @api_router.get("/dashboard/stats")
