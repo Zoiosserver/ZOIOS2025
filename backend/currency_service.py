@@ -192,6 +192,40 @@ class CurrencyService:
                 "failed_rates": target_currencies
             }
     
+    async def _get_fallback_rates(self, base_currency: str, target_currencies: List[str]) -> Dict[str, float]:
+        """Get fallback exchange rates when online APIs fail"""
+        # Mock/fallback rates - in production, these could come from a backup source
+        fallback_rates = {
+            "INR": {
+                "USD": 0.012,
+                "EUR": 0.011,
+                "GBP": 0.0095,
+                "JPY": 1.85,
+                "AUD": 0.018
+            },
+            "USD": {
+                "INR": 83.25,
+                "EUR": 0.92,
+                "GBP": 0.79,
+                "JPY": 154.30,
+                "AUD": 1.52
+            },
+            "EUR": {
+                "INR": 90.45,
+                "USD": 1.09,
+                "GBP": 0.86,
+                "JPY": 167.85,
+                "AUD": 1.65
+            }
+        }
+        
+        base_rates = fallback_rates.get(base_currency, {})
+        return {
+            currency: rate 
+            for currency in target_currencies 
+            if currency in base_rates
+            for rate in [base_rates[currency]]
+        }
     async def set_manual_rate(
         self, 
         company_id: str, 
