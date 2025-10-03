@@ -562,11 +562,17 @@ const SimpleCompanySetup = ({ user, onComplete }) => {
               ← Back
             </button>
             <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50"
+              type="button"
+              onClick={() => {
+                if (formData.accounting_system && formData.base_currency) {
+                  setStep(3);
+                } else {
+                  setError('Please fill in all required fields');
+                }
+              }}
+              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
             >
-              {loading ? 'Setting up...' : 'Complete Setup'}
+              Next: Company Address →
             </button>
           </div>
         </form>
