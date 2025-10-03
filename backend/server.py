@@ -1220,7 +1220,9 @@ async def get_user_company_assignments(current_user: UserInDB = Depends(get_curr
         db_to_use = tenant_db
     
     # Get all users in this tenant
-    users = await db_to_use.users.find({}).to_list(length=None)
+    users_cursor = db_to_use.users.find({})
+    users = await users_cursor.to_list(length=None)
+    users = [parse_from_mongo(user) for user in users]
     
     # Get company setup
     company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
