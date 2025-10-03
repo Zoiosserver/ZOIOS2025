@@ -133,6 +133,7 @@ class SisterCompanyCreate(BaseModel):
     country_code: str
     base_currency: str
     accounting_system: Optional[str] = None
+    fiscal_year_start: Optional[str] = None  # Format: MM-DD
     business_type: str
     industry: str
     incorporation_date: Optional[str] = None
