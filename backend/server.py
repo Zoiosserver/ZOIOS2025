@@ -411,21 +411,24 @@ async def delete_contact(contact_id: str, current_user: UserInDB = Depends(get_c
 
 # Company Routes
 @api_router.post("/companies", response_model=Company)
-async def create_company(company: CompanyCreate):
+async def create_company(company: CompanyCreate, current_user: UserInDB = Depends(get_current_active_user)):
     company_dict = company.dict()
+    company_dict['user_id'] = current_user.id  # Add user_id
     company_obj = Company(**company_dict)
     prepared_data = prepare_for_mongo(company_obj.dict())
     await db.companies.insert_one(prepared_data)
     return company_obj
 
 @api_router.get("/companies", response_model=List[Company])
-async def get_companies(skip: int = 0, limit: int = 100):
-    companies = await db.companies.find().skip(skip).limit(limit).to_list(length=None)
+async def get_companies(current_user: UserInDB = Depends(get_current_active_user), skip: int = 0, limit: int = 100):
+    user_filter = get_user_filter(current_user)
+    companies = await db.companies.find(user_filter).skip(skip).limit(limit).to_list(length=None)
     return [Company(**parse_from_mongo(company)) for company in companies]
 
 @api_router.get("/companies/{company_id}", response_model=Company)
-async def get_company(company_id: str):
-    company = await db.companies.find_one({"id": company_id})
+async def get_company(company_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    user_filter = get_user_filter(current_user)
+    company = await db.companies.find_one({**user_filter, "id": company_id})
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     return Company(**parse_from_mongo(company))
