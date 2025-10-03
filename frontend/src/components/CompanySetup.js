@@ -664,12 +664,14 @@ const CompanySetup = () => {
                 {/* Accounting System Display for Sister Company */}
                 {sisterCompanyAccountingSystem && sisterCompanyForm.country_code && (
                   <div className="md:col-span-2">
-                    <Alert>
+                    <Alert className="w-full no-truncate">
                       <Info className="h-4 w-4" />
-                      <AlertDescription>
-                        <strong>Accounting System:</strong> {sisterCompanyAccountingSystem.name} <br />
-                        <strong>Base Currency:</strong> {sisterCompanyForm.base_currency} <br />
-                        <strong>Fiscal Year:</strong> Starts {sisterCompanyAccountingSystem.fiscal_year_start}
+                      <AlertDescription className="w-full no-truncate">
+                        <div className="space-y-1 no-truncate">
+                          <div className="no-truncate"><strong>Accounting System:</strong> <span className="no-truncate">{sisterCompanyAccountingSystem.name}</span></div>
+                          <div className="no-truncate"><strong>Base Currency:</strong> <span className="no-truncate">{sisterCompanyForm.base_currency}</span></div>
+                          <div className="no-truncate"><strong>Fiscal Year:</strong> <span className="no-truncate">Starts {sisterCompanyAccountingSystem.fiscal_year_start}</span></div>
+                        </div>
                       </AlertDescription>
                     </Alert>
                   </div>
