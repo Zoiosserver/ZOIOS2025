@@ -231,10 +231,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Tab Navigation in Company Setup"
+    - "Tab Navigation in Company Setup - COMPLETED SUCCESSFULLY"
   stuck_tasks: []
   test_all: false
-  test_priority: "high_first"
+  test_priority: "completed"
 
   - task: "Tab Navigation in Company Setup"
     implemented: true
