@@ -13,7 +13,8 @@ import {
   Edit,
   Info,
   Building,
-  Mail
+  Mail,
+  Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
