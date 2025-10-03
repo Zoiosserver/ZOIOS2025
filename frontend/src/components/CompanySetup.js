@@ -591,12 +591,15 @@ const CompanySetup = () => {
 
                 <div className="md:col-span-2 flex gap-2">
                   <Button type="button" onClick={addSisterCompany} disabled={loading}>
-                    {loading ? 'Adding...' : 'Add Company'}
+                    {loading ? 
+                      (editingSisterCompanyId ? 'Updating...' : 'Adding...') : 
+                      (editingSisterCompanyId ? 'Update Company' : 'Add Company')
+                    }
                   </Button>
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setShowSisterCompanyForm(false)}
+                    onClick={cancelEdit}
                   >
                     Cancel
                   </Button>
