@@ -55,10 +55,11 @@ const Signup = ({ onBackToLogin }) => {
       const { access_token, user: userData } = response.data;
       localStorage.setItem('token', access_token);
       
-      // Use the auth context login function to set user data properly
-      await login(formData.email, formData.password);
-      
-      toast.success('Account created successfully!');
+      // Redirect to login page and let user login manually to avoid state issues
+      toast.success('Account created successfully! Please log in with your credentials.');
+      if (onBackToLogin) {
+        onBackToLogin();
+      }
     } catch (error) {
       console.error('Signup error:', error);
       setError(error.response?.data?.detail || 'Signup failed');
