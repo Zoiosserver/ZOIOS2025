@@ -732,7 +732,7 @@ async def add_sister_company(
     tenant_service = await get_tenant_service(mongo_url)
     tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
     
-    if not tenant_db:
+    if tenant_db is None:
         # Fallback to main database
         db_to_use = db
     else:
@@ -791,7 +791,7 @@ async def get_sister_companies(current_user: UserInDB = Depends(get_current_acti
     tenant_service = await get_tenant_service(mongo_url)
     tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
     
-    if not tenant_db:
+    if tenant_db is None:
         # Fallback to main database
         db_to_use = db
     else:
@@ -818,7 +818,7 @@ async def delete_sister_company(
     tenant_service = await get_tenant_service(mongo_url)
     tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
     
-    if not tenant_db:
+    if tenant_db is None:
         # Fallback to main database
         db_to_use = db
     else:
