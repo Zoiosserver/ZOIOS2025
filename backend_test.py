@@ -631,146 +631,385 @@ class BackendTester:
             self.log(f"❌ ExchangeRate API integration error: {str(e)}")
             return False
 
+    def test_admin_login(self):
+        """Test admin login with admin@zoios.com credentials"""
+        self.log("Testing admin login with admin@zoios.com...")
+        
+        login_data = {
+            "email": ADMIN_EMAIL,
+            "password": ADMIN_PASSWORD
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/auth/login", json=login_data)
+            self.log(f"Admin login response status: {response.status_code}")
+            self.log(f"Admin login response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.auth_token = data.get('access_token')
+                self.user_data = data.get('user')
+                self.log("✅ Admin login successful")
+                self.log(f"User ID: {self.user_data.get('id')}")
+                self.log(f"Role: {self.user_data.get('role')}")
+                return True
+            else:
+                self.log(f"❌ Admin login failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Admin login error: {str(e)}")
+            return False
+
+    def test_auth_me_permissions(self):
+        """Test /auth/me endpoint returns user permissions"""
+        self.log("Testing /auth/me endpoint for permissions field...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            response = self.session.get(f"{API_BASE}/auth/me", headers=headers)
+            self.log(f"/auth/me response status: {response.status_code}")
+            self.log(f"/auth/me response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log("✅ /auth/me endpoint working")
+                
+                # Check if permissions field is present
+                permissions = data.get('permissions')
+                if permissions is not None:
+                    self.log("✅ Permissions field found in /auth/me response")
+                    self.log(f"Permissions: {permissions}")
+                    return True
+                else:
+                    self.log("❌ Permissions field missing from /auth/me response")
+                    return False
+            else:
+                self.log(f"❌ /auth/me failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ /auth/me error: {str(e)}")
+            return False
+
+    def test_currency_update_rates_fix(self):
+        """Test currency update rates endpoint for undefined fix"""
+        self.log("Testing currency update rates endpoint for undefined fix...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/currency/update-rates", headers=headers)
+            self.log(f"Currency update response status: {response.status_code}")
+            self.log(f"Currency update response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log("✅ Currency update rates endpoint working")
+                
+                # Check for proper response format
+                updated_rates = data.get('updated_rates')
+                if updated_rates is not None:
+                    self.log("✅ updated_rates field present (no undefined)")
+                    self.log(f"Updated rates: {updated_rates}")
+                    
+                    # Check for other required fields
+                    required_fields = ['base_currency', 'target_currencies', 'last_updated']
+                    all_fields_present = True
+                    for field in required_fields:
+                        if field not in data:
+                            self.log(f"❌ Missing required field: {field}")
+                            all_fields_present = False
+                        else:
+                            self.log(f"✅ Field present: {field} = {data[field]}")
+                    
+                    return all_fields_present
+                else:
+                    self.log("❌ updated_rates field missing - undefined issue not fixed")
+                    return False
+            else:
+                self.log(f"❌ Currency update failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Currency update error: {str(e)}")
+            return False
+
+    def test_create_test_user_for_deletion(self):
+        """Create a test user that can be deleted"""
+        self.log("Creating test user for deletion testing...")
+        
+        signup_data = {
+            "email": TEST_EMAIL,
+            "password": TEST_PASSWORD,
+            "name": TEST_NAME,
+            "company": TEST_COMPANY
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            self.log(f"Test user creation response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                test_user_id = data.get('user', {}).get('id')
+                self.log(f"✅ Test user created successfully with ID: {test_user_id}")
+                return test_user_id
+            elif response.status_code == 400 and "already registered" in response.text:
+                self.log("⚠️ Test user already exists, will try to find and delete")
+                return "existing_user"
+            else:
+                self.log(f"❌ Test user creation failed: {response.text}")
+                return None
+                
+        except Exception as e:
+            self.log(f"❌ Test user creation error: {str(e)}")
+            return None
+
+    def test_user_deletion_fix(self):
+        """Test user deletion with cross-database lookup"""
+        self.log("Testing user deletion with cross-database lookup...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # First create a test user to delete
+        test_user_id = self.test_create_test_user_for_deletion()
+        if not test_user_id:
+            self.log("❌ Could not create test user for deletion")
+            return False
+        
+        # If user already exists, try to find it via user list
+        if test_user_id == "existing_user":
+            try:
+                # Get all users to find our test user
+                response = self.session.get(f"{API_BASE}/admin/users", headers=headers)
+                if response.status_code == 200:
+                    users = response.json()
+                    test_user = next((u for u in users if u.get('email') == TEST_EMAIL), None)
+                    if test_user:
+                        test_user_id = test_user.get('id')
+                        self.log(f"Found existing test user with ID: {test_user_id}")
+                    else:
+                        self.log("❌ Could not find existing test user")
+                        return False
+                else:
+                    self.log("❌ Could not retrieve user list")
+                    return False
+            except Exception as e:
+                self.log(f"❌ Error finding existing user: {str(e)}")
+                return False
+        
+        # Now try to delete the test user
+        try:
+            response = self.session.delete(f"{API_BASE}/users/{test_user_id}", headers=headers)
+            self.log(f"User deletion response status: {response.status_code}")
+            self.log(f"User deletion response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success'):
+                    self.log("✅ User deletion successful")
+                    return True
+                else:
+                    self.log("❌ User deletion reported failure")
+                    return False
+            else:
+                self.log(f"❌ User deletion failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ User deletion error: {str(e)}")
+            return False
+
+    def test_user_permissions_update(self):
+        """Test user permissions update functionality"""
+        self.log("Testing user permissions update...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Use the current admin user for permissions testing
+        user_id = self.user_data.get('id') if self.user_data else None
+        if not user_id:
+            self.log("❌ No user ID available")
+            return False
+        
+        # Test permissions data
+        permissions_data = {
+            "permissions": {
+                "dashboard": True,
+                "crm_contacts": True,
+                "crm_companies": False,
+                "currency_management": True,
+                "user_management": False
+            }
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/users/{user_id}/permissions", 
+                                       json=permissions_data, headers=headers)
+            self.log(f"Permissions update response status: {response.status_code}")
+            self.log(f"Permissions update response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success'):
+                    self.log("✅ User permissions update successful")
+                    
+                    # Verify permissions were saved by calling /auth/me again
+                    auth_response = self.session.get(f"{API_BASE}/auth/me", headers=headers)
+                    if auth_response.status_code == 200:
+                        auth_data = auth_response.json()
+                        saved_permissions = auth_data.get('permissions', {})
+                        self.log(f"Saved permissions: {saved_permissions}")
+                        
+                        # Check if our test permissions were saved
+                        if (saved_permissions.get('dashboard') == True and 
+                            saved_permissions.get('crm_companies') == False):
+                            self.log("✅ Permissions correctly saved and retrieved")
+                            return True
+                        else:
+                            self.log("❌ Permissions not correctly saved")
+                            return False
+                    else:
+                        self.log("❌ Could not verify saved permissions")
+                        return False
+                else:
+                    self.log("❌ Permissions update reported failure")
+                    return False
+            else:
+                self.log(f"❌ Permissions update failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Permissions update error: {str(e)}")
+            return False
+
     def run_all_tests(self):
-        """Run all tests in sequence"""
+        """Run all tests focusing on recent backend fixes"""
         self.log("=" * 80)
-        self.log("STARTING COMPREHENSIVE BACKEND API TESTS")
-        self.log("Testing: Company Setup Flow + Currency Service + Chart of Accounts")
+        self.log("TESTING RECENT BACKEND FIXES")
+        self.log("Focus: Currency undefined fix, User deletion, Permissions system")
         self.log("=" * 80)
         
         test_results = {}
         
-        # Phase 1: Authentication and Company Setup Tests
+        # Phase 1: Authentication with admin user
         self.log("\n" + "=" * 40)
-        self.log("PHASE 1: AUTHENTICATION & COMPANY SETUP")
+        self.log("PHASE 1: ADMIN AUTHENTICATION")
         self.log("=" * 40)
         
-        # Test 1: User Registration
-        test_results['registration'] = self.test_user_registration()
+        # Test 1: Admin Login
+        test_results['admin_login'] = self.test_admin_login()
         
-        # Test 2: User Login (if registration failed)
-        if not test_results['registration']:
-            test_results['login'] = self.test_user_login()
-        else:
-            test_results['login'] = True
+        # Test 2: Auth Me with Permissions
+        test_results['auth_me_permissions'] = self.test_auth_me_permissions()
         
-        # Test 3: Auth Me endpoint (before setup)
-        test_results['auth_me_before'] = self.test_auth_me_endpoint()
-        
-        # Test 4: JWT Token validity
-        test_results['jwt_validity'] = self.test_jwt_token_validity()
-        
-        # Test 5: Company Setup Step 1
-        test_results['company_setup'] = self.test_company_setup_step1()
-        
-        # Test 6: Auth Me endpoint (after setup)
-        test_results['auth_me_after'] = self.test_auth_me_after_setup()
-        
-        # Test 7: Get Company Setup
-        test_results['get_company_setup'] = self.test_company_setup_get()
-        
-        # Phase 2: Chart of Accounts Tests
+        # Phase 2: Currency Exchange Rate Fix
         self.log("\n" + "=" * 40)
-        self.log("PHASE 2: CHART OF ACCOUNTS")
+        self.log("PHASE 2: CURRENCY EXCHANGE RATE FIX")
         self.log("=" * 40)
         
-        # Test 8: Chart of Accounts
-        test_results['chart_of_accounts'] = self.test_chart_of_accounts()
+        # Test 3: Currency Update Rates Fix
+        test_results['currency_update_fix'] = self.test_currency_update_rates_fix()
         
-        # Phase 3: Currency Service Tests
+        # Phase 3: User Management Fixes
         self.log("\n" + "=" * 40)
-        self.log("PHASE 3: CURRENCY SERVICE")
+        self.log("PHASE 3: USER MANAGEMENT FIXES")
         self.log("=" * 40)
         
-        # Test 9: ExchangeRate API Integration
-        test_results['exchangerate_api'] = self.test_exchangerate_api_integration()
+        # Test 4: User Permissions Update
+        test_results['permissions_update'] = self.test_user_permissions_update()
         
-        # Test 10: Get Currency Rates
-        test_results['currency_rates_get'] = self.test_currency_rates_get()
-        
-        # Test 11: Update Currency Rates
-        test_results['currency_rates_update'] = self.test_currency_rates_update()
-        
-        # Test 12: Manual Currency Rate
-        test_results['currency_manual_rate'] = self.test_currency_manual_rate()
-        
-        # Test 13: Currency Conversion
-        test_results['currency_conversion'] = self.test_currency_conversion()
-        
-        # Phase 4: Integration Tests
-        self.log("\n" + "=" * 40)
-        self.log("PHASE 4: INTEGRATION TESTS")
-        self.log("=" * 40)
-        
-        # Test 14: Frontend simulation
-        test_results['frontend_simulation'] = self.test_frontend_simulation()
-        
-        # Test 15: Token refresh scenario
-        test_results['token_refresh'] = self.test_token_refresh_scenario()
+        # Test 5: User Deletion Fix
+        test_results['user_deletion_fix'] = self.test_user_deletion_fix()
         
         # Summary
         self.log("\n" + "=" * 80)
-        self.log("COMPREHENSIVE TEST RESULTS SUMMARY")
+        self.log("RECENT BACKEND FIXES TEST RESULTS")
         self.log("=" * 80)
         
-        # Group results by phase
-        auth_tests = ['registration', 'login', 'auth_me_before', 'jwt_validity', 'company_setup', 'auth_me_after', 'get_company_setup']
-        chart_tests = ['chart_of_accounts']
-        currency_tests = ['exchangerate_api', 'currency_rates_get', 'currency_rates_update', 'currency_manual_rate', 'currency_conversion']
-        integration_tests = ['frontend_simulation', 'token_refresh']
+        # Group results by fix
+        auth_tests = ['admin_login', 'auth_me_permissions']
+        currency_tests = ['currency_update_fix']
+        user_mgmt_tests = ['permissions_update', 'user_deletion_fix']
         
-        self.log("\n📋 AUTHENTICATION & COMPANY SETUP:")
+        self.log("\n🔐 AUTHENTICATION & PERMISSIONS:")
         for test_name in auth_tests:
             if test_name in test_results:
                 status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
                 self.log(f"  {test_name.upper()}: {status}")
         
-        self.log("\n📊 CHART OF ACCOUNTS:")
-        for test_name in chart_tests:
-            if test_name in test_results:
-                status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
-                self.log(f"  {test_name.upper()}: {status}")
-        
-        self.log("\n💱 CURRENCY SERVICE:")
+        self.log("\n💱 CURRENCY EXCHANGE RATE FIX:")
         for test_name in currency_tests:
             if test_name in test_results:
                 status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
                 self.log(f"  {test_name.upper()}: {status}")
         
-        self.log("\n🔗 INTEGRATION TESTS:")
-        for test_name in integration_tests:
+        self.log("\n👥 USER MANAGEMENT FIXES:")
+        for test_name in user_mgmt_tests:
             if test_name in test_results:
                 status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
                 self.log(f"  {test_name.upper()}: {status}")
         
         # Overall assessment
-        critical_tests = ['registration', 'login', 'auth_me_before', 'company_setup', 'auth_me_after']
-        new_feature_tests = ['chart_of_accounts', 'currency_rates_get', 'currency_rates_update', 'exchangerate_api']
+        all_tests = ['admin_login', 'auth_me_permissions', 'currency_update_fix', 
+                    'permissions_update', 'user_deletion_fix']
         
-        critical_passed = all(test_results.get(test, False) for test in critical_tests if test in test_results)
-        new_features_passed = all(test_results.get(test, False) for test in new_feature_tests if test in test_results)
+        all_passed = all(test_results.get(test, False) for test in all_tests)
+        critical_passed = test_results.get('admin_login', False) and test_results.get('currency_update_fix', False)
         
         self.log("\n" + "=" * 80)
         self.log("FINAL ASSESSMENT")
         self.log("=" * 80)
         
-        if critical_passed and new_features_passed:
-            self.log("🎉 ALL TESTS PASSED - Complete system working correctly!")
-            self.log("✅ Company setup flow: WORKING")
-            self.log("✅ Chart of accounts: WORKING") 
-            self.log("✅ Currency service: WORKING")
-            self.log("✅ Online rate fetching: WORKING")
+        if all_passed:
+            self.log("🎉 ALL RECENT FIXES WORKING CORRECTLY!")
+            self.log("✅ Currency Exchange Rate undefined fix: WORKING")
+            self.log("✅ User deletion with cross-database lookup: WORKING") 
+            self.log("✅ Enhanced /auth/me with permissions: WORKING")
+            self.log("✅ User permissions update: WORKING")
         elif critical_passed:
-            self.log("🎯 CORE FUNCTIONALITY WORKING - Some new features may have issues")
-            self.log("✅ Company setup flow: WORKING")
-            if not test_results.get('chart_of_accounts', True):
-                self.log("❌ Chart of accounts: FAILED")
-            if not new_features_passed:
-                self.log("❌ Currency service: SOME ISSUES")
+            self.log("🎯 CRITICAL FIXES WORKING - Some issues remain")
+            self.log("✅ Currency Exchange Rate undefined fix: WORKING")
+            if not test_results.get('user_deletion_fix', True):
+                self.log("❌ User deletion fix: FAILED")
+            if not test_results.get('permissions_update', True):
+                self.log("❌ User permissions update: FAILED")
         else:
-            self.log("🚨 CRITICAL ISSUES FOUND")
-            if not test_results.get('auth_me_after', True):
-                self.log("🔍 ROOT CAUSE: onboarding_completed status not being updated after company setup")
+            self.log("🚨 CRITICAL ISSUES FOUND IN RECENT FIXES")
+            if not test_results.get('currency_update_fix', True):
+                self.log("❌ Currency undefined issue: NOT FIXED")
+            if not test_results.get('admin_login', True):
+                self.log("❌ Admin authentication: FAILED")
         
         return test_results
 
