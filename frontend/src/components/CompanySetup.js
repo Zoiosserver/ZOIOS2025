@@ -635,7 +635,7 @@ const CompanySetup = () => {
                 <div>
                   <Label htmlFor="sister_fiscal_year_start">Fiscal Year Start Date *</Label>
                   <Select value={sisterCompanyForm.fiscal_year_start} onValueChange={(value) => setSisterCompanyForm(prev => ({...prev, fiscal_year_start: value}))}>
-                    <SelectTrigger tabIndex={6}>
+                    <SelectTrigger tabIndex={11}>
                       <SelectValue placeholder="Select fiscal year start" />
                     </SelectTrigger>
                     <SelectContent>
