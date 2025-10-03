@@ -32,6 +32,8 @@ const COLORS = {
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
+  const [companySetup, setCompanySetup] = useState(null);
+  const [sisterCompanies, setSisterCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
