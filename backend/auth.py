@@ -60,15 +60,7 @@ class Token(BaseModel):
     token_type: str
     user: User
 
-# Password utilities
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-def get_password_hash(password):
-    # Ensure password is not longer than 72 bytes for bcrypt
-    if len(password.encode('utf-8')) > 72:
-        password = password[:72]
-    return pwd_context.hash(password)
+# Password utilities (using the functions defined above)
 
 # JWT utilities
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
