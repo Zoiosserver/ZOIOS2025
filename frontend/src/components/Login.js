@@ -118,11 +118,11 @@ const Login = () => {
         </Card>
 
         {/* Demo Credentials */}
-        <Card className=\"mt-6 bg-blue-50 border-blue-200\">
-          <CardContent className=\"p-4\">
-            <div className=\"text-center\">
-              <h3 className=\"text-sm font-semibold text-blue-900 mb-2\">Demo Credentials</h3>
-              <div className=\"text-xs text-blue-700 space-y-1\">
+        <Card className="mt-6 bg-blue-50 border-blue-200">
+          <CardContent className="p-4">
+            <div className="text-center">
+              <h3 className="text-sm font-semibold text-blue-900 mb-2">Demo Credentials</h3>
+              <div className="text-xs text-blue-700 space-y-1">
                 <div><strong>Admin:</strong> admin@zoios.com / admin123</div>
               </div>
             </div>
@@ -130,8 +130,8 @@ const Login = () => {
         </Card>
 
         {/* Footer */}
-        <div className=\"text-center mt-8\">
-          <p className=\"text-xs text-gray-500\">
+        <div className="text-center mt-8">
+          <p className="text-xs text-gray-500">
             © 2025 ZOIOS. Advanced Marketing CRM Platform.
           </p>
         </div>
