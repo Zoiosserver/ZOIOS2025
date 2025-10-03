@@ -21,8 +21,8 @@ const ProtectedRoute = ({ children }) => {
     return <Login />;
   }
 
-  // Check if user needs to complete company setup (except for admin users)
-  if (user && !user.onboarding_completed && user.role !== 'admin') {
+  // Check if user needs to complete company setup
+  if (user && !user.onboarding_completed) {
     return <CompanySetup />;
   }
 
