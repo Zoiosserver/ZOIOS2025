@@ -245,6 +245,7 @@ async def register(user_data: UserCreate, current_user: UserInDB = Depends(get_a
         company=user["company"],
         role=user["role"],
         is_active=user["is_active"],
+        onboarding_completed=user["onboarding_completed"],
         created_at=user["created_at"]
     )
     
@@ -306,6 +307,7 @@ async def public_signup(user_data: UserSignup):
         company=user["company"],
         role=user["role"],
         is_active=user["is_active"],
+        onboarding_completed=user["onboarding_completed"],
         created_at=user["created_at"]
     )
     
