@@ -16,7 +16,7 @@ from auth import (
     authenticate_user, hash_password, set_database, create_default_admin,
     User, UserCreate, UserSignup, UserLogin, Token, UserInDB, prepare_user_for_mongo, parse_user_from_mongo,
     PasswordReset, create_password_reset_token, verify_reset_token, use_reset_token,
-    CompanySetup, CompanySetupCreate, ChartOfAccount
+    CompanySetup, CompanySetupCreate, ChartOfAccount, SisterCompany, SisterCompanyCreate, ConsolidatedAccount
 )
 from email_service import send_password_reset_email, send_welcome_email
 from accounting_systems import (
