@@ -47,6 +47,8 @@ const Signup = ({ onBackToLogin }) => {
     try {
       // Direct fetch call for reliability
       const BACKEND_URL = window.location.protocol + '//' + window.location.hostname + ':8001';
+      console.log('Signup - Using backend URL:', BACKEND_URL);
+      alert('Signup - Backend URL: ' + BACKEND_URL); // Debug alert
       const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
