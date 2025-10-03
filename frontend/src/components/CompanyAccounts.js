@@ -72,17 +72,16 @@ const CompanyAccounts = () => {
       });
     });
     
-    // Sort existing codes and find the next available one
+    // Sort existing codes
     existingCodes.sort((a, b) => a - b);
     
-    // If no existing codes, start with the base
-    if (existingCodes.length === 0) {
-      return range.start.toString();
+    // Find the next available code starting from range.start
+    let nextCode = range.start;
+    while (existingCodes.includes(nextCode)) {
+      nextCode++;
     }
     
-    // Find the highest existing code and add 1
-    const maxCode = Math.max(...existingCodes);
-    return (maxCode + 1).toString();
+    return nextCode.toString();
   };
 
   const handleAccountTypeChange = (accountType) => {
