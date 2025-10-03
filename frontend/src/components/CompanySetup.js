@@ -688,7 +688,7 @@ const CompanySetup = () => {
                   </Button>
                   <Button
                     type="button"
-                    tabIndex={9}
+                    tabIndex={14}
                     variant="outline"
                     onClick={cancelEdit}
                   >
