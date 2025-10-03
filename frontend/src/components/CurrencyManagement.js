@@ -135,13 +135,31 @@ const CurrencyManagement = () => {
     }
   };
 
-  const formatCurrency = (amount, currency) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 4
-    }).format(amount);
+  const formatCurrency = (amount, currency = 'USD') => {
+    try {
+      // Special handling for INR and other currencies
+      const currencySymbols = {
+        'INR': '₹',
+        'USD': '$',
+        'EUR': '€',
+        'GBP': '£',
+        'JPY': '¥',
+        'CNY': '¥',
+        'AUD': 'A$',
+        'CAD': 'C$',
+        'CHF': 'Fr'
+      };
+      
+      const symbol = currencySymbols[currency] || currency;
+      const formattedAmount = new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(amount);
+      
+      return `${symbol} ${formattedAmount}`;
+    } catch (error) {
+      return `${currency} ${amount.toFixed(2)}`;
+    }
   };
 
   const formatDate = (dateString) => {
