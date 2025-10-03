@@ -186,6 +186,9 @@ frontend:
         - working: false
           agent: "main"
           comment: "Auth context may not be properly handling onboarding_completed status updates from backend."
+        - working: false
+          agent: "main"
+          comment: "Added refreshUser method to AuthContext to properly update user state after company setup without hard page reload."
 
 metadata:
   created_by: "main_agent"
