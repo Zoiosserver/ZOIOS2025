@@ -275,14 +275,28 @@ const CompanySetup = () => {
       return;
     }
 
-    // Add sister company to local state (will be saved when main setup completes)
-    const newSisterCompany = {
-      id: `temp-${Date.now()}`, // Temporary ID
-      ...sisterCompanyForm,
-      created_at: new Date().toISOString()
-    };
+    if (editingSisterCompanyId) {
+      // Update existing sister company
+      setSisterCompanies(sisterCompanies.map(company => 
+        company.id === editingSisterCompanyId 
+          ? { ...company, ...sisterCompanyForm, updated_at: new Date().toISOString() }
+          : company
+      ));
+      toast.success('Sister company updated successfully!');
+      setEditingSisterCompanyId(null);
+    } else {
+      // Add new sister company to local state (will be saved when main setup completes)
+      const newSisterCompany = {
+        id: `temp-${Date.now()}`, // Temporary ID
+        ...sisterCompanyForm,
+        created_at: new Date().toISOString()
+      };
+      
+      setSisterCompanies([...sisterCompanies, newSisterCompany]);
+      toast.success('Sister company added to setup!');
+    }
     
-    setSisterCompanies([...sisterCompanies, newSisterCompany]);
+    // Reset form
     setSisterCompanyForm({
       company_name: '',
       country_code: '',
@@ -292,7 +306,6 @@ const CompanySetup = () => {
       ownership_percentage: 100
     });
     setShowSisterCompanyForm(false);
-    toast.success('Sister company added to setup!');
   };
 
   const removeSisterCompany = (companyId) => {
