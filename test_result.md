@@ -147,7 +147,7 @@ backend:
     file: "/app/backend/accounting_systems.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
@@ -158,6 +158,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "✅ CHART OF ACCOUNTS WORKING PERFECTLY: Successfully tested GET /api/setup/chart-of-accounts endpoint. Retrieved 26 accounts with proper US GAAP structure including all expected account codes (1000-Cash, 1100-AR, 2000-AP, 3000-Common Stock, 4000-Sales Revenue, 5000-COGS, 6000-Salaries). Accounts are properly categorized by type (asset, liability, equity, revenue, expense) and category (current_asset, fixed_asset, etc.). Double-entry accounting structure is correctly implemented."
+        - working: true
+          agent: "testing"
+          comment: "✅ CHART OF ACCOUNTS FULLY VERIFIED: Fixed tenant database lookup issue in /api/setup/chart-of-accounts endpoint. Now properly retrieves 26 US GAAP accounts from correct tenant database. All expected account codes (1000, 1100, 2000, 3000, 4000, 5000, 6000) present with proper categorization. Chart of accounts system is production-ready and working with multi-tenant architecture."
 
   - task: "Multi-Currency Online Rate Fetching"
     implemented: true
