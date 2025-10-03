@@ -85,6 +85,39 @@ const CompanyAccounts = () => {
     fetchCompanyAccounts(companyId);
   };
 
+  const updateOpeningBalance = async (accountId, balance) => {
+    try {
+      await axios.put(`${API}/company/${selectedCompany.id}/accounts/${accountId}/opening-balance`, {
+        opening_balance: parseFloat(balance)
+      });
+      toast.success('Opening balance updated successfully');
+      fetchCompanyAccounts(selectedCompany.id);
+      setEditingBalance(null);
+    } catch (error) {
+      console.error('Error updating opening balance:', error);
+      toast.error('Failed to update opening balance');
+    }
+  };
+
+  const addNewAccount = async () => {
+    try {
+      await axios.post(`${API}/company/${selectedCompany.id}/accounts`, newAccount);
+      toast.success('Account added successfully');
+      fetchCompanyAccounts(selectedCompany.id);
+      setShowAddAccountDialog(false);
+      setNewAccount({
+        code: '',
+        name: '',
+        account_type: '',
+        category: '',
+        opening_balance: 0
+      });
+    } catch (error) {
+      console.error('Error adding account:', error);
+      toast.error(error.response?.data?.detail || 'Failed to add account');
+    }
+  };
+
   const formatCurrency = (amount, currency = 'USD') => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
