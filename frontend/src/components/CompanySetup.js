@@ -62,6 +62,7 @@ const CompanySetup = () => {
     // Step 2: Accounting & Currency
     base_currency: '',
     additional_currencies: [],
+    fiscal_year_start: '',  // Format: MM-DD (e.g., "01-01" for January 1st)
     
     // Step 3: Company Details
     address: '',
