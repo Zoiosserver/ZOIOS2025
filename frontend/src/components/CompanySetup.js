@@ -480,12 +480,14 @@ const CompanySetup = () => {
       </div>
 
       {accountingSystem && (
-        <Alert>
+        <Alert className="w-full no-truncate">
           <Info className="h-4 w-4" />
-          <AlertDescription>
-            <strong>Accounting System:</strong> {accountingSystem.name} <br />
-            <strong>Fiscal Year:</strong> Starts {accountingSystem.fiscal_year_start} <br />
-            <strong>Base Currency:</strong> {accountingSystem.currency}
+          <AlertDescription className="w-full no-truncate">
+            <div className="space-y-1 no-truncate">
+              <div className="no-truncate"><strong>Accounting System:</strong> <span className="no-truncate">{accountingSystem.name}</span></div>
+              <div className="no-truncate"><strong>Fiscal Year:</strong> <span className="no-truncate">Starts {accountingSystem.fiscal_year_start}</span></div>
+              <div className="no-truncate"><strong>Base Currency:</strong> <span className="no-truncate">{accountingSystem.currency}</span></div>
+            </div>
           </AlertDescription>
         </Alert>
       )}
