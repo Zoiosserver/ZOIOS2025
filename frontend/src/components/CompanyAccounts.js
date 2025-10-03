@@ -45,6 +45,51 @@ const CompanyAccounts = () => {
     opening_balance: 0
   });
 
+  const getNextAccountCode = (accountType) => {
+    if (!companyAccounts?.accounts_by_category) return '';
+    
+    const accountTypeRanges = {
+      'Asset': { start: 1000, prefix: '1' },
+      'Liability': { start: 2000, prefix: '2' },
+      'Equity': { start: 3000, prefix: '3' },
+      'Revenue': { start: 4000, prefix: '4' },
+      'Expense': { start: 5000, prefix: '5' }
+    };
+    
+    const range = accountTypeRanges[accountType];
+    if (!range) return '';
+    
+    // Get all existing codes for this account type
+    const existingCodes = [];
+    Object.values(companyAccounts.accounts_by_category).forEach(accounts => {
+      accounts.forEach(account => {
+        if (account.account_type === accountType && account.code) {
+          const codeNum = parseInt(account.code);
+          if (!isNaN(codeNum)) {
+            existingCodes.push(codeNum);
+          }
+        }
+      });
+    });
+    
+    // Find next available code
+    let nextCode = range.start;
+    while (existingCodes.includes(nextCode)) {
+      nextCode++;
+    }
+    
+    return nextCode.toString();
+  };
+
+  const handleAccountTypeChange = (accountType) => {
+    const nextCode = getNextAccountCode(accountType);
+    setNewAccount({
+      ...newAccount, 
+      account_type: accountType,
+      code: nextCode
+    });
+  };
+
   useEffect(() => {
     fetchCompanies();
   }, []);
