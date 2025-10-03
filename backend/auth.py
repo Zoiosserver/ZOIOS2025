@@ -88,6 +88,7 @@ class CompanySetupCreate(BaseModel):
     country_code: str
     base_currency: str
     additional_currencies: List[str] = []
+    fiscal_year_start: Optional[str] = None  # Format: MM-DD
     business_type: str
     industry: str
     address: Optional[str] = None
