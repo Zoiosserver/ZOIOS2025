@@ -728,8 +728,18 @@ async def add_sister_company(
     current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Add a sister company to the group"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if not tenant_db:
+        # Fallback to main database
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
     # Get company setup to verify it's a group company
-    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
     if not company_setup:
         raise HTTPException(
             status_code=404, 
