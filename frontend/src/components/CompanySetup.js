@@ -213,6 +213,14 @@ const CompanySetup = () => {
           setError('Please select a base currency');
           return false;
         }
+        if (!formData.fiscal_year_start) {
+          setError('Please select fiscal year start date');
+          return false;
+        }
+        if (formData.fiscal_year_start === 'custom' && !formData.fiscal_year_start.match(/^[0-1][0-9]-[0-3][0-9]$/)) {
+          setError('Please enter a valid custom fiscal year date (MM-DD format)');
+          return false;
+        }
         break;
       case 3:
         // Step 3 fields are optional, but we could add validation if needed
