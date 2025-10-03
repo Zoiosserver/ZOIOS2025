@@ -361,45 +361,50 @@ async def get_dashboard_stats(current_user: UserInDB = Depends(get_current_activ
 
 # Contact Routes
 @api_router.post("/contacts", response_model=Contact)
-async def create_contact(contact: ContactCreate):
+async def create_contact(contact: ContactCreate, current_user: UserInDB = Depends(get_current_active_user)):
     contact_dict = contact.dict()
+    contact_dict['user_id'] = current_user.id  # Add user_id
     contact_obj = Contact(**contact_dict)
     prepared_data = prepare_for_mongo(contact_obj.dict())
     await db.contacts.insert_one(prepared_data)
     return contact_obj
 
 @api_router.get("/contacts", response_model=List[Contact])
-async def get_contacts(skip: int = 0, limit: int = 100):
-    contacts = await db.contacts.find().skip(skip).limit(limit).to_list(length=None)
+async def get_contacts(current_user: UserInDB = Depends(get_current_active_user), skip: int = 0, limit: int = 100):
+    user_filter = get_user_filter(current_user)
+    contacts = await db.contacts.find(user_filter).skip(skip).limit(limit).to_list(length=None)
     return [Contact(**parse_from_mongo(contact)) for contact in contacts]
 
 @api_router.get("/contacts/{contact_id}", response_model=Contact)
-async def get_contact(contact_id: str):
-    contact = await db.contacts.find_one({"id": contact_id})
+async def get_contact(contact_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    user_filter = get_user_filter(current_user)
+    contact = await db.contacts.find_one({**user_filter, "id": contact_id})
     if not contact:
         raise HTTPException(status_code=404, detail="Contact not found")
     return Contact(**parse_from_mongo(contact))
 
 @api_router.put("/contacts/{contact_id}", response_model=Contact)
-async def update_contact(contact_id: str, contact_update: ContactUpdate):
+async def update_contact(contact_id: str, contact_update: ContactUpdate, current_user: UserInDB = Depends(get_current_active_user)):
+    user_filter = get_user_filter(current_user)
     update_data = {k: v for k, v in contact_update.dict().items() if v is not None}
     update_data['updated_at'] = datetime.now(timezone.utc)
     prepared_data = prepare_for_mongo(update_data)
     
     result = await db.contacts.update_one(
-        {"id": contact_id}, 
+        {**user_filter, "id": contact_id}, 
         {"$set": prepared_data}
     )
     
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Contact not found")
     
-    updated_contact = await db.contacts.find_one({"id": contact_id})
+    updated_contact = await db.contacts.find_one({**user_filter, "id": contact_id})
     return Contact(**parse_from_mongo(updated_contact))
 
 @api_router.delete("/contacts/{contact_id}")
-async def delete_contact(contact_id: str):
-    result = await db.contacts.delete_one({"id": contact_id})
+async def delete_contact(contact_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    user_filter = get_user_filter(current_user)
+    result = await db.contacts.delete_one({**user_filter, "id": contact_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Contact not found")
     return {"message": "Contact deleted successfully"}
