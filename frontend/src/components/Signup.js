@@ -45,21 +45,30 @@ const Signup = ({ onBackToLogin }) => {
     }
 
     try {
-      const response = await axios.post(`${API}/auth/signup`, {
-        name: formData.name,
-        email: formData.email,
-        company: formData.company,
-        password: formData.password
+      // Direct fetch call for reliability
+      const BACKEND_URL = window.location.protocol + '//' + window.location.hostname + ':8001';
+      const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          company: formData.company,
+          password: formData.password
+        })
       });
 
-      // Auto-login after successful signup
-      const { access_token, user: userData } = response.data;
-      localStorage.setItem('token', access_token);
-      
-      toast.success('Account created successfully! Redirecting to setup...');
-      
-      // Force page reload to trigger authentication check
-      window.location.href = '/';
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.access_token);
+        toast.success('Account created successfully! Redirecting to setup...');
+        window.location.href = '/';
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Signup failed');
+      }
     } catch (error) {
       console.error('Signup error:', error);
       console.error('Error details:', error.response?.data);
