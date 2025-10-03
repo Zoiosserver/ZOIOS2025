@@ -38,6 +38,7 @@ function App() {
                       <Route path="/email-responses" element={<EmailResponses />} />
                       <Route path="/users" element={<UserManagement />} />
                       <Route path="/currency" element={<CurrencyManagement />} />
+                      <Route path="/consolidated-accounts" element={<ConsolidatedAccounts />} />
                     </Routes>
                   </main>
                 </div>
