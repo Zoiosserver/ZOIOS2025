@@ -1673,8 +1673,9 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("startup")
 async def startup_event():
-    # Create default admin user
-    await create_default_admin()
+    # Default admin creation disabled for clean start
+    # await create_default_admin()
+    pass
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
