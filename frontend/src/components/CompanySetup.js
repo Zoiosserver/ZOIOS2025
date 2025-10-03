@@ -809,8 +809,8 @@ const CompanySetup = () => {
             {formData.additional_currencies.map(code => {
               const currency = currencies.find(c => c.code === code);
               return (
-                <Badge key={code} variant="secondary" className="text-xs">
-                  {code} ({currency?.symbol})
+                <Badge key={code} variant="secondary" className="text-xs break-words max-w-full">
+                  <span className="truncate">{code} ({currency?.symbol})</span>
                 </Badge>
               );
             })}
