@@ -145,7 +145,7 @@ async def create_default_admin():
             "email": "admin@zoios.com",
             "hashed_password": get_password_hash("admin123"),
             "name": "Admin User",
-            "company": "OutreachPulse",
+            "company": "ZOIOS",
             "role": "admin",
             "is_active": True,
             "created_at": datetime.now(timezone.utc)
