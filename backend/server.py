@@ -895,7 +895,7 @@ async def get_consolidated_accounts(current_user: UserInDB = Depends(get_current
         
         # Find matching accounts in sister companies
         for sister_company in sister_companies:
-            sister_account = await db.chart_of_accounts.find_one({
+            sister_account = await db_to_use.chart_of_accounts.find_one({
                 "company_id": sister_company["id"],
                 "code": parent_account["code"],
                 "is_active": True
