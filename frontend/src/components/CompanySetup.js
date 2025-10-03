@@ -826,6 +826,7 @@ const CompanySetup = () => {
           <Label htmlFor="state">State/Province</Label>
           <Input
             id="state"
+            tabIndex={3}
             value={formData.state}
             onChange={(e) => setFormData(prev => ({...prev, state: e.target.value}))}
             placeholder="Enter state or province"
