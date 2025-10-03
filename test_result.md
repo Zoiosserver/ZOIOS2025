@@ -231,10 +231,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All currency display improvements verified and working"
+    - "All currency display improvements verified and working - COMPLETED"
   stuck_tasks: []
   test_all: false
-  test_priority: "high_first"
+  test_priority: "completed"
 
   - task: "Tab Navigation in Company Setup"
     implemented: true
