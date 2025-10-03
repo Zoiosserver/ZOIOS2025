@@ -26,6 +26,7 @@ const Sidebar = () => {
     { path: '/companies', label: 'Companies', icon: Building2 },
     { path: '/call-logs', label: 'Call Logs', icon: Phone },
     { path: '/email-responses', label: 'Email Responses', icon: Mail },
+    { path: '/currency', label: 'Currency Management', icon: DollarSign },
   ];
 
   // Add admin-only menu items
