@@ -231,10 +231,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "All primary objectives completed successfully"
+    - "Tab Navigation in Company Setup"
   stuck_tasks: []
   test_all: false
-  test_priority: "completed"
+  test_priority: "high_first"
 
   - task: "Tab Navigation in Company Setup"
     implemented: false
