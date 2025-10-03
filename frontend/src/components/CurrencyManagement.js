@@ -193,9 +193,9 @@ const CurrencyManagement = () => {
     }
   };
 
-  const availableCurrencies = (companySetup && companySetup.base_currency && companySetup.additional_currencies) ? [
+  const availableCurrencies = (companySetup && companySetup.base_currency) ? [
     companySetup.base_currency,
-    ...companySetup.additional_currencies
+    ...(companySetup.additional_currencies || [])
   ] : [];
 
   return (
