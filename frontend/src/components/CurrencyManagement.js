@@ -17,7 +17,8 @@ import {
   Plus,
   CheckCircle,
   AlertCircle,
-  Info
+  Info,
+  Settings
 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
