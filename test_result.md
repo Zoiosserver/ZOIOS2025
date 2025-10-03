@@ -255,8 +255,8 @@ test_plan:
           comment: "✅ TAB NAVIGATION WORKING PERFECTLY: Comprehensive testing confirms all tab navigation functionality is working correctly. VERIFIED: 1) Company Name field (tabIndex=1) - WORKING 2) Country Select (tabIndex=2) - WORKING 3) Business Type Select (tabIndex=3) - WORKING 4) Industry Select (tabIndex=4) - WORKING 5) Add Sister Company button (tabIndex=5) - WORKING (appears when Group Company selected) 6) Navigation buttons (tabIndex=100,101) - WORKING 7) Select keyboard navigation - WORKING (Enter/Space/Escape keys) 8) Tab sequence follows logical order: 1→2→3→4→5→...→100→101. All Select components properly receive focus when tabbed to and can be opened with keyboard. The main agent's tabIndex implementation has completely resolved the user's reported tab navigation issues."
 
   - task: "India Rupee Currency Display Issue"
-    implemented: true
-    working: true
+    implemented: false
+    working: false
     file: "/app/frontend/src/components/CompanySetup.js"
     stuck_count: 0
     priority: "medium"
