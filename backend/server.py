@@ -435,21 +435,24 @@ async def get_company(company_id: str, current_user: UserInDB = Depends(get_curr
 
 # Call Log Routes
 @api_router.post("/call-logs", response_model=CallLog)
-async def create_call_log(call_log: CallLogCreate):
+async def create_call_log(call_log: CallLogCreate, current_user: UserInDB = Depends(get_current_active_user)):
     call_dict = call_log.dict()
+    call_dict['user_id'] = current_user.id  # Add user_id
     call_obj = CallLog(**call_dict)
     prepared_data = prepare_for_mongo(call_obj.dict())
     await db.call_logs.insert_one(prepared_data)
     return call_obj
 
 @api_router.get("/call-logs", response_model=List[CallLog])
-async def get_call_logs(skip: int = 0, limit: int = 100):
-    call_logs = await db.call_logs.find().sort("date", -1).skip(skip).limit(limit).to_list(length=None)
+async def get_call_logs(current_user: UserInDB = Depends(get_current_active_user), skip: int = 0, limit: int = 100):
+    user_filter = get_user_filter(current_user)
+    call_logs = await db.call_logs.find(user_filter).sort("date", -1).skip(skip).limit(limit).to_list(length=None)
     return [CallLog(**parse_from_mongo(call_log)) for call_log in call_logs]
 
 @api_router.get("/call-logs/contact/{contact_id}", response_model=List[CallLog])
-async def get_contact_call_logs(contact_id: str):
-    call_logs = await db.call_logs.find({"contact_id": contact_id}).sort("date", -1).to_list(length=None)
+async def get_contact_call_logs(contact_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    user_filter = get_user_filter(current_user)
+    call_logs = await db.call_logs.find({**user_filter, "contact_id": contact_id}).sort("date", -1).to_list(length=None)
     return [CallLog(**parse_from_mongo(call_log)) for call_log in call_logs]
 
 # Email Response Routes
