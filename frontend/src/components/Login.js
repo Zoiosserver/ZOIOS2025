@@ -56,60 +56,60 @@ const Login = () => {
         </div>
 
         {/* Login Form */}
-        <Card className=\"shadow-xl border-0\">
-          <CardHeader className=\"space-y-1 pb-6\">
-            <CardTitle className=\"text-2xl font-semibold text-center\">Sign In</CardTitle>
+        <Card className="shadow-xl border-0">
+          <CardHeader className="space-y-1 pb-6">
+            <CardTitle className="text-2xl font-semibold text-center">Sign In</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className=\"space-y-4\">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <Alert variant=\"destructive\" className=\"mb-4\">
-                  <AlertCircle className=\"h-4 w-4\" />
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
               
-              <div className=\"space-y-2\">
-                <Label htmlFor=\"email\" className=\"text-sm font-medium\">Email</Label>
-                <div className=\"relative\">
-                  <Mail className=\"absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4\" />
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
-                    id=\"email\"
-                    name=\"email\"
-                    type=\"email\"
-                    placeholder=\"Enter your email\"
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
                     value={formData.email}
                     onChange={handleChange}
-                    className=\"pl-10\"
+                    className="pl-10"
                     required
-                    data-testid=\"login-email\"
+                    data-testid="login-email"
                   />
                 </div>
               </div>
               
-              <div className=\"space-y-2\">
-                <Label htmlFor=\"password\" className=\"text-sm font-medium\">Password</Label>
-                <div className=\"relative\">
-                  <Lock className=\"absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4\" />
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
-                    id=\"password\"
-                    name=\"password\"
-                    type=\"password\"
-                    placeholder=\"Enter your password\"
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="Enter your password"
                     value={formData.password}
                     onChange={handleChange}
-                    className=\"pl-10\"
+                    className="pl-10"
                     required
-                    data-testid=\"login-password\"
+                    data-testid="login-password"
                   />
                 </div>
               </div>
               
               <Button 
-                type=\"submit\" 
-                className=\"w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5\"
+                type="submit" 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5"
                 disabled={loading}
-                data-testid=\"login-submit-btn\"
+                data-testid="login-submit-btn"
               >
                 {loading ? 'Signing in...' : 'Sign In'}
               </Button>
