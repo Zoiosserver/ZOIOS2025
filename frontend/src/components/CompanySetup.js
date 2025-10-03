@@ -264,18 +264,18 @@ const CompanySetup = () => {
           />
         </div>
 
-        <div>
+        <div className="md:col-span-2">
           <Label htmlFor="country">Country *</Label>
           <Select value={formData.country_code} onValueChange={handleCountryChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select your country" />
             </SelectTrigger>
-            <SelectContent className="min-w-[300px] w-auto">
+            <SelectContent className="min-w-[400px] w-auto">
               {countries.map(country => (
                 <SelectItem key={country.code} value={country.code}>
-                  <div className="flex items-center w-full pr-2">
-                    <span className="mr-2">{country.name}</span>
-                    <span className="text-xs text-gray-500">({country.currency})</span>
+                  <div className="flex items-center justify-between w-full">
+                    <span>{country.name}</span>
+                    <span className="text-xs text-gray-500 ml-2">({country.currency})</span>
                   </div>
                 </SelectItem>
               ))}
