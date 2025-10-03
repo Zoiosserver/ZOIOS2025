@@ -728,7 +728,7 @@ const CompanySetup = () => {
       <div>
         <Label htmlFor="base_currency">Base Currency *</Label>
         <Select value={formData.base_currency} onValueChange={(value) => setFormData(prev => ({...prev, base_currency: value}))}>
-          <SelectTrigger>
+          <SelectTrigger tabIndex={1}>
             <SelectValue placeholder="Select base currency" />
           </SelectTrigger>
           <SelectContent>
