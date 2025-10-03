@@ -624,6 +624,33 @@ const CompanySetup = () => {
                   />
                 </div>
 
+                <div>
+                  <Label htmlFor="sister_fiscal_year_start">Fiscal Year Start Date *</Label>
+                  <Select value={sisterCompanyForm.fiscal_year_start} onValueChange={(value) => setSisterCompanyForm(prev => ({...prev, fiscal_year_start: value}))}>
+                    <SelectTrigger tabIndex={6}>
+                      <SelectValue placeholder="Select fiscal year start" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="01-01">January 1st</SelectItem>
+                      <SelectItem value="04-01">April 1st</SelectItem>
+                      <SelectItem value="07-01">July 1st</SelectItem>
+                      <SelectItem value="10-01">October 1st</SelectItem>
+                      <SelectItem value="01-04">January 4th</SelectItem>
+                      <SelectItem value="custom">Custom Date</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {sisterCompanyForm.fiscal_year_start === 'custom' && (
+                    <div className="mt-2">
+                      <Input
+                        tabIndex={7}
+                        placeholder="MM-DD (e.g., 03-15)"
+                        pattern="[0-1][0-9]-[0-3][0-9]"
+                        onChange={(e) => setSisterCompanyForm(prev => ({...prev, fiscal_year_start: e.target.value}))}
+                      />
+                    </div>
+                  )}
+                </div>
+
                 {/* Accounting System Display for Sister Company */}
                 {sisterCompanyAccountingSystem && sisterCompanyForm.country_code && (
                   <div className="md:col-span-2">
