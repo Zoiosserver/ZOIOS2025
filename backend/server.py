@@ -210,7 +210,7 @@ async def register(user_data: UserCreate, current_user: UserInDB = Depends(get_a
         raise HTTPException(status_code=400, detail="Email already registered")
     
     # Create new user
-    hashed_password = get_password_hash(user_data.password)
+    hashed_password = hash_password(user_data.password)
     user = {
         "id": str(uuid.uuid4()),
         "email": user_data.email,
