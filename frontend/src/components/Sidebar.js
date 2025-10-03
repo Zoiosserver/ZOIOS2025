@@ -23,6 +23,7 @@ const Sidebar = () => {
   const location = useLocation();
   const { user, logout, isAdmin } = useAuth();
   const [companySetup, setCompanySetup] = React.useState(null);
+  const [crmMenuOpen, setCrmMenuOpen] = React.useState(false);
   
   React.useEffect(() => {
     const fetchCompanySetup = async () => {
