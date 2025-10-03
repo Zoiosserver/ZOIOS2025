@@ -511,11 +511,12 @@ const CompanySetup = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-32 h-32 flex items-center justify-center mx-auto mb-4">
+          <div className="w-40 h-40 flex items-center justify-center mx-auto mb-4">
             <img 
               src="https://customer-assets.emergentagent.com/job_outreach-pulse-3/artifacts/5adajuhk_Zoios.png" 
               alt="ZOIOS Logo" 
-              className="w-32 h-32 object-contain"
+              className="w-40 h-40 object-contain"
+              style={{width: '150px', height: '150px'}}
             />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to ZOIOS ERP</h1>
