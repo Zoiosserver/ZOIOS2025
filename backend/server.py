@@ -1288,6 +1288,54 @@ async def get_user_company_assignments(current_user: UserInDB = Depends(get_curr
         print(f"Error in user assignments: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
+@api_router.post("/users/{user_id}/permissions")
+async def update_user_permissions(
+    user_id: str,
+    permissions_data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Update user permissions"""
+    # Only admin users can update permissions
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
+    
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    permissions = permissions_data.get("permissions", {})
+    
+    # Validate permission structure
+    valid_permissions = [
+        "dashboard", "crm_contacts", "crm_companies", "crm_call_logs", "crm_email_responses",
+        "currency_management", "consolidated_accounts", "company_accounts", 
+        "user_management", "company_assignments"
+    ]
+    
+    # Clean permissions to only include valid ones
+    clean_permissions = {
+        perm: bool(permissions.get(perm, False))
+        for perm in valid_permissions
+    }
+    
+    result = await db_to_use.users.update_one(
+        {"id": user_id},
+        {"$set": {
+            "permissions": clean_permissions,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"success": True, "message": "User permissions updated successfully"}
+
 @api_router.post("/users/{user_id}/role")
 async def update_user_role(
     user_id: str,
