@@ -42,6 +42,7 @@ class User(BaseModel):
     is_active: bool = True
     onboarding_completed: bool = False
     created_at: datetime
+    permissions: Optional[Dict[str, bool]] = Field(default_factory=dict)
 
 class UserInDB(User):
     hashed_password: str
