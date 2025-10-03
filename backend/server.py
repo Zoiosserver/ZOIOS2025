@@ -444,6 +444,117 @@ async def delete_user(user_id: str, current_user: UserInDB = Depends(get_admin_u
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "User deleted successfully"}
 
+# Company Setup Routes
+@api_router.get("/setup/countries")
+async def get_countries():
+    """Get available countries with accounting systems"""
+    return get_available_countries()
+
+@api_router.get("/setup/currencies") 
+async def get_currencies():
+    """Get available currencies"""
+    return get_available_currencies()
+
+@api_router.get("/setup/accounting-system/{country_code}")
+async def get_country_accounting_system(country_code: str):
+    """Get accounting system details for a country"""
+    accounting_system = get_accounting_system(country_code)
+    if not accounting_system:
+        raise HTTPException(status_code=404, detail="Country not supported")
+    return accounting_system
+
+@api_router.post("/setup/company", response_model=CompanySetup)
+async def setup_company(
+    company_data: CompanySetupCreate, 
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Setup company details and accounting system"""
+    # Check if user already has completed setup
+    if current_user.onboarding_completed:
+        raise HTTPException(status_code=400, detail="Company setup already completed")
+    
+    # Get accounting system details
+    accounting_system = get_accounting_system(company_data.country_code)
+    
+    # Create company setup
+    company_setup = CompanySetup(
+        user_id=current_user.id,
+        company_name=company_data.company_name,
+        country_code=company_data.country_code,
+        accounting_system=accounting_system["name"],
+        base_currency=company_data.base_currency,
+        additional_currencies=company_data.additional_currencies,
+        fiscal_year_start=accounting_system["fiscal_year_start"],
+        business_type=company_data.business_type,
+        industry=company_data.industry,
+        address=company_data.address,
+        city=company_data.city,
+        state=company_data.state,
+        postal_code=company_data.postal_code,
+        phone=company_data.phone,
+        email=company_data.email,
+        website=company_data.website,
+        tax_number=company_data.tax_number,
+        registration_number=company_data.registration_number,
+        setup_completed=True
+    )
+    
+    # Save company setup
+    prepared_company = prepare_for_mongo(company_setup.dict())
+    await db.company_setups.insert_one(prepared_company)
+    
+    # Create chart of accounts
+    chart_template = get_chart_of_accounts(accounting_system["chart_of_accounts"])
+    accounts_to_create = []
+    
+    for category, accounts in chart_template.items():
+        for account in accounts:
+            chart_account = ChartOfAccount(
+                company_id=company_setup.id,
+                code=account["code"],
+                name=account["name"],
+                account_type=account["type"],
+                category=account["category"]
+            )
+            accounts_to_create.append(prepare_for_mongo(chart_account.dict()))
+    
+    if accounts_to_create:
+        await db.chart_of_accounts.insert_many(accounts_to_create)
+    
+    # Update user onboarding status
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$set": {
+            "onboarding_completed": True,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return company_setup
+
+@api_router.get("/setup/company", response_model=CompanySetup)
+async def get_company_setup(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get user's company setup"""
+    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    return CompanySetup(**parse_from_mongo(company_setup))
+
+@api_router.get("/setup/chart-of-accounts")
+async def get_user_chart_of_accounts(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get user's chart of accounts"""
+    # Get user's company setup
+    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    # Get chart of accounts
+    accounts = await db.chart_of_accounts.find(
+        {"company_id": company_setup["id"], "is_active": True}
+    ).to_list(length=None)
+    
+    return [ChartOfAccount(**parse_from_mongo(account)) for account in accounts]
+
 # Dashboard and Analytics
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(current_user: UserInDB = Depends(get_current_active_user)):
