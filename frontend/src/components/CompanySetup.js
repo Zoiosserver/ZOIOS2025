@@ -246,32 +246,30 @@ const CompanySetup = () => {
     }
   };
 
-  const addSisterCompany = async () => {
+  const addSisterCompany = () => {
     if (!sisterCompanyForm.company_name || !sisterCompanyForm.country_code || !sisterCompanyForm.business_type || !sisterCompanyForm.industry) {
       toast.error('Please fill in all required fields for sister company');
       return;
     }
 
-    try {
-      setLoading(true);
-      const response = await axios.post(`${API}/company/sister-companies`, sisterCompanyForm);
-      setSisterCompanies([...sisterCompanies, response.data]);
-      setSisterCompanyForm({
-        company_name: '',
-        country_code: '',
-        base_currency: '',
-        business_type: '',
-        industry: '',
-        ownership_percentage: 100
-      });
-      setShowSisterCompanyForm(false);
-      toast.success('Sister company added successfully!');
-    } catch (error) {
-      console.error('Error adding sister company:', error);
-      toast.error(error.response?.data?.detail || 'Failed to add sister company');
-    } finally {
-      setLoading(false);
-    }
+    // Add sister company to local state (will be saved when main setup completes)
+    const newSisterCompany = {
+      id: `temp-${Date.now()}`, // Temporary ID
+      ...sisterCompanyForm,
+      created_at: new Date().toISOString()
+    };
+    
+    setSisterCompanies([...sisterCompanies, newSisterCompany]);
+    setSisterCompanyForm({
+      company_name: '',
+      country_code: '',
+      base_currency: '',
+      business_type: '',
+      industry: '',
+      ownership_percentage: 100
+    });
+    setShowSisterCompanyForm(false);
+    toast.success('Sister company added to setup!');
   };
 
   const removeSisterCompany = async (companyId) => {
