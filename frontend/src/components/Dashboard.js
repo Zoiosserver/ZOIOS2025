@@ -168,6 +168,108 @@ const Dashboard = () => {
         </div>
       </div>
       
+      {/* Company Information */}
+      {companySetup && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="w-5 h-5" />
+                Company Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-semibold text-lg text-gray-900">{companySetup.company_name}</h3>
+                  <p className="text-gray-600">{companySetup.business_type}</p>
+                  <p className="text-gray-600">{companySetup.industry}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600"><strong>Base Currency:</strong> {companySetup.base_currency}</p>
+                  <p className="text-sm text-gray-600"><strong>Country:</strong> {companySetup.country_code}</p>
+                  {companySetup.fiscal_year_start && (
+                    <p className="text-sm text-gray-600"><strong>Fiscal Year:</strong> Starts {companySetup.fiscal_year_start}</p>
+                  )}
+                </div>
+              </div>
+              
+              {companySetup.address && (
+                <div className="pt-2 border-t">
+                  <p className="text-sm text-gray-600">
+                    <strong>Address:</strong> {companySetup.address}
+                    {companySetup.city && `, ${companySetup.city}`}
+                    {companySetup.state && `, ${companySetup.state}`}
+                    {companySetup.postal_code && ` ${companySetup.postal_code}`}
+                  </p>
+                </div>
+              )}
+              
+              <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                {companySetup.phone && <span><strong>Phone:</strong> {companySetup.phone}</span>}
+                {companySetup.email && <span><strong>Email:</strong> {companySetup.email}</span>}
+                {companySetup.website && <span><strong>Website:</strong> {companySetup.website}</span>}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Accounting System
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <p className="text-sm font-medium text-gray-700">System</p>
+                <p className="text-gray-900">{companySetup.accounting_system || 'Standard Accounting'}</p>
+              </div>
+              
+              <div>
+                <p className="text-sm font-medium text-gray-700">Multi-Currency</p>
+                <p className="text-gray-900">
+                  {companySetup.additional_currencies?.length > 0 ? 'Enabled' : 'Disabled'}
+                </p>
+                {companySetup.additional_currencies?.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-600">Additional Currencies:</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {companySetup.additional_currencies.map(currency => (
+                        <span key={currency} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                          {currency}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {companySetup.business_type === 'Group Company' && (
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Sister Companies</p>
+                  <p className="text-gray-900">{sisterCompanies.length} companies</p>
+                  {sisterCompanies.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {sisterCompanies.slice(0, 3).map(company => (
+                        <div key={company.id} className="text-xs text-gray-600">
+                          • {company.company_name}
+                        </div>
+                      ))}
+                      {sisterCompanies.length > 3 && (
+                        <div className="text-xs text-gray-500">
+                          +{sisterCompanies.length - 3} more...
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat) => {
