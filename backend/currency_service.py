@@ -138,7 +138,10 @@ class CurrencyService:
                 # Try to fetch from online sources first
                 try:
                     online_rates = await self.fetch_online_rates(base_currency, target_currencies)
-                except Exception:
+                    if not online_rates:  # If online returns empty
+                        raise Exception("Online API returned no rates")
+                except Exception as e:
+                    print(f"Online fetch failed: {e}, using fallback rates")
                     # If online fetch fails, use fallback mock rates
                     online_rates = await self._get_fallback_rates(base_currency, target_currencies)
                 
