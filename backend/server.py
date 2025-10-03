@@ -1263,7 +1263,7 @@ async def get_user_company_assignments(current_user: UserInDB = Depends(get_curr
     
     return {
         "users": user_assignments,
-        "companies": companies
+        "companies": [parse_from_mongo(comp) for comp in companies]
     }
 
 @api_router.post("/users/{user_id}/role")
