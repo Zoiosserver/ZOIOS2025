@@ -245,14 +245,54 @@ const CurrencyManagement = () => {
                 </div>
               </div>
               <div>
-                <Label className="text-sm font-medium text-gray-700">Additional Currencies</Label>
-                <div className="mt-1 flex flex-wrap gap-2">
-                  {(companySetup.additional_currencies || []).map(currency => (
-                    <Badge key={currency} variant="outline">
-                      {currency}
-                    </Badge>
-                  ))}
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium text-gray-700">Additional Currencies</Label>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowCurrencySettings(!showCurrencySettings)}
+                  >
+                    <Settings className="w-4 h-4 mr-1" />
+                    Edit
+                  </Button>
                 </div>
+                
+                {showCurrencySettings ? (
+                  <div className="mt-2 space-y-2">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {allCurrencies.map(currency => (
+                        <label key={currency} className="flex items-center space-x-2 p-2 border rounded">
+                          <Checkbox
+                            checked={(companySetup.additional_currencies || []).includes(currency)}
+                            onCheckedChange={(checked) => {
+                              const current = companySetup.additional_currencies || [];
+                              const updated = checked
+                                ? [...current, currency]
+                                : current.filter(c => c !== currency);
+                              updateAdditionalCurrencies(updated);
+                            }}
+                          />
+                          <span className="text-sm">{currency}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setShowCurrencySettings(false)}
+                    >
+                      Done
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {(companySetup.additional_currencies || []).map(currency => (
+                      <Badge key={currency} variant="outline">
+                        {currency}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             {lastUpdated && (
