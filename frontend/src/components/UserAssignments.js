@@ -14,7 +14,10 @@ import {
   Info,
   Building,
   Mail,
-  Trash2
+  Trash2,
+  Settings,
+  Check,
+  X
 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
