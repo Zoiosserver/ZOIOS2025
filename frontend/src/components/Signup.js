@@ -9,7 +9,7 @@ import { BarChart3, User, Mail, Lock, Building, AlertCircle, ArrowLeft } from 'l
 import { toast } from 'sonner';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'https://b74cc3d4-0a98-4583-9eb2-4600dc1ad1aa.preview.emergentagent.com';
 const API = `${BACKEND_URL}/api`;
 console.log('Signup component - BACKEND_URL:', BACKEND_URL, 'API:', API);
 
