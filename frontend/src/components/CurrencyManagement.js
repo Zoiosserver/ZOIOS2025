@@ -360,7 +360,7 @@ const CurrencyManagement = () => {
               </select>
             </div>
             <div className="flex items-end">
-              <Button onClick={convertCurrency} className="w-full">
+              <Button onClick={convertCurrency} className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                 Convert
               </Button>
             </div>
