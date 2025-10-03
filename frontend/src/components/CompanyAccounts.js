@@ -46,7 +46,10 @@ const CompanyAccounts = () => {
   });
 
   const getNextAccountCode = (accountType) => {
-    if (!companyAccounts?.accounts_by_category) return '';
+    if (!companyAccounts?.accounts_by_category) {
+      // If accounts not loaded yet, return empty string to wait
+      return '';
+    }
     
     const accountTypeRanges = {
       'Asset': { start: 1000, prefix: '1' },
@@ -72,18 +75,15 @@ const CompanyAccounts = () => {
       });
     });
     
-    // Sort existing codes
-    existingCodes.sort((a, b) => a - b);
-    
     // Find the next available code
     if (existingCodes.length === 0) {
       return range.start.toString();
     }
     
-    // Sort and find gaps or use next after highest
+    // Sort existing codes
     existingCodes.sort((a, b) => a - b);
     
-    // Check for gaps in sequence
+    // Check for gaps in sequence starting from the range start
     for (let i = range.start; i < range.start + 1000; i++) {
       if (!existingCodes.includes(i)) {
         return i.toString();
