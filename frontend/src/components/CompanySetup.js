@@ -987,6 +987,25 @@ const CompanySetup = () => {
   );
 
   return (
+    <>
+      <style>
+        {`
+          .no-truncate, .no-truncate * {
+            overflow: visible !important;
+            text-overflow: unset !important;
+            white-space: nowrap !important;
+            word-wrap: normal !important;
+          }
+          [data-radix-select-content] {
+            min-width: 600px !important;
+            width: auto !important;
+          }
+          [data-radix-select-item] {
+            overflow: visible !important;
+            white-space: nowrap !important;
+          }
+        `}
+      </style>
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
