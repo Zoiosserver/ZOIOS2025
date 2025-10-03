@@ -360,7 +360,8 @@ const CompanySetup = () => {
       accounting_system: '',
       business_type: '',
       industry: '',
-      ownership_percentage: 100
+      ownership_percentage: 100,
+      fiscal_year_start: ''
     });
     setSisterCompanyAccountingSystem(null);
     setShowSisterCompanyForm(false);
