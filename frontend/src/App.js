@@ -9,6 +9,7 @@ import Companies from './components/Companies';
 import CallLogs from './components/CallLogs';
 import EmailResponses from './components/EmailResponses';
 import UserManagement from './components/UserManagement';
+import ResetPassword from './components/ResetPassword';
 import Sidebar from './components/Sidebar';
 import './App.css';
 
