@@ -1328,6 +1328,8 @@ async def delete_user(
     current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Delete a user (admin only)"""
+    print(f"Delete request for user_id: {user_id} by {current_user.email}")
+    
     # Only admin users can delete users
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
@@ -1349,11 +1351,20 @@ async def delete_user(
     else:
         db_to_use = tenant_db
     
+    # Check if user exists first
+    user_to_delete = await db_to_use.users.find_one({"id": user_id})
+    if not user_to_delete:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    print(f"Found user to delete: {user_to_delete.get('email')}")
+    
     # Delete the user
     result = await db_to_use.users.delete_one({"id": user_id})
     
+    print(f"Delete result: {result.deleted_count} documents deleted")
+    
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail="User not found or could not be deleted")
     
     return {"success": True, "message": "User deleted successfully"}
 
