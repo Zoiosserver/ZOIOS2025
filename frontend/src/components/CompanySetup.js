@@ -501,7 +501,8 @@ const CompanySetup = () => {
       )}
 
       {/* Sister Companies Section for Group Companies */}
-      {formData.business_type === 'Group Company' && (
+      {console.log('Business Type:', formData.business_type) /* Debug log */}
+      {(formData.business_type === 'Group Company') && (
         <div className="mt-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Sister Companies</h3>
