@@ -943,6 +943,7 @@ const CompanySetup = () => {
         <div className="flex justify-between mt-8">
           <Button
             variant="outline"
+            tabIndex={10}
             onClick={handlePrevious}
             disabled={currentStep === 1}
             className="flex items-center"
