@@ -231,9 +231,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "India Rupee Currency Display Issue"
-  stuck_tasks: 
-    - "India Rupee Currency Display Issue"
+    - "All currency display improvements verified and working"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
