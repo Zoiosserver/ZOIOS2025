@@ -281,7 +281,13 @@ const CompanySetup = () => {
       const refreshResult = await refreshUser();
       if (!refreshResult.success) {
         console.error('Failed to refresh user data:', refreshResult.error);
-        toast.error('Setup completed but failed to refresh user data. Please refresh the page.');
+        toast.success('Setup completed successfully! Redirecting to dashboard...');
+        // Force page refresh to trigger dashboard redirect
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+      } else {
+        toast.success('Company setup completed successfully!');
       }
       
     } catch (error) {
