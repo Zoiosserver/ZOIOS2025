@@ -780,6 +780,36 @@ const CompanySetup = () => {
         )}
       </div>
 
+      <div>
+        <Label htmlFor="fiscal_year_start">Fiscal Year Start Date *</Label>
+        <Select value={formData.fiscal_year_start} onValueChange={(value) => setFormData(prev => ({...prev, fiscal_year_start: value}))}>
+          <SelectTrigger tabIndex={2}>
+            <SelectValue placeholder="Select fiscal year start date" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="01-01">January 1st</SelectItem>
+            <SelectItem value="04-01">April 1st</SelectItem>
+            <SelectItem value="07-01">July 1st</SelectItem>
+            <SelectItem value="10-01">October 1st</SelectItem>
+            <SelectItem value="01-04">January 4th</SelectItem>
+            <SelectItem value="custom">Custom Date</SelectItem>
+          </SelectContent>
+        </Select>
+        {formData.fiscal_year_start === 'custom' && (
+          <div className="mt-2">
+            <Label htmlFor="custom_fiscal_date">Custom Fiscal Year Start (MM-DD)</Label>
+            <Input
+              id="custom_fiscal_date"
+              tabIndex={3}
+              placeholder="MM-DD (e.g., 03-15)"
+              pattern="[0-1][0-9]-[0-3][0-9]"
+              onChange={(e) => setFormData(prev => ({...prev, fiscal_year_start: e.target.value}))}
+            />
+          </div>
+        )}
+        <p className="text-xs text-gray-500 mt-1">This determines when your company's financial year begins</p>
+      </div>
+
       {accountingSystem && (
         <Alert>
           <Settings className="h-4 w-4" />
