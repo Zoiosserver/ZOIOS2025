@@ -997,7 +997,10 @@ class BackendTester:
         self.log("PHASE 2: CURRENCY EXCHANGE RATE FIX")
         self.log("=" * 40)
         
-        # Test 3: Currency Update Rates Fix
+        # Test 3: Setup Company for Currency Testing
+        test_results['company_setup'] = self.test_setup_company_for_admin()
+        
+        # Test 4: Currency Update Rates Fix
         test_results['currency_update_fix'] = self.test_currency_update_rates_fix()
         
         # Phase 3: User Management Fixes
