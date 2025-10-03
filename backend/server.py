@@ -428,6 +428,16 @@ async def reset_password(password_reset: PasswordReset):
 @api_router.get("/auth/me", response_model=User)
 async def get_current_user_info(current_user: UserInDB = Depends(get_current_active_user)):
     """Get current user information"""
+    # Get permissions from database (they might not be in the token)
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    db_to_use = tenant_db if tenant_db else db
+    
+    # Fetch fresh user data to get permissions
+    user_data = await db_to_use.users.find_one({"id": current_user.id})
+    permissions = user_data.get("permissions", {}) if user_data else {}
+    
     return User(
         id=current_user.id,
         email=current_user.email,
@@ -436,7 +446,8 @@ async def get_current_user_info(current_user: UserInDB = Depends(get_current_act
         role=current_user.role,
         is_active=current_user.is_active,
         onboarding_completed=current_user.onboarding_completed,
-        created_at=current_user.created_at
+        created_at=current_user.created_at,
+        permissions=permissions
     )
 
 # Admin Routes
