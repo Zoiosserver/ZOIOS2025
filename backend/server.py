@@ -510,7 +510,7 @@ async def setup_company(
     )
     
     # Initialize multi-tenant architecture
-    tenant_service = await get_tenant_service(MONGO_URL)
+    tenant_service = await get_tenant_service(mongo_url)
     
     # Create tenant database for this company
     tenant_db = await tenant_service.get_tenant_database(company_setup.id)
