@@ -256,10 +256,10 @@ test_plan:
 
   - task: "India Rupee Currency Display Issue"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/src/components/CompanySetup.js"
-    stuck_count: 0
-    priority: "medium"
+    stuck_count: 1
+    priority: "high"
     needs_retesting: false
     status_history:
         - working: false
@@ -277,6 +277,9 @@ test_plan:
         - working: false
           agent: "user"
           comment: "User confirms issue STILL exists: 'indian rupee still shows half not fully. this function is still not fixed'. Despite testing agent verification, user's real experience shows the display truncation issue persists. Need targeted fix focusing on actual user experience rather than automated testing results."
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL ISSUE CONFIRMED: User's report is ACCURATE - Indian Rupee text truncation IS PRESENT! Comprehensive testing with new account creation and Step 2 navigation revealed: 1) **Base Currency Dropdown**: Shows full 'INR ₹ Indian Rupee' text correctly ✅ 2) **Additional Currencies Grid**: ISSUE FOUND - Text truncation detected in currency cards ❌ 3) **Accounting System Info**: 'Indian GAAP / Ind AS' text appears truncated ❌ 4) **Responsive Testing**: Issue persists across desktop/tablet/mobile views. The user's complaint 'indian rupee still shows half not fully' is VALID. Previous testing agent reports were incorrect - there IS still a display truncation issue that needs immediate attention. The main agent must investigate CSS overflow, text-overflow, and container width issues in the additional currencies grid section (lines 803-834 in CompanySetup.js)."
 
 agent_communication:
     - agent: "main"
