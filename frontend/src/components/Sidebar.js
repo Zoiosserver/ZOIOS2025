@@ -57,10 +57,16 @@ const Sidebar = () => {
   
   // Build Company submenu items with dynamic currency icon
   const getCurrencyIcon = () => {
-    if (companySetup?.base_currency === 'INR') {
-      return () => <span className="w-5 h-5 flex items-center justify-center text-base">₹</span>;
-    }
-    return DollarSign;
+    const currencyIcons = {
+      'INR': () => <span className="w-5 h-5 flex items-center justify-center text-base">₹</span>,
+      'USD': DollarSign,
+      'EUR': () => <span className="w-5 h-5 flex items-center justify-center text-base">€</span>,
+      'GBP': () => <span className="w-5 h-5 flex items-center justify-center text-base">£</span>,
+      'JPY': () => <span className="w-5 h-5 flex items-center justify-center text-base">¥</span>,
+      'CNY': () => <span className="w-5 h-5 flex items-center justify-center text-base">¥</span>
+    };
+    
+    return currencyIcons[companySetup?.base_currency] || DollarSign;
   };
 
   const companySubmenuItems = [
