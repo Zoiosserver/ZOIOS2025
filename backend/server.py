@@ -244,7 +244,7 @@ async def register(user_data: UserCreate, current_user: UserInDB = Depends(get_a
     return Token(access_token=access_token, token_type="bearer", user=user_response)
 
 @api_router.post("/auth/signup", response_model=Token)
-async def public_signup(user_data: UserCreate):
+async def public_signup(user_data: UserSignup):
     """Public signup endpoint for new users"""
     # Check if user already exists
     existing_user = await db.users.find_one({"email": user_data.email})
