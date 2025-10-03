@@ -59,26 +59,30 @@ const CompanyAccounts = () => {
     const range = accountTypeRanges[accountType];
     if (!range) return '';
     
-    // Get all existing codes for this account type
+    // Get all existing codes for this account type across all categories
     const existingCodes = [];
     Object.values(companyAccounts.accounts_by_category).forEach(accounts => {
       accounts.forEach(account => {
         if (account.account_type === accountType && account.code) {
           const codeNum = parseInt(account.code);
-          if (!isNaN(codeNum)) {
+          if (!isNaN(codeNum) && codeNum >= range.start && codeNum < range.start + 1000) {
             existingCodes.push(codeNum);
           }
         }
       });
     });
     
-    // Find next available code
-    let nextCode = range.start;
-    while (existingCodes.includes(nextCode)) {
-      nextCode++;
+    // Sort existing codes and find the next available one
+    existingCodes.sort((a, b) => a - b);
+    
+    // If no existing codes, start with the base
+    if (existingCodes.length === 0) {
+      return range.start.toString();
     }
     
-    return nextCode.toString();
+    // Find the highest existing code and add 1
+    const maxCode = Math.max(...existingCodes);
+    return (maxCode + 1).toString();
   };
 
   const handleAccountTypeChange = (accountType) => {
