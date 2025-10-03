@@ -123,22 +123,41 @@ const SimpleCompanySetup = ({ user, onComplete }) => {
     try {
       const backendUrl = window.location.origin;
       
+      const submitData = {
+        ...formData,
+        address: addressData
+      };
+      
+      console.log('Submitting company setup:', submitData);
+      
       const response = await fetch(`${backendUrl}/api/setup/company`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submitData)
       });
 
       if (response.ok) {
-        onComplete();
+        console.log('Company setup successful');
+        // Add a small delay before calling onComplete to ensure state is updated
+        setTimeout(() => {
+          try {
+            onComplete();
+          } catch (err) {
+            console.error('Error in onComplete callback:', err);
+            // Fallback - just show success message
+            alert('Company setup completed successfully!');
+            window.location.reload();
+          }
+        }, 500);
       } else {
-        const error = await response.json();
-        setError(error.detail || 'Setup failed');
+        const errorData = await response.json().catch(() => ({ detail: 'Setup failed' }));
+        setError(errorData.detail || 'Setup failed');
       }
     } catch (err) {
+      console.error('Setup submission error:', err);
       setError('Connection failed: ' + err.message);
     } finally {
       setLoading(false);
