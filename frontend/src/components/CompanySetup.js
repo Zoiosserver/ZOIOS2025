@@ -607,7 +607,7 @@ const CompanySetup = () => {
                     value={sisterCompanyForm.industry}
                     onValueChange={(value) => setSisterCompanyForm(prev => ({...prev, industry: value}))}
                   >
-                    <SelectTrigger tabIndex={4}>
+                    <SelectTrigger tabIndex={9}>
                       <SelectValue placeholder="Select industry" />
                     </SelectTrigger>
                     <SelectContent>
