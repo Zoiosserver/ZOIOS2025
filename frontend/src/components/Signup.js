@@ -45,13 +45,9 @@ const Signup = ({ onBackToLogin }) => {
     }
 
     try {
-      // Use same host as frontend but port 8001
-      const BACKEND_URL = window.location.origin.replace(':3000', ':8001').replace('https://', 'https://').replace('http://', 'https://');
-      console.log('Frontend origin:', window.location.origin);
-      console.log('Constructed backend URL:', BACKEND_URL);
-      
-      // Show user what URL we're trying
-      setError('Trying to connect to: ' + BACKEND_URL);
+      // Simple hardcoded URL for now
+      const BACKEND_URL = 'http://localhost:8001';
+      console.log('Using backend URL:', BACKEND_URL);
       
       const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
         method: 'POST',
