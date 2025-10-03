@@ -136,16 +136,19 @@ backend:
           comment: "✅ BACKEND AUTH WORKING PERFECTLY: /auth/me endpoint correctly returns onboarding_completed: true after company setup. JWT token handling is correct. Backend authentication is not the issue."
 
   - task: "Chart of Accounts Implementation"
-    implemented: false
+    implemented: true
     working: "NA"
     file: "/app/backend/accounting_systems.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Need to implement double-entry chart of accounts with scalable structure."
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented comprehensive chart of accounts with country-specific templates (US GAAP, UK GAAP, Indian GAAP) and automatic account creation during company setup."
 
   - task: "Multi-Currency Online Rate Fetching"
     implemented: false
