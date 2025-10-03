@@ -231,10 +231,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Tab Navigation in Company Setup - COMPLETED SUCCESSFULLY"
+    - "India Rupee Currency Display Issue"
   stuck_tasks: []
   test_all: false
-  test_priority: "completed"
+  test_priority: "medium_first"
 
   - task: "Tab Navigation in Company Setup"
     implemented: true
