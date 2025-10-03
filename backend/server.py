@@ -682,7 +682,14 @@ async def update_exchange_rates(current_user: UserInDB = Depends(get_current_act
     additional_currencies = company_setup.get("additional_currencies", [])
     
     if not additional_currencies:
-        return {"success": True, "message": "No additional currencies configured"}
+        return {
+            "success": True, 
+            "message": "No additional currencies configured",
+            "updated_rates": 0,
+            "base_currency": base_currency,
+            "target_currencies": [],
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
     
     currency_service = await get_currency_service(db_to_use)
     
