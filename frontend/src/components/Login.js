@@ -45,14 +45,14 @@ const Login = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo and Title */}
-        <div className=\"text-center mb-8\">
-          <div className=\"flex justify-center mb-4\">
-            <div className=\"w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg\">
-              <BarChart3 className=\"w-8 h-8 text-white\" />
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg">
+              <BarChart3 className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h1 className=\"text-3xl font-bold text-gray-900 mb-2\">Welcome to ZOIOS</h1>
-          <p className=\"text-gray-600\">Sign in to your marketing CRM account</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to ZOIOS</h1>
+          <p className="text-gray-600">Sign in to your marketing CRM account</p>
         </div>
 
         {/* Login Form */}
