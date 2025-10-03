@@ -287,11 +287,53 @@ const CompanyAccounts = () => {
                                 </Badge>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className="text-lg font-semibold text-gray-900">
-                                {formatCurrency(account.balance, selectedCompany.base_currency)}
+                            <div className="flex items-center gap-4">
+                              <div className="text-right">
+                                {editingBalance === account.id ? (
+                                  <div className="flex items-center gap-2">
+                                    <Input
+                                      type="number"
+                                      value={newBalance}
+                                      onChange={(e) => setNewBalance(e.target.value)}
+                                      className="w-32"
+                                      placeholder="0.00"
+                                    />
+                                    <Button 
+                                      size="sm" 
+                                      onClick={() => updateOpeningBalance(account.id, newBalance)}
+                                      className="bg-green-600 hover:bg-green-700"
+                                    >
+                                      <Save className="w-4 h-4" />
+                                    </Button>
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline"
+                                      onClick={() => setEditingBalance(null)}
+                                    >
+                                      <X className="w-4 h-4" />
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <div className="text-lg font-semibold text-gray-900">
+                                      {formatCurrency(account.balance, selectedCompany.base_currency)}
+                                    </div>
+                                    <div className="text-sm text-gray-500">Current Balance</div>
+                                  </>
+                                )}
                               </div>
-                              <div className="text-sm text-gray-500">Current Balance</div>
+                              {editingBalance !== account.id && (
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => {
+                                    setEditingBalance(account.id);
+                                    setNewBalance(account.balance.toString());
+                                  }}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                              )}
                             </div>
                           </div>
                         </div>
