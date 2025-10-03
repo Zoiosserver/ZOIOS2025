@@ -13,7 +13,9 @@ import {
   Shield,
   User,
   DollarSign,
-  FileText
+  FileText,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
