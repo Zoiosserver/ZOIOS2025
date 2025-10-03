@@ -34,6 +34,16 @@ const CompanyAccounts = () => {
   const [companies, setCompanies] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [companyAccounts, setCompanyAccounts] = useState(null);
+  const [editingBalance, setEditingBalance] = useState(null);
+  const [newBalance, setNewBalance] = useState('');
+  const [showAddAccountDialog, setShowAddAccountDialog] = useState(false);
+  const [newAccount, setNewAccount] = useState({
+    code: '',
+    name: '',
+    account_type: '',
+    category: '',
+    opening_balance: 0
+  });
 
   useEffect(() => {
     fetchCompanies();
