@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import hashlib
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from motor.motor_asyncio import AsyncIOMotorClient
