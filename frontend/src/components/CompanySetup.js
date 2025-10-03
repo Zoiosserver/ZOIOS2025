@@ -461,14 +461,27 @@ const CompanySetup = () => {
                       }));
                     }}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select country" />
+                    <SelectTrigger className="w-full">
+                      <div className="flex items-center justify-between w-full">
+                        {sisterCompanyForm.country_code ? (
+                          <>
+                            <span className="flex-1 text-left truncate">
+                              {countries.find(c => c.code === sisterCompanyForm.country_code)?.name || 'Unknown'}
+                            </span>
+                            <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                              ({countries.find(c => c.code === sisterCompanyForm.country_code)?.currency || ''})
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-gray-500">Select country</span>
+                        )}
+                      </div>
                     </SelectTrigger>
-                    <SelectContent className="min-w-[400px] w-auto">
+                    <SelectContent className="min-w-[400px] w-auto max-h-[200px] overflow-y-auto">
                       {countries.map(country => (
-                        <SelectItem key={country.code} value={country.code}>
-                          <div className="flex items-center justify-between w-full">
-                            <span>{country.name}</span>
+                        <SelectItem key={country.code} value={country.code} className="cursor-pointer">
+                          <div className="flex items-center w-full">
+                            <span className="flex-1">{country.name}</span>
                             <span className="text-xs text-gray-500 ml-2">({country.currency})</span>
                           </div>
                         </SelectItem>
