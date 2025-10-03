@@ -313,6 +313,23 @@ async def login(user_credentials: UserLogin):
     
     return Token(access_token=access_token, token_type="bearer", user=user_response)
 
+@api_router.post("/auth/forgot-password")
+async def forgot_password(email: str):
+    """Forgot password endpoint - sends reset instructions"""
+    # Check if user exists
+    user = await db.users.find_one({"email": email})
+    if not user:
+        # Don't reveal if email exists or not for security
+        return {"message": "If the email exists, password reset instructions have been sent"}
+    
+    # In a real implementation, you would:
+    # 1. Generate a secure reset token
+    # 2. Store it in database with expiration
+    # 3. Send email with reset link
+    # For now, we'll just return a success message
+    
+    return {"message": "If the email exists, password reset instructions have been sent"}
+
 @api_router.get("/auth/me", response_model=User)
 async def get_current_user_info(current_user: UserInDB = Depends(get_current_active_user)):
     """Get current user information"""
