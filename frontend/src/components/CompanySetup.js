@@ -267,7 +267,7 @@ const CompanySetup = () => {
         <div>
           <Label htmlFor="country">Country *</Label>
           <Select value={formData.country_code} onValueChange={handleCountryChange}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select your country" />
             </SelectTrigger>
             <SelectContent className="max-w-none w-full">
