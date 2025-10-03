@@ -113,14 +113,20 @@ const Sidebar = () => {
         <ul className="space-y-1 px-4">
           {menuItems.map((item) => {
             if (item.isSubmenu) {
-              // Handle submenu items (like CRM)
+              // Handle submenu items (CRM, Company, etc.)
               const isAnySubmenuActive = item.submenuItems.some(subItem => location.pathname === subItem.path);
               const Icon = item.icon;
+              
+              // Determine which submenu state to use
+              const isMenuOpen = item.label === 'CRM' ? crmMenuOpen : companyMenuOpen;
+              const toggleMenu = item.label === 'CRM' 
+                ? () => setCrmMenuOpen(!crmMenuOpen)
+                : () => setCompanyMenuOpen(!companyMenuOpen);
               
               return (
                 <li key={item.label}>
                   <button
-                    onClick={() => setCrmMenuOpen(!crmMenuOpen)}
+                    onClick={toggleMenu}
                     className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                       isAnySubmenuActive
                         ? 'bg-blue-50 text-blue-700'
@@ -131,7 +137,7 @@ const Sidebar = () => {
                       <Icon className={`w-5 h-5 ${isAnySubmenuActive ? 'text-blue-700' : 'text-gray-500'}`} />
                       <span>{item.label}</span>
                     </div>
-                    {crmMenuOpen ? (
+                    {isMenuOpen ? (
                       <ChevronDown className="w-4 h-4" />
                     ) : (
                       <ChevronRight className="w-4 h-4" />
