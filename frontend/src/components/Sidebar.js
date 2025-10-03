@@ -51,6 +51,27 @@ const Sidebar = () => {
     }
   }, [user]);
   
+  // Build Company submenu items
+  const companySubmenuItems = [
+    { path: '/currency', label: 'Currency Management', icon: DollarSign }
+  ];
+
+  // Add group company specific items
+  if (companySetup && companySetup.business_type === 'Group Company') {
+    companySubmenuItems.push(
+      { path: '/consolidated-accounts', label: 'Consolidated Accounts', icon: FileText },
+      { path: '/company-accounts', label: 'Company Accounts', icon: Building }
+    );
+  }
+
+  // Add admin-only company items
+  if (isAdmin()) {
+    companySubmenuItems.push(
+      { path: '/users', label: 'User Management', icon: Shield },
+      { path: '/user-assignments', label: 'Company Assignments', icon: Users }
+    );
+  }
+
   const menuItems = [
     { path: '/', label: 'Dashboard', icon: Home },
     { 
@@ -64,20 +85,13 @@ const Sidebar = () => {
         { path: '/email-responses', label: 'Email Responses', icon: Mail },
       ]
     },
-    { path: '/currency', label: 'Currency Management', icon: DollarSign },
+    { 
+      label: 'Company', 
+      icon: Building, 
+      isSubmenu: true,
+      submenuItems: companySubmenuItems
+    }
   ];
-
-  // Add consolidated accounts for group companies
-  if (companySetup && companySetup.business_type === 'Group Company') {
-    menuItems.push({ path: '/consolidated-accounts', label: 'Consolidated Accounts', icon: FileText });
-    menuItems.push({ path: '/company-accounts', label: 'Company Accounts', icon: Building });
-  }
-
-  // Add admin-only menu items
-  if (isAdmin()) {
-    menuItems.push({ path: '/users', label: 'User Management', icon: Shield });
-    menuItems.push({ path: '/user-assignments', label: 'Company Assignments', icon: Users });
-  }
   
   return (
     <div className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-sm z-10">
