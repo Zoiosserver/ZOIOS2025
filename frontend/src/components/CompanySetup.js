@@ -570,6 +570,7 @@ const CompanySetup = () => {
             <Building className="h-4 w-4" />
             <AlertDescription>
               As a Group Company, you can manage multiple sister companies with consolidated accounting. 
+              Sister companies added here will be saved when you complete the setup process.
               Each sister company will have its own chart of accounts that can be consolidated for reporting.
             </AlertDescription>
           </Alert>
