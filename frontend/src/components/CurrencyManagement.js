@@ -96,6 +96,20 @@ const CurrencyManagement = () => {
     }
   };
 
+  const updateAdditionalCurrencies = async (selectedCurrencies) => {
+    try {
+      await axios.put(`${API}/company/additional-currencies`, {
+        additional_currencies: selectedCurrencies
+      });
+      toast.success('Additional currencies updated successfully');
+      fetchCompanySetup();
+      fetchExchangeRates();
+    } catch (error) {
+      console.error('Error updating additional currencies:', error);
+      toast.error('Failed to update additional currencies');
+    }
+  };
+
   const saveManualRate = async (baseCurrency, targetCurrency, rate) => {
     try {
       await axios.post(`${API}/currency/set-manual-rate`, {
