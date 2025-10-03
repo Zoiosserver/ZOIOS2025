@@ -500,9 +500,15 @@ const CompanySetup = () => {
         </Alert>
       )}
 
+      {/* Debug: Show current business type */}
+      {formData.business_type && (
+        <div className="mt-4 p-2 bg-gray-100 rounded text-sm">
+          <strong>Selected Business Type:</strong> {formData.business_type}
+        </div>
+      )}
+
       {/* Sister Companies Section for Group Companies */}
-      {console.log('Business Type:', formData.business_type) /* Debug log */}
-      {(formData.business_type === 'Group Company') && (
+      {formData.business_type === 'Group Company' && (
         <div className="mt-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Sister Companies</h3>
