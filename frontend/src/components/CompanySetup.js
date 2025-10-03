@@ -164,6 +164,17 @@ const CompanySetup = () => {
     }
   };
 
+  const fetchSisterCompanyAccountingSystem = async (countryCode) => {
+    try {
+      const response = await axios.get(`${API}/setup/accounting-system/${countryCode}`);
+      setSisterCompanyAccountingSystem(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching sister company accounting system:', error);
+      return null;
+    }
+  };
+
   const handleCountryChange = (countryCode) => {
     const country = countries.find(c => c.code === countryCode);
     setSelectedCountry(country);
