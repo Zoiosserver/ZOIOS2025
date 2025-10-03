@@ -110,14 +110,12 @@ const ResetPassword = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <div className="w-40 h-40 flex items-center justify-center">
-                <img 
-                  src="https://customer-assets.emergentagent.com/job_outreach-pulse-3/artifacts/5adajuhk_Zoios.png" 
-                  alt="ZOIOS Logo" 
-                  className="w-40 h-40 object-contain"
-                  style={{width: '150px', height: '150px'}}
-                />
-              </div>
+              <img 
+                src="https://customer-assets.emergentagent.com/job_outreach-pulse-3/artifacts/5adajuhk_Zoios.png" 
+                alt="ZOIOS Logo" 
+                className="object-contain"
+                style={{width: '150px', height: '150px'}}
+              />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Password Reset Successful</h1>
             <p className="text-gray-600">Your password has been updated successfully</p>
