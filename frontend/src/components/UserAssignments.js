@@ -64,7 +64,7 @@ const UserAssignments = () => {
   };
 
   const deleteUser = async (userId, userEmail) => {
-    if (userEmail === 'admin@zoios.com') {
+    if (userEmail === 'admin@2mholding.com') {
       toast.error('Cannot delete super admin user');
       return;
     }
