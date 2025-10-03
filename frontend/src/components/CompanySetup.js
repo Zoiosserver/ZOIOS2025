@@ -709,6 +709,7 @@ const CompanySetup = () => {
                       {company.accounting_system && (
                         <p className="text-xs text-blue-600">
                           Accounting: {company.accounting_system} • Currency: {company.base_currency}
+                          {company.fiscal_year_start && ` • Fiscal Year: ${company.fiscal_year_start}`}
                         </p>
                       )}
                     </div>
