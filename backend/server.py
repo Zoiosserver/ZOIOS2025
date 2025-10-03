@@ -14,8 +14,10 @@ from enum import Enum
 from auth import (
     get_current_active_user, get_admin_user, create_access_token, 
     authenticate_user, hash_password, set_database, create_default_admin,
-    User, UserCreate, UserSignup, UserLogin, Token, UserInDB, prepare_user_for_mongo, parse_user_from_mongo
+    User, UserCreate, UserSignup, UserLogin, Token, UserInDB, prepare_user_for_mongo, parse_user_from_mongo,
+    PasswordReset, create_password_reset_token, verify_reset_token, use_reset_token
 )
+from email_service import send_password_reset_email, send_welcome_email
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
