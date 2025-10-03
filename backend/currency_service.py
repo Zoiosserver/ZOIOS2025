@@ -11,11 +11,12 @@ from typing import Dict, List, Optional, Any
 from pydantic import BaseModel
 import logging
 
-# Import helper function from server
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from server import prepare_for_mongo
+# Helper function for MongoDB preparation
+def prepare_for_mongo(data):
+    """Prepare data for MongoDB storage"""
+    if isinstance(data, dict):
+        return {k: v for k, v in data.items() if v is not None}
+    return data
 
 logger = logging.getLogger(__name__)
 
