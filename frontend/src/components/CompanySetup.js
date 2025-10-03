@@ -666,6 +666,11 @@ const CompanySetup = () => {
                       <p className="text-sm text-gray-600">
                         {countries.find(c => c.code === company.country_code)?.name} • {company.business_type} • {company.ownership_percentage}% owned
                       </p>
+                      {company.accounting_system && (
+                        <p className="text-xs text-blue-600">
+                          Accounting: {company.accounting_system} • Currency: {company.base_currency}
+                        </p>
+                      )}
                     </div>
                     <div className="flex gap-2">
                       <Button
