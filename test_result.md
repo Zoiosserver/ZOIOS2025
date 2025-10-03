@@ -137,11 +137,11 @@ backend:
 
   - task: "Chart of Accounts Implementation"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/accounting_systems.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
@@ -149,6 +149,9 @@ backend:
         - working: "NA"
           agent: "main"
           comment: "Implemented comprehensive chart of accounts with country-specific templates (US GAAP, UK GAAP, Indian GAAP) and automatic account creation during company setup."
+        - working: true
+          agent: "testing"
+          comment: "✅ CHART OF ACCOUNTS WORKING PERFECTLY: Successfully tested GET /api/setup/chart-of-accounts endpoint. Retrieved 26 accounts with proper US GAAP structure including all expected account codes (1000-Cash, 1100-AR, 2000-AP, 3000-Common Stock, 4000-Sales Revenue, 5000-COGS, 6000-Salaries). Accounts are properly categorized by type (asset, liability, equity, revenue, expense) and category (current_asset, fixed_asset, etc.). Double-entry accounting structure is correctly implemented."
 
   - task: "Multi-Currency Online Rate Fetching"
     implemented: true
