@@ -620,14 +620,24 @@ const CompanySetup = () => {
                         {countries.find(c => c.code === company.country_code)?.name} • {company.business_type} • {company.ownership_percentage}% owned
                       </p>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeSisterCompany(company.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      Remove
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => editSisterCompany(company.id)}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeSisterCompany(company.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        Remove
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}
