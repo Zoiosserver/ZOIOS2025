@@ -243,6 +243,48 @@ async def register(user_data: UserCreate, current_user: UserInDB = Depends(get_a
     
     return Token(access_token=access_token, token_type="bearer", user=user_response)
 
+@api_router.post("/auth/signup", response_model=Token)
+async def public_signup(user_data: UserCreate):
+    """Public signup endpoint for new users"""
+    # Check if user already exists
+    existing_user = await db.users.find_one({"email": user_data.email})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Create new user with 'user' role (not admin)
+    hashed_password = hash_password(user_data.password)
+    user = {
+        "id": str(uuid.uuid4()),
+        "email": user_data.email,
+        "hashed_password": hashed_password,
+        "name": user_data.name,
+        "company": user_data.company,
+        "role": "user",  # Always create as regular user
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc)
+    }
+    
+    prepared_user = prepare_user_for_mongo(user)
+    await db.users.insert_one(prepared_user)
+    
+    # Create access token
+    access_token_expires = timedelta(minutes=30)
+    access_token = create_access_token(
+        data={"sub": user["email"]}, expires_delta=access_token_expires
+    )
+    
+    user_response = User(
+        id=user["id"],
+        email=user["email"],
+        name=user["name"],
+        company=user["company"],
+        role=user["role"],
+        is_active=user["is_active"],
+        created_at=user["created_at"]
+    )
+    
+    return Token(access_token=access_token, token_type="bearer", user=user_response)
+
 @api_router.post("/auth/login", response_model=Token)
 async def login(user_credentials: UserLogin):
     """User login endpoint"""
