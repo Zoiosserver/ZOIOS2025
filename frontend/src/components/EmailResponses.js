@@ -138,7 +138,7 @@ const EmailResponses = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Email Responses</h1>
-          <p className="text-gray-600 mt-1">Track your email outreach and responses</p>
+          <p className="text-gray-600 mt-1">Track your business email communications</p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
