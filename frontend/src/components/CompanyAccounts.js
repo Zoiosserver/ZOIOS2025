@@ -362,16 +362,16 @@ const CompanyAccounts = () => {
                         </div>
                         <div>
                           <Label htmlFor="account_type">Account Type</Label>
-                          <Select value={newAccount.account_type} onValueChange={(value) => setNewAccount({...newAccount, account_type: value})}>
+                          <Select value={newAccount.account_type} onValueChange={handleAccountTypeChange}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select account type" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Asset">Asset</SelectItem>
-                              <SelectItem value="Liability">Liability</SelectItem>
-                              <SelectItem value="Equity">Equity</SelectItem>
-                              <SelectItem value="Revenue">Revenue</SelectItem>
-                              <SelectItem value="Expense">Expense</SelectItem>
+                              <SelectItem value="Asset">Asset (1000-1999)</SelectItem>
+                              <SelectItem value="Liability">Liability (2000-2999)</SelectItem>
+                              <SelectItem value="Equity">Equity (3000-3999)</SelectItem>
+                              <SelectItem value="Revenue">Revenue (4000-4999)</SelectItem>
+                              <SelectItem value="Expense">Expense (5000-5999)</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
