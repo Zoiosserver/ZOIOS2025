@@ -377,6 +377,165 @@ const CompanySetup = () => {
           </AlertDescription>
         </Alert>
       )}
+
+      {/* Sister Companies Section for Group Companies */}
+      {formData.business_type === 'Group Company' && (
+        <div className="mt-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900">Sister Companies</h3>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowSisterCompanyForm(!showSisterCompanyForm)}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Sister Company
+            </Button>
+          </div>
+
+          {/* Sister Company Form */}
+          {showSisterCompanyForm && (
+            <Card className="p-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="sister_company_name">Company Name *</Label>
+                  <Input
+                    id="sister_company_name"
+                    value={sisterCompanyForm.company_name}
+                    onChange={(e) => setSisterCompanyForm(prev => ({...prev, company_name: e.target.value}))}
+                    placeholder="Enter sister company name"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="sister_country">Country *</Label>
+                  <Select
+                    value={sisterCompanyForm.country_code}
+                    onValueChange={(value) => {
+                      const country = countries.find(c => c.code === value);
+                      setSisterCompanyForm(prev => ({
+                        ...prev,
+                        country_code: value,
+                        base_currency: country?.currency || ''
+                      }));
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent className="min-w-[400px] w-auto">
+                      {countries.map(country => (
+                        <SelectItem key={country.code} value={country.code}>
+                          <div className="flex items-center justify-between w-full">
+                            <span>{country.name}</span>
+                            <span className="text-xs text-gray-500 ml-2">({country.currency})</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="sister_business_type">Business Type *</Label>
+                  <Select
+                    value={sisterCompanyForm.business_type}
+                    onValueChange={(value) => setSisterCompanyForm(prev => ({...prev, business_type: value}))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select business type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {businessTypes.filter(type => type !== 'Group Company').map(type => (
+                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="sister_industry">Industry *</Label>
+                  <Select
+                    value={sisterCompanyForm.industry}
+                    onValueChange={(value) => setSisterCompanyForm(prev => ({...prev, industry: value}))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select industry" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {industries.map(industry => (
+                        <SelectItem key={industry} value={industry}>{industry}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="ownership_percentage">Ownership Percentage</Label>
+                  <Input
+                    id="ownership_percentage"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={sisterCompanyForm.ownership_percentage}
+                    onChange={(e) => setSisterCompanyForm(prev => ({...prev, ownership_percentage: parseFloat(e.target.value)}))}
+                    placeholder="100"
+                  />
+                </div>
+
+                <div className="md:col-span-2 flex gap-2">
+                  <Button type="button" onClick={addSisterCompany} disabled={loading}>
+                    {loading ? 'Adding...' : 'Add Company'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowSisterCompanyForm(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Sister Companies List */}
+          {sisterCompanies.length > 0 && (
+            <div className="space-y-2">
+              {sisterCompanies.map(company => (
+                <Card key={company.id} className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium text-gray-900">{company.company_name}</h4>
+                      <p className="text-sm text-gray-600">
+                        {countries.find(c => c.code === company.country_code)?.name} • {company.business_type} • {company.ownership_percentage}% owned
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeSisterCompany(company.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          <Alert>
+            <Building className="h-4 w-4" />
+            <AlertDescription>
+              As a Group Company, you can manage multiple sister companies with consolidated accounting. 
+              Each sister company will have its own chart of accounts that can be consolidated for reporting.
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
     </div>
   );
 
