@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SimpleLogin from './components/SimpleLogin';
 import SimpleSignup from './components/SimpleSignup';
-import SimpleCompanySetup from './components/SimpleCompanySetup';
+import WorkingCompanySetup from './components/WorkingCompanySetup';
 import SimpleDashboard from './components/SimpleDashboard';
 import './App.css';
 
