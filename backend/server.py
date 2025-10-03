@@ -780,7 +780,7 @@ async def add_sister_company(
             accounts_to_create.append(prepare_for_mongo(chart_account.dict()))
     
     if accounts_to_create:
-        await db.chart_of_accounts.insert_many(accounts_to_create)
+        await db_to_use.chart_of_accounts.insert_many(accounts_to_create)
     
     return sister_company_data
 
