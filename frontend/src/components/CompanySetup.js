@@ -234,6 +234,45 @@ const CompanySetup = () => {
     }
   };
 
+  const addSisterCompany = async () => {
+    if (!sisterCompanyForm.company_name || !sisterCompanyForm.country_code || !sisterCompanyForm.business_type || !sisterCompanyForm.industry) {
+      toast.error('Please fill in all required fields for sister company');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.post(`${API}/company/sister-companies`, sisterCompanyForm);
+      setSisterCompanies([...sisterCompanies, response.data]);
+      setSisterCompanyForm({
+        company_name: '',
+        country_code: '',
+        base_currency: '',
+        business_type: '',
+        industry: '',
+        ownership_percentage: 100
+      });
+      setShowSisterCompanyForm(false);
+      toast.success('Sister company added successfully!');
+    } catch (error) {
+      console.error('Error adding sister company:', error);
+      toast.error(error.response?.data?.detail || 'Failed to add sister company');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeSisterCompany = async (companyId) => {
+    try {
+      await axios.delete(`${API}/company/sister-companies/${companyId}`);
+      setSisterCompanies(sisterCompanies.filter(company => company.id !== companyId));
+      toast.success('Sister company removed successfully!');
+    } catch (error) {
+      console.error('Error removing sister company:', error);
+      toast.error(error.response?.data?.detail || 'Failed to remove sister company');
+    }
+  };
+
   const renderStepIndicator = () => (
     <div className="flex items-center justify-center mb-8">
       {[1, 2, 3].map((step) => (
