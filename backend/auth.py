@@ -111,6 +111,42 @@ class ChartOfAccount(BaseModel):
     is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class SisterCompany(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    group_company_id: str  # Reference to the parent group company
+    company_name: str
+    country_code: str
+    base_currency: str
+    business_type: str
+    industry: str
+    incorporation_date: Optional[str] = None
+    ownership_percentage: Optional[float] = 100.0  # Percentage owned by group
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SisterCompanyCreate(BaseModel):
+    company_name: str
+    country_code: str
+    base_currency: str
+    business_type: str
+    industry: str
+    incorporation_date: Optional[str] = None
+    ownership_percentage: Optional[float] = 100.0
+
+class ConsolidatedAccount(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    group_company_id: str
+    account_code: str
+    account_name: str
+    account_type: str
+    category: str
+    consolidated_balance: float = 0.0
+    sister_companies_data: List[Dict] = []  # Individual company balances
+    consolidation_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 class PasswordResetToken(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
