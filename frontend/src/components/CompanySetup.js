@@ -99,6 +99,7 @@ const CompanySetup = () => {
     'Agriculture',
     'Entertainment & Media',
     'Energy & Utilities',
+    'Elevators & Escalators',
     'Other'
   ];
 
