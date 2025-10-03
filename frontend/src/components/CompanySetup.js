@@ -802,7 +802,34 @@ const CompanySetup = () => {
         <p className="text-sm text-gray-600 mb-3">
           Select additional currencies for multi-currency transactions. You can manage exchange rates and convert between currencies later.
         </p>
+        
+        {/* Popular currencies section */}
+        <div className="mb-3">
+          <Label className="text-sm text-gray-700 mb-2 block">Popular Currencies</Label>
+          <div className="flex flex-wrap gap-2">
+            {['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD'].filter(code => code !== formData.base_currency).map(code => {
+              const currency = currencies.find(c => c.code === code);
+              if (!currency) return null;
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => handleCurrencyToggle(code)}
+                  className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                    formData.additional_currencies.includes(code)
+                      ? 'bg-blue-100 border-blue-300 text-blue-700'
+                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {currency.symbol} {code}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-4 bg-gray-50">
+          <div className="text-xs text-gray-600 mb-2 font-medium">All Available Currencies</div>
           {currencies.filter(c => c.code !== formData.base_currency).map(currency => (
             <div 
               key={currency.code} 
