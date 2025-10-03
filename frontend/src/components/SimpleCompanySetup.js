@@ -228,6 +228,142 @@ const SimpleCompanySetup = ({ user, onComplete }) => {
               />
             </div>
 
+            {/* Sister Companies Section */}
+            {formData.business_type === 'Group Company' && (
+              <div className="border-t pt-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">Sister Companies</h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowSisterCompanyForm(true)}
+                    className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 text-sm"
+                  >
+                    + Add Sister Company
+                  </button>
+                </div>
+
+                {formData.sister_companies.length > 0 && (
+                  <div className="space-y-3 mb-4">
+                    {formData.sister_companies.map((company, index) => (
+                      <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="font-medium">{company.name}</div>
+                            <div className="text-sm text-gray-600">
+                              {company.country} • {company.industry} • {company.ownership_percentage}% ownership
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newSisters = formData.sister_companies.filter((_, i) => i !== index);
+                              setFormData({ ...formData, sister_companies: newSisters });
+                            }}
+                            className="text-red-600 hover:text-red-800 text-sm"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {showSisterCompanyForm && (
+                  <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                    <h4 className="font-medium text-gray-900 mb-3">Add Sister Company</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Company Name</label>
+                        <input
+                          type="text"
+                          value={sisterCompanyData.name}
+                          onChange={(e) => setSisterCompanyData({ ...sisterCompanyData, name: e.target.value })}
+                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Country</label>
+                        <select
+                          value={sisterCompanyData.country}
+                          onChange={(e) => setSisterCompanyData({ ...sisterCompanyData, country: e.target.value })}
+                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                        >
+                          <option value="">Select Country</option>
+                          {countries.map(country => (
+                            <option key={country.code} value={country.code}>
+                              {country.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Industry</label>
+                        <select
+                          value={sisterCompanyData.industry}
+                          onChange={(e) => setSisterCompanyData({ ...sisterCompanyData, industry: e.target.value })}
+                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                        >
+                          <option value="">Select Industry</option>
+                          <option value="Technology">Technology</option>
+                          <option value="Manufacturing">Manufacturing</option>
+                          <option value="Healthcare">Healthcare</option>
+                          <option value="Financial Services">Financial Services</option>
+                          <option value="Retail & E-commerce">Retail & E-commerce</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">Ownership Percentage</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={sisterCompanyData.ownership_percentage}
+                          onChange={(e) => setSisterCompanyData({ ...sisterCompanyData, ownership_percentage: parseInt(e.target.value) })}
+                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <div className="flex space-x-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (sisterCompanyData.name && sisterCompanyData.country && sisterCompanyData.industry) {
+                              setFormData({
+                                ...formData,
+                                sister_companies: [...formData.sister_companies, sisterCompanyData]
+                              });
+                              setSisterCompanyData({ name: '', country: '', business_type: 'Private Limited Company', industry: '', ownership_percentage: 100 });
+                              setShowSisterCompanyForm(false);
+                            }
+                          }}
+                          className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 text-sm"
+                        >
+                          Add Company
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowSisterCompanyForm(false);
+                            setSisterCompanyData({ name: '', country: '', business_type: 'Private Limited Company', industry: '', ownership_percentage: 100 });
+                          }}
+                          className="bg-gray-600 text-white px-3 py-1 rounded-md hover:bg-gray-700 text-sm"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {formData.business_type === 'Group Company' && formData.sister_companies.length === 0 && !showSisterCompanyForm && (
+                  <div className="text-center py-4 text-gray-500 bg-gray-50 rounded-lg">
+                    No sister companies added yet. Click "Add Sister Company" to get started.
+                  </div>
+                )}
+              </div>
+            )}
+
             <button
               type="submit"
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
