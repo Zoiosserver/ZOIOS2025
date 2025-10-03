@@ -114,6 +114,16 @@ const CompanySetup = () => {
     }
   }, [formData.country_code]);
 
+  useEffect(() => {
+    // Set selectedCountry when countries are loaded and there's a country_code
+    if (countries.length > 0 && formData.country_code && !selectedCountry) {
+      const country = countries.find(c => c.code === formData.country_code);
+      if (country) {
+        setSelectedCountry(country);
+      }
+    }
+  }, [countries, formData.country_code]);
+
   const fetchCountries = async () => {
     try {
       const response = await axios.get(`${API}/setup/countries`);
