@@ -953,7 +953,7 @@ const CompanySetup = () => {
           </Button>
 
           {currentStep < 3 ? (
-            <Button onClick={handleNext} className="flex items-center bg-blue-600 hover:bg-blue-700 text-white">
+            <Button onClick={handleNext} tabIndex={11} className="flex items-center bg-blue-600 hover:bg-blue-700 text-white">
               Next
               <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
