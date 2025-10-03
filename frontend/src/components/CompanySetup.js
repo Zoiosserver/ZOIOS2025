@@ -272,15 +272,9 @@ const CompanySetup = () => {
     toast.success('Sister company added to setup!');
   };
 
-  const removeSisterCompany = async (companyId) => {
-    try {
-      await axios.delete(`${API}/company/sister-companies/${companyId}`);
-      setSisterCompanies(sisterCompanies.filter(company => company.id !== companyId));
-      toast.success('Sister company removed successfully!');
-    } catch (error) {
-      console.error('Error removing sister company:', error);
-      toast.error(error.response?.data?.detail || 'Failed to remove sister company');
-    }
+  const removeSisterCompany = (companyId) => {
+    setSisterCompanies(sisterCompanies.filter(company => company.id !== companyId));
+    toast.success('Sister company removed from setup!');
   };
 
   const renderStepIndicator = () => (
