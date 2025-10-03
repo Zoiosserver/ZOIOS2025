@@ -254,29 +254,95 @@ const UserAssignments = () => {
                       </div>
                     </div>
 
-                    {/* Company Assignments */}
+                    {/* Menu Permissions */}
                     <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Company Access:</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {userData.company_assignments.map((assignment, index) => (
-                          <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                            <span className="text-sm text-gray-700">{assignment.company_name}</span>
-                            <div className="flex items-center gap-2">
-                              <Badge 
-                                variant="outline" 
-                                className={getRoleBadgeColor(assignment.role)}
-                              >
-                                {assignment.role}
-                              </Badge>
-                              {assignment.can_edit && (
-                                <Badge variant="outline" className="bg-green-100 text-green-800">
-                                  Can Edit
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                        ))}
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-medium text-gray-700">Menu Permissions:</h4>
+                        {editingPermissions !== userData.id && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => startEditingPermissions(userData.id, userData.permissions)}
+                          >
+                            <Settings className="w-4 h-4 mr-1" />
+                            Edit
+                          </Button>
+                        )}
                       </div>
+
+                      {editingPermissions === userData.id ? (
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {[
+                              { key: 'dashboard', label: 'Dashboard' },
+                              { key: 'crm_contacts', label: 'CRM - Contacts' },
+                              { key: 'crm_companies', label: 'CRM - Companies' },
+                              { key: 'crm_call_logs', label: 'CRM - Call Logs' },
+                              { key: 'crm_email_responses', label: 'CRM - Email Responses' },
+                              { key: 'currency_management', label: 'Currency Management' },
+                              { key: 'consolidated_accounts', label: 'Consolidated Accounts' },
+                              { key: 'company_accounts', label: 'Company Accounts' },
+                              { key: 'user_management', label: 'User Management' },
+                              { key: 'company_assignments', label: 'Company Assignments' }
+                            ].map(permission => (
+                              <div key={permission.key} className="flex items-center justify-between p-2 bg-white border rounded">
+                                <span className="text-sm text-gray-700">{permission.label}</span>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant={tempPermissions[permission.key] ? "default" : "outline"}
+                                    onClick={() => handlePermissionToggle(permission.key, !tempPermissions[permission.key])}
+                                    className="h-6 w-16"
+                                  >
+                                    {tempPermissions[permission.key] ? 
+                                      <><Check className="w-3 h-3 mr-1" />Yes</> : 
+                                      <><X className="w-3 h-3 mr-1" />No</>
+                                    }
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex gap-2 pt-2">
+                            <Button
+                              size="sm"
+                              onClick={() => updateUserPermissions(userData.id, tempPermissions)}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              Save Permissions
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setEditingPermissions(null)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                          {[
+                            { key: 'dashboard', label: 'Dashboard' },
+                            { key: 'crm_contacts', label: 'CRM - Contacts' },
+                            { key: 'crm_companies', label: 'CRM - Companies' },
+                            { key: 'crm_call_logs', label: 'CRM - Call Logs' },
+                            { key: 'crm_email_responses', label: 'CRM - Email Responses' },
+                            { key: 'currency_management', label: 'Currency Management' },
+                            { key: 'consolidated_accounts', label: 'Consolidated Accounts' },
+                            { key: 'company_accounts', label: 'Company Accounts' },
+                            { key: 'user_management', label: 'User Management' },
+                            { key: 'company_assignments', label: 'Company Assignments' }
+                          ].map(permission => (
+                            <div key={permission.key} className="flex items-center justify-between text-xs p-1">
+                              <span className="text-gray-600">{permission.label}</span>
+                              <Badge variant={userData.permissions?.[permission.key] ? "default" : "secondary"} className="text-xs">
+                                {userData.permissions?.[permission.key] ? 'Yes' : 'No'}
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
