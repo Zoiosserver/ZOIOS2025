@@ -101,7 +101,7 @@ function App() {
 
   if (currentView === 'company-setup') {
     return (
-      <SimpleCompanySetup 
+      <WorkingCompanySetup 
         user={user}
         onComplete={handleCompanySetupComplete}
       />
