@@ -871,6 +871,7 @@ const CompanySetup = () => {
           <Label htmlFor="website">Website</Label>
           <Input
             id="website"
+            tabIndex={7}
             value={formData.website}
             onChange={(e) => setFormData(prev => ({...prev, website: e.target.value}))}
             placeholder="https://www.example.com"
