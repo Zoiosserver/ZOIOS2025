@@ -246,7 +246,7 @@ const CurrencyManagement = () => {
               <div>
                 <Label className="text-sm font-medium text-gray-700">Additional Currencies</Label>
                 <div className="mt-1 flex flex-wrap gap-2">
-                  {companySetup.additional_currencies?.map(currency => (
+                  {(companySetup.additional_currencies || []).map(currency => (
                     <Badge key={currency} variant="outline">
                       {currency}
                     </Badge>
