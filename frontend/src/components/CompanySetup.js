@@ -837,6 +837,7 @@ const CompanySetup = () => {
           <Label htmlFor="postal_code">Postal Code</Label>
           <Input
             id="postal_code"
+            tabIndex={4}
             value={formData.postal_code}
             onChange={(e) => setFormData(prev => ({...prev, postal_code: e.target.value}))}
             placeholder="Enter postal code"
