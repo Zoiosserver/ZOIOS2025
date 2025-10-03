@@ -1,9 +1,10 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Login from './Login';
+import CompanySetup from './CompanySetup';
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
 
   if (loading) {
     return (
