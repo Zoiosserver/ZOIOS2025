@@ -145,7 +145,7 @@ const Sidebar = () => {
                   </button>
                   
                   {/* Submenu items */}
-                  {crmMenuOpen && (
+                  {isMenuOpen && (
                     <ul className="mt-1 space-y-1 ml-8">
                       {item.submenuItems.map((subItem) => {
                         const isActive = location.pathname === subItem.path;
