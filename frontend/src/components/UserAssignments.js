@@ -63,6 +63,24 @@ const UserAssignments = () => {
     }
   };
 
+  const deleteUser = async (userId, userEmail) => {
+    if (userEmail === 'admin@zoios.com') {
+      toast.error('Cannot delete super admin user');
+      return;
+    }
+    
+    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      try {
+        await axios.delete(`${API}/users/${userId}`);
+        toast.success('User deleted successfully');
+        fetchUserAssignments();
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        toast.error(error.response?.data?.detail || 'Failed to delete user');
+      }
+    }
+  };
+
   const getRoleBadgeColor = (role) => {
     switch (role.toLowerCase()) {
       case 'admin': return 'bg-red-100 text-red-800 border-red-200';
