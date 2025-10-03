@@ -213,7 +213,11 @@ const CurrencyManagement = () => {
                 <Label className="text-sm font-medium text-gray-700">Base Currency</Label>
                 <div className="mt-1">
                   <Badge variant="default" className="text-lg px-3 py-1">
-                    {companySetup.base_currency}
+                    {companySetup.base_currency} 
+                    {companySetup.base_currency === 'INR' && ' ₹'}
+                    {companySetup.base_currency === 'USD' && ' $'}
+                    {companySetup.base_currency === 'EUR' && ' €'}
+                    {companySetup.base_currency === 'GBP' && ' £'}
                   </Badge>
                 </div>
               </div>
