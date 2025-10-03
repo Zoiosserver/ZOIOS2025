@@ -75,13 +75,24 @@ const CompanyAccounts = () => {
     // Sort existing codes
     existingCodes.sort((a, b) => a - b);
     
-    // Find the next available code starting from range.start
-    let nextCode = range.start;
-    while (existingCodes.includes(nextCode)) {
-      nextCode++;
+    // Find the next available code
+    if (existingCodes.length === 0) {
+      return range.start.toString();
     }
     
-    return nextCode.toString();
+    // Sort and find gaps or use next after highest
+    existingCodes.sort((a, b) => a - b);
+    
+    // Check for gaps in sequence
+    for (let i = range.start; i < range.start + 1000; i++) {
+      if (!existingCodes.includes(i)) {
+        return i.toString();
+      }
+    }
+    
+    // If no gaps, use next after highest
+    const maxCode = Math.max(...existingCodes);
+    return (maxCode + 1).toString();
   };
 
   const handleAccountTypeChange = (accountType) => {
