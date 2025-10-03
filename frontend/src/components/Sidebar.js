@@ -115,26 +115,47 @@ const Sidebar = () => {
     });
   }
 
-  const menuItems = [
-    { path: '/', label: 'Dashboard', icon: Home },
-    { 
+  // Build CRM submenu items based on permissions
+  const crmSubmenuItems = [];
+  if (hasPermission('crm_contacts')) {
+    crmSubmenuItems.push({ path: '/contacts', label: 'Contacts', icon: Users });
+  }
+  if (hasPermission('crm_companies')) {
+    crmSubmenuItems.push({ path: '/companies', label: 'Companies', icon: Building2 });
+  }
+  if (hasPermission('crm_call_logs')) {
+    crmSubmenuItems.push({ path: '/call-logs', label: 'Call Logs', icon: Phone });
+  }
+  if (hasPermission('crm_email_responses')) {
+    crmSubmenuItems.push({ path: '/email-responses', label: 'Email Responses', icon: Mail });
+  }
+
+  const menuItems = [];
+
+  // Add Dashboard if user has permission
+  if (hasPermission('dashboard')) {
+    menuItems.push({ path: '/', label: 'Dashboard', icon: Home });
+  }
+
+  // Add CRM menu if user has any CRM permissions
+  if (crmSubmenuItems.length > 0) {
+    menuItems.push({ 
       label: 'CRM', 
       icon: BarChart3, 
       isSubmenu: true,
-      submenuItems: [
-        { path: '/contacts', label: 'Contacts', icon: Users },
-        { path: '/companies', label: 'Companies', icon: Building2 },
-        { path: '/call-logs', label: 'Call Logs', icon: Phone },
-        { path: '/email-responses', label: 'Email Responses', icon: Mail },
-      ]
-    },
-    { 
+      submenuItems: crmSubmenuItems
+    });
+  }
+
+  // Add Company menu if user has any company permissions
+  if (companySubmenuItems.length > 0) {
+    menuItems.push({ 
       label: 'Company', 
       icon: Building, 
       isSubmenu: true,
       submenuItems: companySubmenuItems
-    }
-  ];
+    });
+  }
   
   return (
     <div className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-sm z-10">
