@@ -220,7 +220,7 @@ const CurrencyManagement = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              {companySetup.base_currency === 'INR' ? 
+              {companySetup?.base_currency === 'INR' ? 
                 <span className="text-lg">₹</span> : 
                 <DollarSign className="w-5 h-5" />
               }
