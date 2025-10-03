@@ -773,8 +773,11 @@ def main():
     
     # Exit with error code if critical tests failed
     critical_tests = ['registration', 'login', 'auth_me_before', 'company_setup', 'auth_me_after']
+    new_feature_tests = ['chart_of_accounts', 'currency_rates_get', 'exchangerate_api']
     critical_passed = all(results.get(test, False) for test in critical_tests if test in results)
+    new_features_passed = all(results.get(test, False) for test in new_feature_tests if test in results)
     
+    # Exit successfully if critical tests pass (new features are not critical for exit code)
     sys.exit(0 if critical_passed else 1)
 
 if __name__ == "__main__":
