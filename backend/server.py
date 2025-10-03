@@ -1052,6 +1052,184 @@ async def get_accessible_companies(current_user: UserInDB = Depends(get_current_
     
     return companies
 
+@api_router.post("/company/{company_id}/accounts")
+async def add_account_to_company(
+    company_id: str,
+    account_data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Add a new account to company's chart of accounts"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Verify user has access to this company
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    # Check if this is the main company or a sister company
+    if company_id == company_setup["id"]:
+        # Main company - user has access
+        pass
+    else:
+        # Check if it's a sister company
+        sister_company = await db_to_use.sister_companies.find_one({
+            "id": company_id,
+            "group_company_id": company_setup["id"],
+            "is_active": True
+        })
+        
+        if not sister_company:
+            raise HTTPException(status_code=403, detail="Access denied to this company")
+    
+    # Create new account
+    from uuid import uuid4
+    account_id = str(uuid4())
+    
+    new_account = {
+        "id": account_id,
+        "company_id": company_id,
+        "code": account_data.get("code"),
+        "name": account_data.get("name"),
+        "account_type": account_data.get("account_type"),
+        "category": account_data.get("category"),
+        "opening_balance": account_data.get("opening_balance", 0.0),
+        "current_balance": account_data.get("opening_balance", 0.0),
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": current_user.id
+    }
+    
+    # Check if account code already exists
+    existing_account = await db_to_use.chart_of_accounts.find_one({
+        "company_id": company_id,
+        "code": account_data.get("code"),
+        "is_active": True
+    })
+    
+    if existing_account:
+        raise HTTPException(status_code=400, detail=f"Account code {account_data.get('code')} already exists")
+    
+    await db_to_use.chart_of_accounts.insert_one(prepare_for_mongo(new_account))
+    
+    return {"success": True, "account": new_account}
+
+@api_router.put("/company/{company_id}/accounts/{account_id}/opening-balance")
+async def update_account_opening_balance(
+    company_id: str,
+    account_id: str,
+    balance_data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Update opening balance for an account"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Verify user has access to this company
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    # Check access to company
+    if company_id != company_setup["id"]:
+        sister_company = await db_to_use.sister_companies.find_one({
+            "id": company_id,
+            "group_company_id": company_setup["id"],
+            "is_active": True
+        })
+        
+        if not sister_company:
+            raise HTTPException(status_code=403, detail="Access denied to this company")
+    
+    # Update account opening balance
+    opening_balance = balance_data.get("opening_balance", 0.0)
+    
+    result = await db_to_use.chart_of_accounts.update_one(
+        {"id": account_id, "company_id": company_id, "is_active": True},
+        {
+            "$set": {
+                "opening_balance": opening_balance,
+                "current_balance": opening_balance,  # Reset current balance to opening balance
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+                "updated_by": current_user.id
+            }
+        }
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Account not found")
+    
+    return {"success": True, "message": "Opening balance updated successfully"}
+
+@api_router.get("/users/company-assignments")
+async def get_user_company_assignments(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get user company assignments and roles"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Get all users in this tenant
+    users = await db_to_use.users.find({}).to_list(length=None)
+    
+    # Get company setup
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    # Get sister companies
+    sister_companies = await db_to_use.sister_companies.find({
+        "group_company_id": company_setup["id"],
+        "is_active": True
+    }).to_list(length=None)
+    
+    companies = [company_setup] + sister_companies
+    
+    user_assignments = []
+    for user in users:
+        user_data = {
+            "id": user["id"],
+            "email": user["email"],
+            "full_name": user["full_name"],
+            "role": user.get("role", "user"),
+            "is_active": user.get("is_active", True),
+            "company_assignments": []
+        }
+        
+        # Check which companies this user has access to
+        for company in companies:
+            # For now, all users in tenant have access to all companies
+            # This can be enhanced with specific role-based access
+            user_data["company_assignments"].append({
+                "company_id": company["id"],
+                "company_name": company.get("company_name", "Unknown"),
+                "role": "viewer" if user.get("role") != "admin" else "admin",
+                "can_edit": user.get("role") == "admin"
+            })
+        
+        user_assignments.append(user_data)
+    
+    return {
+        "users": user_assignments,
+        "companies": companies
+    }
+
 # Dashboard and Analytics
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(current_user: UserInDB = Depends(get_current_active_user)):
