@@ -231,9 +231,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "India Rupee Currency Display Issue - CRITICAL TRUNCATION CONFIRMED"
-  stuck_tasks: 
-    - "India Rupee Currency Display Issue"
+    - "Currency Exchange Rate Undefined Issue"
+    - "Currency Symbol Display Fix"
+    - "Account Code Auto-Generation Fix" 
+    - "User Deletion Fix"
+    - "Granular Permission System Implementation"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
