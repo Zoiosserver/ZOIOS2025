@@ -1333,6 +1333,34 @@ async def delete_user(
     
     return {"success": True, "message": "User deleted successfully"}
 
+@api_router.put("/company/additional-currencies")
+async def update_additional_currencies(
+    currency_data: dict,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Update additional currencies for the company"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    additional_currencies = currency_data.get("additional_currencies", [])
+    
+    # Update company setup with new additional currencies
+    result = await db_to_use.company_setups.update_one(
+        {"user_id": current_user.id},
+        {"$set": {"additional_currencies": additional_currencies}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    return {"success": True, "message": "Additional currencies updated successfully"}
+
 # Dashboard and Analytics
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(current_user: UserInDB = Depends(get_current_active_user)):
