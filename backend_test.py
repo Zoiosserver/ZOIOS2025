@@ -1008,10 +1008,10 @@ class BackendTester:
         self.log("PHASE 3: USER MANAGEMENT FIXES")
         self.log("=" * 40)
         
-        # Test 4: User Permissions Update
+        # Test 5: User Permissions Update
         test_results['permissions_update'] = self.test_user_permissions_update()
         
-        # Test 5: User Deletion Fix
+        # Test 6: User Deletion Fix
         test_results['user_deletion_fix'] = self.test_user_deletion_fix()
         
         # Summary
