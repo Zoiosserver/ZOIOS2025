@@ -263,6 +263,85 @@ const CompanyAccounts = () => {
                 </div>
 
                 {/* Accounts by Category */}
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Chart of Accounts</h3>
+                  <Dialog open={showAddAccountDialog} onOpenChange={setShowAddAccountDialog}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Account
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New Account</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="code">Account Code</Label>
+                          <Input
+                            id="code"
+                            value={newAccount.code}
+                            onChange={(e) => setNewAccount({...newAccount, code: e.target.value})}
+                            placeholder="e.g., 1001"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="name">Account Name</Label>
+                          <Input
+                            id="name"
+                            value={newAccount.name}
+                            onChange={(e) => setNewAccount({...newAccount, name: e.target.value})}
+                            placeholder="e.g., Cash in Hand"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="account_type">Account Type</Label>
+                          <Select value={newAccount.account_type} onValueChange={(value) => setNewAccount({...newAccount, account_type: value})}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select account type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Asset">Asset</SelectItem>
+                              <SelectItem value="Liability">Liability</SelectItem>
+                              <SelectItem value="Equity">Equity</SelectItem>
+                              <SelectItem value="Revenue">Revenue</SelectItem>
+                              <SelectItem value="Expense">Expense</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="category">Category</Label>
+                          <Input
+                            id="category"
+                            value={newAccount.category}
+                            onChange={(e) => setNewAccount({...newAccount, category: e.target.value})}
+                            placeholder="e.g., Current Assets"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="opening_balance">Opening Balance</Label>
+                          <Input
+                            id="opening_balance"
+                            type="number"
+                            value={newAccount.opening_balance}
+                            onChange={(e) => setNewAccount({...newAccount, opening_balance: parseFloat(e.target.value) || 0})}
+                            placeholder="0.00"
+                          />
+                        </div>
+                        <div className="flex gap-2 pt-4">
+                          <Button onClick={addNewAccount} className="bg-blue-600 hover:bg-blue-700">
+                            Add Account
+                          </Button>
+                          <Button variant="outline" onClick={() => setShowAddAccountDialog(false)}>
+                            Cancel
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
                 {Object.entries(companyAccounts.accounts_by_category).map(([category, accounts]) => (
                   <div key={category} className="border rounded-lg overflow-hidden">
                     <div className="bg-gray-50 px-4 py-3 border-b">
