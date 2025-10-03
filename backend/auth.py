@@ -58,6 +58,58 @@ class UserSignup(BaseModel):
     name: str
     company: str
 
+class CompanySetup(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    company_name: str
+    country_code: str
+    accounting_system: str
+    base_currency: str
+    additional_currencies: List[str] = []
+    fiscal_year_start: str  # MM-DD format
+    business_type: str
+    industry: str
+    address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
+    tax_number: Optional[str] = None
+    registration_number: Optional[str] = None
+    setup_completed: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CompanySetupCreate(BaseModel):
+    company_name: str
+    country_code: str
+    base_currency: str
+    additional_currencies: List[str] = []
+    business_type: str
+    industry: str
+    address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
+    tax_number: Optional[str] = None
+    registration_number: Optional[str] = None
+
+class ChartOfAccount(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    code: str
+    name: str
+    account_type: str  # asset, liability, equity, revenue, expense
+    category: str  # current_asset, fixed_asset, etc.
+    parent_id: Optional[str] = None
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 class PasswordResetToken(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
