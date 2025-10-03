@@ -96,12 +96,23 @@ const CompanyAccounts = () => {
   };
 
   const handleAccountTypeChange = (accountType) => {
-    const nextCode = getNextAccountCode(accountType);
+    // Update account type first
     setNewAccount(prev => ({
       ...prev, 
       account_type: accountType,
-      code: nextCode
+      code: '' // Clear code while we calculate the next one
     }));
+    
+    // Generate next available code
+    setTimeout(() => {
+      const nextCode = getNextAccountCode(accountType);
+      if (nextCode) {
+        setNewAccount(prev => ({
+          ...prev,
+          code: nextCode
+        }));
+      }
+    }, 100); // Small delay to ensure state is updated
   };
 
   useEffect(() => {
