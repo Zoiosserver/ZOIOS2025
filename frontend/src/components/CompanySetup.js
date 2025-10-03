@@ -64,6 +64,7 @@ const CompanySetup = () => {
   const businessTypes = [
     'Sole Proprietorship',
     'Partnership', 
+    'Private Limited Company',
     'Limited Liability Company (LLC)',
     'Corporation',
     'S Corporation',
