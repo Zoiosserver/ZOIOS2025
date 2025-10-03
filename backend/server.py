@@ -1265,6 +1265,7 @@ async def get_user_company_assignments(current_user: UserInDB = Depends(get_curr
                 "full_name": str(user_raw.get("name", user_raw.get("full_name", "Unknown User"))),
                 "role": str(user_raw.get("role", "user")),
                 "is_active": bool(user_raw.get("is_active", True)),
+                "permissions": user_raw.get("permissions", {}),
                 "company_assignments": []
             }
             
