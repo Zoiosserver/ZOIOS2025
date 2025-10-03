@@ -236,6 +236,21 @@ test_plan:
   test_all: false
   test_priority: "completed"
 
+  - task: "Tab Navigation in Company Setup"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/CompanySetup.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "User reports tab navigation not working on company information page. Tab key should move through form fields in logical order but is not functioning properly."
+        - working: false
+          agent: "main"
+          comment: "Identified issues: conflicting tabIndex values, missing tabIndex on country Select component, inconsistent numbering, wrong tabIndex={0} on buttons. Need to implement proper sequential tab navigation."
+
 agent_communication:
     - agent: "main"
       message: "Initial analysis shows redirection issue after Step 1 completion. Need to debug JWT token handling and onboarding status updates. Also need to implement chart of accounts and multi-currency features."
@@ -247,3 +262,5 @@ agent_communication:
       message: "Fixed frontend redirection issue by replacing window.location.reload() with proper AuthContext.refreshUser() method. Implemented comprehensive currency management UI and added it to navigation. Backend testing confirms all APIs working correctly. Ready for complete frontend testing to validate the fixes and new features."
     - agent: "testing"
       message: "🎉 COMPLETE SUCCESS: All primary testing objectives achieved! 1) REDIRECTION FIX CONFIRMED: Users now complete company setup and stay on dashboard (NOT redirected to login) 2) CURRENCY MANAGEMENT FULLY FUNCTIONAL: New /currency page accessible, exchange rates working, converter functional 3) END-TO-END USER FLOW PERFECT: Registration → Company Setup (3 steps) → Dashboard → Currency Management → Navigation all working seamlessly 4) ALL UI COMPONENTS RENDERING CORRECTLY: No errors, proper styling, responsive design 5) AUTHENTICATION STATE MAINTAINED: Users remain logged in throughout entire flow. The main agent's fixes have completely resolved the original redirection issue and successfully implemented all new currency features. System is production-ready."
+    - agent: "main"
+      message: "User reports tab navigation not working on company information page. Identified multiple issues with tabIndex implementation: conflicting values, missing tabIndex on Select components, inconsistent numbering. Working to fix proper sequential tab navigation through all form fields."
