@@ -192,7 +192,7 @@ const CurrencyManagement = () => {
     }
   };
 
-  const availableCurrencies = companySetup ? [
+  const availableCurrencies = (companySetup && companySetup.base_currency && companySetup.additional_currencies) ? [
     companySetup.base_currency,
     ...companySetup.additional_currencies
   ] : [];
