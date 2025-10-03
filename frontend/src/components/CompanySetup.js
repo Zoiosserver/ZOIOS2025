@@ -426,7 +426,7 @@ const CompanySetup = () => {
         <div className="md:col-span-2">
           <Label htmlFor="country">Country *</Label>
           <Select value={formData.country_code} onValueChange={handleCountryChange}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full" tabIndex={2}>
               <SelectValue placeholder="Select your country">
                 {selectedCountry ? `${selectedCountry.name} (${selectedCountry.currency})` : "Select your country"}
               </SelectValue>
@@ -467,7 +467,7 @@ const CompanySetup = () => {
         <div className="md:col-span-2">
           <Label htmlFor="industry">Industry *</Label>
           <Select value={formData.industry} onValueChange={(value) => setFormData(prev => ({...prev, industry: value}))}>
-            <SelectTrigger tabIndex={4}>
+            <SelectTrigger className="w-full" tabIndex={4}>
               <SelectValue placeholder="Select your industry" />
             </SelectTrigger>
             <SelectContent>
