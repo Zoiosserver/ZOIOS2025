@@ -760,7 +760,7 @@ async def add_sister_company(
     
     # Save to database
     prepared_company = prepare_for_mongo(sister_company_data.dict())
-    await db.sister_companies.insert_one(prepared_company)
+    await db_to_use.sister_companies.insert_one(prepared_company)
     
     # Create chart of accounts for sister company
     from accounting_systems import get_accounting_system, get_chart_of_accounts
