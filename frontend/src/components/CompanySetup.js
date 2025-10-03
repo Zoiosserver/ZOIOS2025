@@ -320,7 +320,16 @@ const CompanySetup = () => {
           <Label htmlFor="country">Country *</Label>
           <Select value={formData.country_code} onValueChange={handleCountryChange}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select your country" />
+              <div className="flex items-center justify-between w-full">
+                {selectedCountry ? (
+                  <>
+                    <span className="flex-1 text-left truncate">{selectedCountry.name}</span>
+                    <span className="text-xs text-gray-500 ml-2 flex-shrink-0">({selectedCountry.currency})</span>
+                  </>
+                ) : (
+                  <span className="text-gray-500">Select your country</span>
+                )}
+              </div>
             </SelectTrigger>
             <SelectContent className="min-w-[400px] w-auto max-h-[200px] overflow-y-auto">
               {countries.map(country => (
