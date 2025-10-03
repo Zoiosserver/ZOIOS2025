@@ -848,7 +848,17 @@ async def delete_sister_company(
 @api_router.get("/company/consolidated-accounts", response_model=List[ConsolidatedAccount])
 async def get_consolidated_accounts(current_user: UserInDB = Depends(get_current_active_user)):
     """Get consolidated accounts for group company"""
-    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        # Fallback to main database
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
     if not company_setup:
         raise HTTPException(status_code=404, detail="Company setup not found")
     
@@ -856,7 +866,7 @@ async def get_consolidated_accounts(current_user: UserInDB = Depends(get_current
         raise HTTPException(status_code=400, detail="Only group companies have consolidated accounts")
     
     # Get all sister companies
-    sister_companies = await db.sister_companies.find({
+    sister_companies = await db_to_use.sister_companies.find({
         "group_company_id": company_setup["id"],
         "is_active": True
     }).to_list(length=None)
@@ -865,7 +875,7 @@ async def get_consolidated_accounts(current_user: UserInDB = Depends(get_current
         return []
     
     # Get parent company chart of accounts
-    parent_accounts = await db.chart_of_accounts.find({
+    parent_accounts = await db_to_use.chart_of_accounts.find({
         "company_id": company_setup["id"],
         "is_active": True
     }).to_list(length=None)
