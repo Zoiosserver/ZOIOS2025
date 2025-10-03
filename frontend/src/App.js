@@ -36,6 +36,7 @@ function App() {
                       <Route path="/call-logs" element={<CallLogs />} />
                       <Route path="/email-responses" element={<EmailResponses />} />
                       <Route path="/users" element={<UserManagement />} />
+                      <Route path="/currency" element={<CurrencyManagement />} />
                     </Routes>
                   </main>
                 </div>
