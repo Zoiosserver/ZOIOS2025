@@ -780,15 +780,13 @@ const CompanySetup = () => {
               )}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent className="min-w-[450px] w-auto max-h-[300px] overflow-y-auto">
+          <SelectContent className="min-w-[600px] w-auto max-h-[300px] overflow-y-auto">
             {currencies.map(currency => (
-              <SelectItem key={currency.code} value={currency.code} className="py-3">
-                <div className="flex flex-col w-full">
-                  <div className="flex items-center mb-1">
-                    <span className="font-medium text-gray-900">{currency.code}</span>
-                    <span className="ml-2 text-gray-700">{currency.symbol}</span>
+              <SelectItem key={currency.code} value={currency.code} className="py-3 min-w-0">
+                <div className="w-full overflow-visible">
+                  <div className="text-base font-medium text-gray-900 whitespace-nowrap overflow-visible">
+                    {currency.code} {currency.symbol} - {currency.name}
                   </div>
-                  <div className="text-sm text-gray-600 whitespace-normal leading-tight">{currency.name}</div>
                 </div>
               </SelectItem>
             ))}
