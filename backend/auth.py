@@ -142,7 +142,7 @@ async def create_default_admin():
     if not admin_exists:
         admin_user = {
             "id": str(uuid.uuid4()),
-            "email": "admin@outreachpulse.com",
+            "email": "admin@zoios.com",
             "hashed_password": get_password_hash("admin123"),
             "name": "Admin User",
             "company": "OutreachPulse",
