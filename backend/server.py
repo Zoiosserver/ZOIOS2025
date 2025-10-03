@@ -268,6 +268,7 @@ async def public_signup(user_data: UserSignup):
         "company": user_data.company,
         "role": "user",  # Always create as regular user
         "is_active": True,
+        "onboarding_completed": False,  # Require company setup
         "created_at": datetime.now(timezone.utc)
     }
     
