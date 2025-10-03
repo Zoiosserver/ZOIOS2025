@@ -632,13 +632,19 @@ async def get_company_setup(current_user: UserInDB = Depends(get_current_active_
 @api_router.get("/setup/chart-of-accounts")
 async def get_user_chart_of_accounts(current_user: UserInDB = Depends(get_current_active_user)):
     """Get user's chart of accounts"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    db_to_use = tenant_db if tenant_db is not None else db
+    
     # Get user's company setup
-    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
     if not company_setup:
         raise HTTPException(status_code=404, detail="Company setup not found")
     
     # Get chart of accounts
-    accounts = await db.chart_of_accounts.find(
+    accounts = await db_to_use.chart_of_accounts.find(
         {"company_id": company_setup["id"], "is_active": True}
     ).to_list(length=None)
     
