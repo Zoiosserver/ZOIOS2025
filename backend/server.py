@@ -518,11 +518,15 @@ async def setup_company(
     # Assign user to this tenant
     await tenant_service.assign_user_to_tenant(current_user.email, company_setup.id)
     
-    # Save company setup
+    # Save company setup to tenant database
     prepared_company = prepare_for_mongo(company_setup.dict())
-    await db.company_setups.insert_one(prepared_company)
+    await tenant_db.company_setups.insert_one(prepared_company)
     
-    # Create chart of accounts
+    # Also save user to tenant database
+    prepared_user = prepare_user_for_mongo(current_user.dict())
+    await tenant_db.users.insert_one(prepared_user)
+    
+    # Create chart of accounts based on accounting system in tenant database
     chart_template = get_chart_of_accounts(accounting_system["chart_of_accounts"])
     accounts_to_create = []
     
@@ -538,12 +542,12 @@ async def setup_company(
             accounts_to_create.append(prepare_for_mongo(chart_account.dict()))
     
     if accounts_to_create:
-        await db.chart_of_accounts.insert_many(accounts_to_create)
+        await tenant_db.chart_of_accounts.insert_many(accounts_to_create)
     
     # Set up initial currency exchange rates if additional currencies are configured
     if company_data.additional_currencies:
         try:
-            currency_service = await get_currency_service(db)
+            currency_service = await get_currency_service(tenant_db)
             await currency_service.update_company_rates(
                 company_id=company_setup.id,
                 base_currency=company_data.base_currency,
@@ -554,14 +558,18 @@ async def setup_company(
             # Log error but don't fail the setup process
             logger.warning(f"Failed to fetch initial currency rates: {e}")
     
-    # Update user onboarding status
-    await db.users.update_one(
-        {"id": current_user.id},
-        {"$set": {
-            "onboarding_completed": True,
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        }}
-    )
+    # Update user onboarding status in both main database and tenant database
+    update_data = {
+        "onboarding_completed": True,
+        "company_id": company_setup.id,  # Link user to company
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Update in main database for authentication
+    await db.users.update_one({"id": current_user.id}, {"$set": update_data})
+    
+    # Update in tenant database
+    await tenant_db.users.update_one({"id": current_user.id}, {"$set": update_data})
     
     return company_setup
 
