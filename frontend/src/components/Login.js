@@ -18,6 +18,7 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [currentView, setCurrentView] = useState('login'); // 'login', 'signup', 'forgot-password'
 
   const handleSubmit = async (e) => {
     e.preventDefault();
