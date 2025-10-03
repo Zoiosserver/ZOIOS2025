@@ -317,20 +317,80 @@ async def login(user_credentials: UserLogin):
 
 @api_router.post("/auth/forgot-password")
 async def forgot_password(email: str):
-    """Forgot password endpoint - sends reset instructions"""
-    # Check if user exists
-    user = await db.users.find_one({"email": email})
-    if not user:
-        # Don't reveal if email exists or not for security
+    """Forgot password endpoint - sends reset instructions via email"""
+    try:
+        # Check if user exists
+        user = await db.users.find_one({"email": email})
+        if user:
+            # Generate reset token
+            reset_token = await create_password_reset_token(user["id"])
+            
+            # Get base URL for reset link (you might want to make this configurable)
+            base_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+            
+            # Send reset email
+            email_sent = await send_password_reset_email(
+                email=email,
+                user_name=user["name"],
+                reset_token=reset_token,
+                base_url=base_url
+            )
+            
+            if email_sent:
+                print(f"✅ Password reset email sent to {email}")
+            else:
+                print(f"❌ Failed to send password reset email to {email}")
+        
+        # Always return success message for security (don't reveal if email exists)
         return {"message": "If the email exists, password reset instructions have been sent"}
-    
-    # In a real implementation, you would:
-    # 1. Generate a secure reset token
-    # 2. Store it in database with expiration
-    # 3. Send email with reset link
-    # For now, we'll just return a success message
-    
-    return {"message": "If the email exists, password reset instructions have been sent"}
+        
+    except Exception as e:
+        print(f"❌ Error in forgot password: {str(e)}")
+        return {"message": "If the email exists, password reset instructions have been sent"}
+
+@api_router.post("/auth/reset-password")
+async def reset_password(password_reset: PasswordReset):
+    """Reset password using the reset token"""
+    try:
+        # Verify the reset token
+        reset_token = await verify_reset_token(password_reset.token)
+        if not reset_token:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid or expired reset token"
+            )
+        
+        # Get the user
+        user = await db.users.find_one({"id": reset_token["user_id"]})
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="User not found"
+            )
+        
+        # Update the password
+        new_hashed_password = hash_password(password_reset.new_password)
+        await db.users.update_one(
+            {"id": reset_token["user_id"]},
+            {"$set": {
+                "hashed_password": new_hashed_password,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        # Mark the token as used
+        await use_reset_token(password_reset.token)
+        
+        return {"message": "Password reset successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error in reset password: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to reset password"
+        )
 
 @api_router.get("/auth/me", response_model=User)
 async def get_current_user_info(current_user: UserInDB = Depends(get_current_active_user)):
