@@ -211,6 +211,7 @@ const SimpleCompanySetup = ({ user, onComplete }) => {
                 <option value="Pharmaceuticals">Pharmaceuticals</option>
                 <option value="Telecommunications">Telecommunications</option>
                 <option value="Travel & Tourism">Travel & Tourism</option>
+                <option value="Elevator & Escalator">Elevator & Escalator</option>
                 <option value="Government">Government</option>
                 <option value="Non-Profit">Non-Profit</option>
                 <option value="Other">Other</option>
