@@ -580,7 +580,7 @@ async def get_tenant_info(current_user: UserInDB = Depends(get_current_active_us
         tenant_service = await get_tenant_service(mongo_url)
         tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
         
-        if not tenant_db:
+        if tenant_db is None:
             return {
                 "tenant_assigned": False,
                 "message": "User not assigned to any tenant database"
