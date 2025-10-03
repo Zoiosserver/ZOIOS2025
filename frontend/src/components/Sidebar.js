@@ -76,6 +76,7 @@ const Sidebar = () => {
   // Add admin-only menu items
   if (isAdmin()) {
     menuItems.push({ path: '/users', label: 'User Management', icon: Shield });
+    menuItems.push({ path: '/user-assignments', label: 'Company Assignments', icon: Users });
   }
   
   return (
