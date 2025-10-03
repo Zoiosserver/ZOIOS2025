@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Backend API Testing Script for Recent Backend Fixes
-Tests the specific fixes implemented:
-1. Currency Exchange Rate Undefined Fix
-2. User Deletion Fix  
-3. Enhanced /auth/me Endpoint with permissions
-4. User Permissions Update functionality
+ZOIOS ERP Backend API Comprehensive Testing Script
+Tests all key backend functionality as requested in review:
+1. Authentication System (registration, login, JWT tokens, /auth/me)
+2. Company Setup API with address collection functionality
+3. Currency Management (exchange rates, conversion, undefined fixes)
+4. Multi-tenancy (tenant database creation and isolation)
+5. User Management (deletion and granular permissions)
 """
 
 import requests
@@ -13,22 +14,24 @@ import json
 import os
 from datetime import datetime
 import sys
+import time
+import random
 
 # Get backend URL from environment
 BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://finance-hub-176.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
-# Test credentials as specified in review request
-ADMIN_EMAIL = "admin@zoios.com"
-ADMIN_PASSWORD = "admin123"
-
-# Additional test user for deletion testing
-import time
+# Generate unique test credentials for fresh testing
 timestamp = str(int(time.time()))
-TEST_EMAIL = f"testuser{timestamp}@example.com"
+random_suffix = str(random.randint(1000, 9999))
+TEST_EMAIL = f"test{timestamp}{random_suffix}@example.com"
 TEST_PASSWORD = "testpass123"
 TEST_NAME = "Test User"
-TEST_COMPANY = "Test Company"
+TEST_COMPANY = "Test Company Inc"
+
+# Admin credentials for testing user management
+ADMIN_EMAIL = "admin@zoios.com"
+ADMIN_PASSWORD = "admin123"
 
 class BackendTester:
     def __init__(self):
