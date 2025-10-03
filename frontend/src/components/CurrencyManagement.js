@@ -36,6 +36,8 @@ const CurrencyManagement = () => {
   const [convertFrom, setConvertFrom] = useState('');
   const [convertTo, setConvertTo] = useState('');
   const [convertResult, setConvertResult] = useState(null);
+  const [showCurrencySettings, setShowCurrencySettings] = useState(false);
+  const [availableCurrencies] = useState(['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY', 'SGD']);
   const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
