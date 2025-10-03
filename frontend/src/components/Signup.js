@@ -52,9 +52,12 @@ const Signup = ({ onBackToLogin }) => {
       });
 
       // Auto-login after successful signup
-      localStorage.setItem('token', response.data.access_token);
-      window.location.reload(); // Trigger auth check
-
+      const { access_token, user: userData } = response.data;
+      localStorage.setItem('token', access_token);
+      
+      // Use the auth context login function to set user data properly
+      await login(formData.email, formData.password);
+      
       toast.success('Account created successfully!');
     } catch (error) {
       console.error('Signup error:', error);
