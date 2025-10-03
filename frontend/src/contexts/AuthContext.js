@@ -102,6 +102,22 @@ export const AuthProvider = ({ children }) => {
     return user?.role === 'admin';
   };
 
+  const refreshUser = async () => {
+    if (token) {
+      try {
+        const response = await axios.get(`${API}/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUser(response.data);
+        return { success: true };
+      } catch (error) {
+        console.error('Failed to refresh user data:', error);
+        return { success: false, error: error.response?.data?.detail || 'Failed to refresh user data' };
+      }
+    }
+    return { success: false, error: 'No token available' };
+  };
+
   const value = {
     user,
     token,
@@ -109,6 +125,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     isAdmin,
+    refreshUser,
     isAuthenticated: !!user
   };
 
