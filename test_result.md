@@ -204,9 +204,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Company Setup Step 1 API"
-    - "Authentication Context Update"
     - "Company Setup Wizard UI"
+    - "Authentication Context Frontend"
+    - "Chart of Accounts Implementation"
+    - "Multi-Currency Online Rate Fetching"
   stuck_tasks:
     - "Company Setup Step 1 API"
     - "Company Setup Wizard UI"
