@@ -353,11 +353,11 @@ test_plan:
 
   - task: "User Deletion Fix"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "user"
@@ -365,6 +365,9 @@ test_plan:
         - working: "NA"
           agent: "main"
           comment: "Enhanced user deletion endpoint to check both tenant and main databases for user lookup. Added logic to search in main database if user not found in tenant database. Improved logging and error handling for cross-database user deletion scenarios."
+        - working: true
+          agent: "testing"
+          comment: "✅ USER DELETION FIX WORKING PERFECTLY: Comprehensive testing confirms cross-database user deletion is working correctly. VERIFIED: 1) Successfully created test users for deletion testing 2) DELETE /api/users/{user_id} endpoint working with admin@zoios.com credentials 3) Cross-database lookup functioning - searches both tenant and main databases 4) Proper response format with success: true and message 5) Backend logs show correct user lookup and deletion process 6) Super admin protection still in place (admin@2mholding.com protected) 7) Self-deletion prevention working. The main agent's enhancement to check both databases has completely resolved the user deletion issue."
 
   - task: "Granular Permission System Implementation"
     implemented: true
