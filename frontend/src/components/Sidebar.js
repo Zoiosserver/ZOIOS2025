@@ -69,7 +69,35 @@ const Sidebar = () => {
         </ul>
       </nav>
       
-      <div className="absolute bottom-6 left-4 right-4">
+      <div className="absolute bottom-6 left-4 right-4 space-y-4">
+        {/* User Info */}
+        <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+          <div className="flex items-center space-x-3">
+            <div className={`p-2 rounded-lg ${user?.role === 'admin' ? 'bg-purple-100' : 'bg-blue-100'}`}>
+              {user?.role === 'admin' ? (
+                <Shield className="w-4 h-4 text-purple-600" />
+              ) : (
+                <User className="w-4 h-4 text-blue-600" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
+              <p className="text-xs text-gray-600 truncate">{user?.email}</p>
+            </div>
+          </div>
+          <Button
+            onClick={logout}
+            variant="outline"
+            size="sm"
+            className="w-full mt-3 text-xs"
+            data-testid="logout-btn"
+          >
+            <LogOut className="w-3 h-3 mr-1" />
+            Logout
+          </Button>
+        </div>
+
+        {/* Brand Info */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
           <p className="text-sm font-medium text-blue-900 mb-1">ZOIOS CRM</p>
           <p className="text-xs text-blue-700">Track your outreach efforts and grow your business</p>
