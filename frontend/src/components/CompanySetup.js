@@ -270,12 +270,12 @@ const CompanySetup = () => {
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select your country" />
             </SelectTrigger>
-            <SelectContent className="max-w-none w-full">
+            <SelectContent className="min-w-[300px] w-auto">
               {countries.map(country => (
-                <SelectItem key={country.code} value={country.code} className="max-w-none">
-                  <div className="flex items-center justify-between w-full min-w-0">
-                    <span className="flex-1 truncate">{country.name}</span>
-                    <span className="text-xs text-gray-500 ml-2 flex-shrink-0">({country.currency})</span>
+                <SelectItem key={country.code} value={country.code}>
+                  <div className="flex items-center w-full pr-2">
+                    <span className="mr-2">{country.name}</span>
+                    <span className="text-xs text-gray-500">({country.currency})</span>
                   </div>
                 </SelectItem>
               ))}
