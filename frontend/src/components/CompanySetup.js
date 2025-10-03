@@ -650,7 +650,7 @@ const CompanySetup = () => {
                   {sisterCompanyForm.fiscal_year_start === 'custom' && (
                     <div className="mt-2">
                       <Input
-                        tabIndex={7}
+                        tabIndex={12}
                         placeholder="MM-DD (e.g., 03-15)"
                         pattern="[0-1][0-9]-[0-3][0-9]"
                         onChange={(e) => setSisterCompanyForm(prev => ({...prev, fiscal_year_start: e.target.value}))}
