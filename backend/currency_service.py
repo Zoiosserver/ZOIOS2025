@@ -71,8 +71,6 @@ class CurrencyService:
             if provider not in self.online_providers:
                 raise ValueError(f"Unsupported provider: {provider}")
             
-            provider_config = self.online_providers[provider]
-            
             # Use different APIs based on provider
             if provider == "exchangerate-api":
                 return await self._fetch_from_exchangerate_api(base_currency, target_currencies)
