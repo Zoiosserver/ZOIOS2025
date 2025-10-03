@@ -700,6 +700,65 @@ class BackendTester:
             self.log(f"❌ /auth/me error: {str(e)}")
             return False
 
+    def test_setup_company_for_admin(self):
+        """Setup company for admin user to enable currency testing"""
+        self.log("Setting up company for admin user...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Check if company setup already exists
+        try:
+            response = self.session.get(f"{API_BASE}/setup/company", headers=headers)
+            if response.status_code == 200:
+                self.log("✅ Company setup already exists")
+                return True
+        except:
+            pass
+        
+        # Create company setup
+        setup_data = {
+            "company_name": "ZOIOS Test Company",
+            "country_code": "US",
+            "base_currency": "USD",
+            "additional_currencies": ["EUR", "GBP"],
+            "business_type": "Corporation",
+            "industry": "Technology",
+            "address": "123 Test Street",
+            "city": "Test City",
+            "state": "CA",
+            "postal_code": "12345",
+            "phone": "+1-555-123-4567",
+            "email": ADMIN_EMAIL,
+            "website": "https://zoios.com",
+            "tax_number": "123456789",
+            "registration_number": "REG123456"
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            self.log(f"Company setup response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                self.log("✅ Company setup created successfully")
+                return True
+            elif response.status_code == 400 and "already completed" in response.text:
+                self.log("✅ Company setup already completed")
+                return True
+            else:
+                self.log(f"❌ Company setup failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Company setup error: {str(e)}")
+            return False
+
     def test_currency_update_rates_fix(self):
         """Test currency update rates endpoint for undefined fix"""
         self.log("Testing currency update rates endpoint for undefined fix...")
