@@ -45,8 +45,8 @@ const Signup = ({ onBackToLogin }) => {
     }
 
     try {
-      // Use proxy to backend
-      const BACKEND_URL = '';
+      // Use localhost backend
+      const BACKEND_URL = 'http://localhost:8001';
       console.log('Signup - Using backend URL:', BACKEND_URL);
       
       const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
