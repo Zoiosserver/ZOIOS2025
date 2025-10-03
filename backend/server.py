@@ -604,7 +604,16 @@ async def get_tenant_info(current_user: UserInDB = Depends(get_current_active_us
 @api_router.get("/setup/company", response_model=CompanySetup)
 async def get_company_setup(current_user: UserInDB = Depends(get_current_active_user)):
     """Get user's company setup"""
-    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if not tenant_db:
+        # Fallback to main database for users without tenant setup
+        company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    else:
+        company_setup = await tenant_db.company_setups.find_one({"user_id": current_user.id})
+    
     if not company_setup:
         raise HTTPException(status_code=404, detail="Company setup not found")
     return CompanySetup(**parse_from_mongo(company_setup))
