@@ -579,6 +579,113 @@ const SimpleCompanySetup = ({ user, onComplete }) => {
       </div>
     </div>
   );
+  }
+
+  // Step 3: Company Address
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-2xl w-full space-y-8 p-6">
+        <div>
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">
+            Company Setup - Step 3
+          </h2>
+          <p className="text-center text-gray-600">Company Address Information</p>
+        </div>
+        
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Street Address</label>
+            <textarea
+              value={addressData.street_address}
+              onChange={(e) => setAddressData({ ...addressData, street_address: e.target.value })}
+              placeholder="Enter complete street address"
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+              rows={3}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">City</label>
+              <input
+                type="text"
+                value={addressData.city}
+                onChange={(e) => setAddressData({ ...addressData, city: e.target.value })}
+                placeholder="City"
+                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">State/Province</label>
+              <input
+                type="text"
+                value={addressData.state}
+                onChange={(e) => setAddressData({ ...addressData, state: e.target.value })}
+                placeholder="State or Province"
+                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Postal Code</label>
+              <input
+                type="text"
+                value={addressData.postal_code}
+                onChange={(e) => setAddressData({ ...addressData, postal_code: e.target.value })}
+                placeholder="Postal Code"
+                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Country</label>
+              <select
+                value={addressData.country}
+                onChange={(e) => setAddressData({ ...addressData, country: e.target.value })}
+                className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              >
+                <option value="">Select Country</option>
+                {countries.map(country => (
+                  <option key={country.code} value={country.code}>
+                    {country.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex space-x-4">
+            <button
+              type="button"
+              onClick={() => setStep(2)}
+              className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700"
+            >
+              ← Back
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:opacity-50"
+            >
+              {loading ? 'Completing Setup...' : 'Complete Company Setup'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };
 
 export default SimpleCompanySetup;
