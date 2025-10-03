@@ -26,8 +26,8 @@ const Login = () => {
     setError('');
 
     try {
-      // Use localhost backend  
-      const BACKEND_URL = 'http://localhost:8001';
+      // Use the preview URL from supervisor config
+      const BACKEND_URL = 'https://b74cc3d4-0a98-4583-9eb2-4600dc1ad1aa.preview.emergentagent.com';
       console.log('Login - Using backend URL:', BACKEND_URL);
       
       const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
