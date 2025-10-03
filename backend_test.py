@@ -890,7 +890,8 @@ class BackendTester:
                         else:
                             self.log(f"✅ Field present: {field} = {data[field]}")
                     
-                    return all_fields_present
+                    # Also test the no additional currencies scenario
+                    return all_fields_present and self.test_currency_no_additional_currencies(headers)
                 else:
                     self.log("❌ updated_rates field missing - undefined issue not fixed")
                     return False
@@ -900,6 +901,103 @@ class BackendTester:
                 
         except Exception as e:
             self.log(f"❌ Fresh user currency test error: {str(e)}")
+            return False
+
+    def test_currency_no_additional_currencies(self, headers):
+        """Test currency update when no additional currencies are configured"""
+        self.log("Testing currency update with no additional currencies...")
+        
+        # Create another fresh user with no additional currencies
+        fresh_email = f"nocurrency{int(time.time())}@example.com"
+        signup_data = {
+            "email": fresh_email,
+            "password": "testpass123",
+            "name": "No Currency Test User",
+            "company": "No Currency Test Company"
+        }
+        
+        try:
+            # Sign up fresh user
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            if response.status_code != 200:
+                self.log(f"❌ No currency user signup failed: {response.text}")
+                return False
+            
+            no_currency_token = response.json().get('access_token')
+            no_currency_headers = {
+                "Authorization": f"Bearer {no_currency_token}",
+                "Content-Type": "application/json"
+            }
+            
+            # Setup company with NO additional currencies
+            setup_data = {
+                "company_name": "No Currency Test Company",
+                "country_code": "US",
+                "base_currency": "USD",
+                "additional_currencies": [],  # Empty array
+                "business_type": "Corporation",
+                "industry": "Technology",
+                "address": "123 Test Street",
+                "city": "Test City",
+                "state": "CA",
+                "postal_code": "12345",
+                "phone": "+1-555-123-4567",
+                "email": fresh_email,
+                "website": "https://testcompany.com",
+                "tax_number": "123456789",
+                "registration_number": "REG123456"
+            }
+            
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=no_currency_headers)
+            if response.status_code != 200:
+                self.log(f"❌ No currency company setup failed: {response.text}")
+                return False
+            
+            self.log("✅ No currency user and company setup created")
+            
+            # Test currency update rates with no additional currencies
+            response = self.session.post(f"{API_BASE}/currency/update-rates", headers=no_currency_headers)
+            self.log(f"No currency update response status: {response.status_code}")
+            self.log(f"No currency update response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log("✅ Currency update rates endpoint working with no additional currencies")
+                
+                # Check for proper response format - this is the key test for the undefined fix
+                updated_rates = data.get('updated_rates')
+                if updated_rates is not None:
+                    self.log("✅ updated_rates field present (no undefined) - FIX CONFIRMED")
+                    self.log(f"Updated rates: {updated_rates}")
+                    
+                    # Should be 0 when no additional currencies
+                    if updated_rates == 0:
+                        self.log("✅ updated_rates correctly shows 0 for no additional currencies")
+                    
+                    # Check for other required fields
+                    required_fields = ['base_currency', 'target_currencies', 'last_updated']
+                    all_fields_present = True
+                    for field in required_fields:
+                        if field not in data:
+                            self.log(f"❌ Missing required field: {field}")
+                            all_fields_present = False
+                        else:
+                            self.log(f"✅ Field present: {field} = {data[field]}")
+                    
+                    # target_currencies should be empty array
+                    if data.get('target_currencies') == []:
+                        self.log("✅ target_currencies correctly shows empty array")
+                    
+                    return all_fields_present
+                else:
+                    self.log("❌ updated_rates field missing - undefined issue NOT FIXED")
+                    return False
+            else:
+                self.log(f"❌ No currency update failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ No currency test error: {str(e)}")
             return False
 
     def test_create_test_user_for_deletion(self):
