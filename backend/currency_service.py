@@ -219,12 +219,11 @@ class CurrencyService:
         }
         
         base_rates = fallback_rates.get(base_currency, {})
-        return {
-            currency: rate 
-            for currency in target_currencies 
-            if currency in base_rates
-            for rate in [base_rates[currency]]
-        }
+        result = {}
+        for currency in target_currencies:
+            if currency in base_rates:
+                result[currency] = base_rates[currency]
+        return result
     async def set_manual_rate(
         self, 
         company_id: str, 
