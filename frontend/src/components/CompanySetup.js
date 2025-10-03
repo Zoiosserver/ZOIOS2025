@@ -795,9 +795,14 @@ const CompanySetup = () => {
       </div>
 
       <div>
-        <Label>Additional Currencies (Optional)</Label>
-        <p className="text-sm text-gray-600 mb-3">Select additional currencies for multi-currency transactions</p>
-        <div className="space-y-3 max-h-60 overflow-y-auto border rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <Label className="text-base font-semibold">Additional Currencies</Label>
+          <Badge variant="secondary" className="text-xs">Optional</Badge>
+        </div>
+        <p className="text-sm text-gray-600 mb-3">
+          Select additional currencies for multi-currency transactions. You can manage exchange rates and convert between currencies later.
+        </p>
+        <div className="space-y-2 max-h-60 overflow-y-auto border rounded-lg p-4 bg-gray-50">
           {currencies.filter(c => c.code !== formData.base_currency).map(currency => (
             <div 
               key={currency.code} 
