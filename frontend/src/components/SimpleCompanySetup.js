@@ -16,7 +16,17 @@ const SimpleCompanySetup = ({ user, onComplete }) => {
     fiscal_year_start: new Date().getFullYear() + '-04-01',
     accounting_system: '',
     base_currency: '',
-    additional_currencies: []
+    additional_currencies: [],
+    sister_companies: []
+  });
+
+  const [showSisterCompanyForm, setShowSisterCompanyForm] = useState(false);
+  const [sisterCompanyData, setSisterCompanyData] = useState({
+    name: '',
+    country: '',
+    business_type: 'Private Limited Company',
+    industry: '',
+    ownership_percentage: 100
   });
 
   useEffect(() => {
