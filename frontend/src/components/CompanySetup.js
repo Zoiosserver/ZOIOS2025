@@ -882,6 +882,7 @@ const CompanySetup = () => {
           <Label htmlFor="tax_number">Tax Number</Label>
           <Input
             id="tax_number"
+            tabIndex={8}
             value={formData.tax_number}
             onChange={(e) => setFormData(prev => ({...prev, tax_number: e.target.value}))}
             placeholder="Enter tax identification number"
