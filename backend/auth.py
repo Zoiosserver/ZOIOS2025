@@ -40,6 +40,7 @@ class User(BaseModel):
     company: str
     role: str  # "admin" or "user"
     is_active: bool = True
+    onboarding_completed: bool = False
     created_at: datetime
 
 class UserInDB(User):
