@@ -800,22 +800,23 @@ const CompanySetup = () => {
       <div>
         <Label>Additional Currencies (Optional)</Label>
         <p className="text-sm text-gray-600 mb-3">Select additional currencies for multi-currency transactions</p>
-        <div className="flex flex-wrap gap-4 max-h-60 overflow-y-auto border rounded-lg p-4">
+        <div className="space-y-3 max-h-60 overflow-y-auto border rounded-lg p-4">
           {currencies.filter(c => c.code !== formData.base_currency).map(currency => (
             <div 
               key={currency.code} 
-              className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+              className={`w-full p-4 border rounded-lg cursor-pointer transition-colors ${
                 formData.additional_currencies.includes(currency.code)
                   ? 'bg-blue-50 border-blue-300' 
                   : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
               }`}
               onClick={() => handleCurrencyToggle(currency.code)}
               title={`${currency.code} - ${currency.symbol} - ${currency.name}`}
-              style={{minWidth: '250px', width: 'calc(50% - 1rem)'}}
             >
-              <div className="text-sm font-bold text-gray-900 mb-2">{currency.code}</div>
-              <div className="text-sm text-gray-700 mb-2">{currency.symbol}</div>
-              <div className="text-sm text-gray-600 word-break-break-word">{currency.name}</div>
+              <div className="flex items-center space-x-3">
+                <div className="text-sm font-bold text-gray-900 flex-shrink-0">{currency.code}</div>
+                <div className="text-sm text-gray-700 flex-shrink-0">{currency.symbol}</div>
+                <div className="text-sm text-gray-600 flex-grow">{currency.name}</div>
+              </div>
             </div>
           ))}
         </div>
