@@ -124,7 +124,7 @@ const Login = () => {
         {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-xs text-gray-500">
-            © 2025 ZOIOS. Advanced Marketing CRM Platform.
+            © 2025 ZOIOS. Advanced ERP Platform.
           </p>
         </div>
       </div>
