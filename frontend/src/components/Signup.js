@@ -45,10 +45,10 @@ const Signup = ({ onBackToLogin }) => {
     }
 
     try {
-      // Direct fetch call for reliability
-      const BACKEND_URL = window.location.protocol + '//' + window.location.hostname + ':8001';
+      // Use the working external URL from supervisor config
+      const BACKEND_URL = 'https://b74cc3d4-0a98-4583-9eb2-4600dc1ad1aa.preview.emergentagent.com';
       console.log('Signup - Using backend URL:', BACKEND_URL);
-      alert('Signup - Backend URL: ' + BACKEND_URL); // Debug alert
+      
       const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
@@ -62,6 +62,8 @@ const Signup = ({ onBackToLogin }) => {
         })
       });
 
+      console.log('Response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.access_token);
@@ -69,6 +71,7 @@ const Signup = ({ onBackToLogin }) => {
         window.location.href = '/';
       } else {
         const errorData = await response.json();
+        console.error('Signup error response:', errorData);
         throw new Error(errorData.detail || 'Signup failed');
       }
     } catch (error) {
