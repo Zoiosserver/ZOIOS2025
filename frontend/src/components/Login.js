@@ -25,13 +25,34 @@ const Login = () => {
     setLoading(true);
     setError('');
 
-    const result = await login(formData.email, formData.password);
-    
-    if (result.success) {
-      toast.success('Login successful!');
-    } else {
-      setError(result.error);
-      toast.error(result.error);
+    try {
+      // Direct API call bypass AuthContext for debugging
+      const BACKEND_URL = window.location.protocol + '//' + window.location.hostname + ':8001';
+      const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.access_token);
+        toast.success('Login successful! Redirecting...');
+        window.location.href = '/'; // Force reload to trigger auth check
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || 'Login failed');
+        toast.error(errorData.detail || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('Network error - cannot connect to server');
+      toast.error('Network error - cannot connect to server');
     }
     
     setLoading(false);
