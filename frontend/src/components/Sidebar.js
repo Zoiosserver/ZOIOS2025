@@ -36,7 +36,7 @@ const Sidebar = () => {
   React.useEffect(() => {
     const fetchCompanySetup = async () => {
       try {
-        const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+        const BACKEND_URL = window.location.origin.replace(':3000', '');
         const response = await fetch(`${BACKEND_URL}/api/setup/company`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
