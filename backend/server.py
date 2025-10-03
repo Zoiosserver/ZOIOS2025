@@ -665,6 +665,153 @@ async def convert_currency(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+# Sister Company Management Routes
+@api_router.post("/company/sister-companies", response_model=SisterCompany)
+async def add_sister_company(
+    sister_company: SisterCompanyCreate,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Add a sister company to the group"""
+    # Get company setup to verify it's a group company
+    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    if company_setup.get("business_type") != "Group Company":
+        raise HTTPException(status_code=400, detail="Only group companies can add sister companies")
+    
+    # Create sister company
+    sister_company_data = SisterCompany(
+        group_company_id=company_setup["id"],
+        **sister_company.dict()
+    )
+    
+    # Save to database
+    prepared_company = prepare_for_mongo(sister_company_data.dict())
+    await db.sister_companies.insert_one(prepared_company)
+    
+    # Create chart of accounts for sister company
+    from accounting_systems import get_accounting_system, get_chart_of_accounts
+    accounting_system = get_accounting_system(sister_company.country_code)
+    chart_template = get_chart_of_accounts(accounting_system["chart_of_accounts"])
+    
+    accounts_to_create = []
+    for category, accounts in chart_template.items():
+        for account in accounts:
+            chart_account = ChartOfAccount(
+                company_id=sister_company_data.id,
+                code=account["code"],
+                name=account["name"],
+                account_type=account["type"],
+                category=account["category"]
+            )
+            accounts_to_create.append(prepare_for_mongo(chart_account.dict()))
+    
+    if accounts_to_create:
+        await db.chart_of_accounts.insert_many(accounts_to_create)
+    
+    return sister_company_data
+
+@api_router.get("/company/sister-companies", response_model=List[SisterCompany])
+async def get_sister_companies(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get all sister companies for the group"""
+    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    sister_companies = await db.sister_companies.find({
+        "group_company_id": company_setup["id"],
+        "is_active": True
+    }).to_list(length=None)
+    
+    return [SisterCompany(**parse_from_mongo(company)) for company in sister_companies]
+
+@api_router.delete("/company/sister-companies/{sister_company_id}")
+async def delete_sister_company(
+    sister_company_id: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Delete a sister company"""
+    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    # Verify the sister company belongs to this group
+    sister_company = await db.sister_companies.find_one({
+        "id": sister_company_id,
+        "group_company_id": company_setup["id"]
+    })
+    
+    if not sister_company:
+        raise HTTPException(status_code=404, detail="Sister company not found")
+    
+    # Soft delete
+    await db.sister_companies.update_one(
+        {"id": sister_company_id},
+        {"$set": {"is_active": False, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "Sister company deleted successfully"}
+
+@api_router.get("/company/consolidated-accounts", response_model=List[ConsolidatedAccount])
+async def get_consolidated_accounts(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get consolidated accounts for group company"""
+    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    if company_setup.get("business_type") != "Group Company":
+        raise HTTPException(status_code=400, detail="Only group companies have consolidated accounts")
+    
+    # Get all sister companies
+    sister_companies = await db.sister_companies.find({
+        "group_company_id": company_setup["id"],
+        "is_active": True
+    }).to_list(length=None)
+    
+    if not sister_companies:
+        return []
+    
+    # Get parent company chart of accounts
+    parent_accounts = await db.chart_of_accounts.find({
+        "company_id": company_setup["id"],
+        "is_active": True
+    }).to_list(length=None)
+    
+    consolidated_accounts = []
+    
+    for parent_account in parent_accounts:
+        consolidated_account = ConsolidatedAccount(
+            group_company_id=company_setup["id"],
+            account_code=parent_account["code"],
+            account_name=parent_account["name"],
+            account_type=parent_account["account_type"],
+            category=parent_account["category"],
+            consolidated_balance=0.0,
+            sister_companies_data=[]
+        )
+        
+        # Find matching accounts in sister companies
+        for sister_company in sister_companies:
+            sister_account = await db.chart_of_accounts.find_one({
+                "company_id": sister_company["id"],
+                "code": parent_account["code"],
+                "is_active": True
+            })
+            
+            if sister_account:
+                sister_data = {
+                    "company_id": sister_company["id"],
+                    "company_name": sister_company["company_name"],
+                    "balance": 0.0,  # This would come from actual accounting entries
+                    "ownership_percentage": sister_company.get("ownership_percentage", 100.0)
+                }
+                consolidated_account.sister_companies_data.append(sister_data)
+        
+        consolidated_accounts.append(consolidated_account)
+    
+    return consolidated_accounts
+
 # Dashboard and Analytics
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(current_user: UserInDB = Depends(get_current_active_user)):
