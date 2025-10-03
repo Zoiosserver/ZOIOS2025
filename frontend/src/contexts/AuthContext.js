@@ -11,7 +11,7 @@ export const useAuth = () => {
   return context;
 };
 
-const BACKEND_URL = 'http://localhost:8001'; // Hardcoded for debugging
+const BACKEND_URL = window.location.protocol + '//' + window.location.hostname + ':8001'; // Dynamic host
 const API = `${BACKEND_URL}/api`;
 console.log('AuthContext - BACKEND_URL:', BACKEND_URL, 'API:', API);
 
