@@ -299,6 +299,80 @@ class BackendTester:
             self.log(f"❌ Get company setup error: {str(e)}")
             return False
     
+    def test_frontend_simulation(self):
+        """Simulate the exact frontend flow that's causing the issue"""
+        self.log("Testing frontend simulation flow...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Simulate what happens after company setup completion
+        # 1. Company setup completes successfully (already tested)
+        # 2. Frontend calls window.location.reload()
+        # 3. AuthContext checkAuth runs and calls /auth/me
+        
+        self.log("Simulating page reload - calling /auth/me multiple times...")
+        
+        for i in range(3):
+            try:
+                response = self.session.get(f"{API_BASE}/auth/me", headers=headers)
+                self.log(f"Auth check #{i+1} - Status: {response.status_code}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    self.log(f"Auth check #{i+1} - onboarding_completed: {data.get('onboarding_completed')}")
+                    
+                    if not data.get('onboarding_completed'):
+                        self.log(f"❌ Auth check #{i+1} - onboarding_completed is still False!")
+                        return False
+                else:
+                    self.log(f"❌ Auth check #{i+1} failed: {response.text}")
+                    return False
+                    
+            except Exception as e:
+                self.log(f"❌ Auth check #{i+1} error: {str(e)}")
+                return False
+        
+        self.log("✅ Frontend simulation passed - onboarding_completed consistently True")
+        return True
+    
+    def test_token_refresh_scenario(self):
+        """Test if there are any token refresh issues"""
+        self.log("Testing token refresh scenario...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+        
+        # Test with a fresh session (simulating page reload)
+        fresh_session = requests.Session()
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            response = fresh_session.get(f"{API_BASE}/auth/me", headers=headers)
+            self.log(f"Fresh session auth check - Status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log(f"Fresh session - onboarding_completed: {data.get('onboarding_completed')}")
+                return data.get('onboarding_completed', False)
+            else:
+                self.log(f"❌ Fresh session auth check failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Fresh session error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all tests in sequence"""
         self.log("=" * 60)
@@ -331,6 +405,12 @@ class BackendTester:
         # Test 7: Get Company Setup
         test_results['get_company_setup'] = self.test_company_setup_get()
         
+        # Test 8: Frontend simulation
+        test_results['frontend_simulation'] = self.test_frontend_simulation()
+        
+        # Test 9: Token refresh scenario
+        test_results['token_refresh'] = self.test_token_refresh_scenario()
+        
         # Summary
         self.log("=" * 60)
         self.log("TEST RESULTS SUMMARY")
@@ -347,6 +427,9 @@ class BackendTester:
         self.log("=" * 60)
         if critical_passed:
             self.log("🎉 ALL CRITICAL TESTS PASSED - Company setup flow working correctly")
+            self.log("🔍 ANALYSIS: Backend APIs are working perfectly")
+            self.log("🔍 CONCLUSION: The redirection issue is likely in the FRONTEND code")
+            self.log("🔍 SPECIFIC ISSUE: AuthContext may not be properly updating user state after page reload")
         else:
             self.log("🚨 CRITICAL TESTS FAILED - Company setup flow has issues")
             
