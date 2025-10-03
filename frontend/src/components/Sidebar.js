@@ -103,8 +103,8 @@ const Sidebar = () => {
 
         {/* Brand Info */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
-          <p className="text-sm font-medium text-blue-900 mb-1">ZOIOS CRM</p>
-          <p className="text-xs text-blue-700">Track your outreach efforts and grow your business</p>
+          <p className="text-sm font-medium text-blue-900 mb-1">ZOIOS ERP</p>
+          <p className="text-xs text-blue-700">Streamline your business operations and grow efficiently</p>
         </div>
       </div>
     </div>
