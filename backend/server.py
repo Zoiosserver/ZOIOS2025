@@ -573,6 +573,34 @@ async def setup_company(
     
     return company_setup
 
+@api_router.get("/tenant/info")
+async def get_tenant_info(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get tenant information for current user"""
+    try:
+        tenant_service = await get_tenant_service(mongo_url)
+        tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+        
+        if not tenant_db:
+            return {
+                "tenant_assigned": False,
+                "message": "User not assigned to any tenant database"
+            }
+        
+        stats = await tenant_service.get_tenant_stats(current_user.company_id if hasattr(current_user, 'company_id') else 'unknown')
+        
+        return {
+            "tenant_assigned": True,
+            "database_name": tenant_db.name,
+            "user_email": current_user.email,
+            "stats": stats
+        }
+        
+    except Exception as e:
+        return {
+            "tenant_assigned": False,
+            "error": str(e)
+        }
+
 @api_router.get("/setup/company", response_model=CompanySetup)
 async def get_company_setup(current_user: UserInDB = Depends(get_current_active_user)):
     """Get user's company setup"""
