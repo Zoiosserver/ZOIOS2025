@@ -45,8 +45,8 @@ const Signup = ({ onBackToLogin }) => {
     }
 
     try {
-      // Use the preview URL from supervisor config  
-      const BACKEND_URL = 'https://b74cc3d4-0a98-4583-9eb2-4600dc1ad1aa.preview.emergentagent.com';
+      // Use same host as frontend but port 8001
+      const BACKEND_URL = window.location.origin.replace(':3000', ':8001').replace('https://', 'https://').replace('http://', 'https://');
       console.log('Signup - Using backend URL:', BACKEND_URL);
       
       const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
