@@ -336,6 +336,7 @@ async def login(user_credentials: UserLogin):
         company=user.company,
         role=user.role,
         is_active=user.is_active,
+        onboarding_completed=user.onboarding_completed,
         created_at=user.created_at
     )
     
