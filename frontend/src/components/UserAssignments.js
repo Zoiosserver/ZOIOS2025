@@ -173,6 +173,15 @@ const UserAssignments = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => deleteUser(userData.id, userData.email)}
+                          disabled={userData.email === 'admin@zoios.com'}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                         <Select 
                           value={userData.role} 
                           onValueChange={(newRole) => updateUserRole(userData.id, newRole)}
