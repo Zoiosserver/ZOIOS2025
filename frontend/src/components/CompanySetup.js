@@ -797,11 +797,11 @@ const CompanySetup = () => {
       <div>
         <Label>Additional Currencies (Optional)</Label>
         <p className="text-sm text-gray-600 mb-3">Select additional currencies for multi-currency transactions</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 max-h-60 overflow-y-auto border rounded-lg p-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto border rounded-lg p-4">
           {currencies.filter(c => c.code !== formData.base_currency).map(currency => (
             <div 
               key={currency.code} 
-              className={`p-3 border rounded-lg cursor-pointer transition-colors min-w-0 ${
+              className={`p-4 border rounded-lg cursor-pointer transition-colors w-full ${
                 formData.additional_currencies.includes(currency.code)
                   ? 'bg-blue-50 border-blue-300' 
                   : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
@@ -809,9 +809,9 @@ const CompanySetup = () => {
               onClick={() => handleCurrencyToggle(currency.code)}
               title={`${currency.code} - ${currency.symbol} - ${currency.name}`}
             >
-              <div className="text-sm font-medium break-words">{currency.code}</div>
-              <div className="text-xs text-gray-600 break-words">{currency.symbol}</div>
-              <div className="text-xs text-gray-500 truncate">{currency.name}</div>
+              <div className="text-sm font-bold text-gray-900 mb-1">{currency.code}</div>
+              <div className="text-sm text-gray-700 mb-1">{currency.symbol}</div>
+              <div className="text-xs text-gray-600 leading-relaxed whitespace-normal">{currency.name}</div>
             </div>
           ))}
         </div>
