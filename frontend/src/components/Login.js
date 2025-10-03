@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BarChart3, Lock, Mail, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import Signup from './Signup';
+import ForgotPassword from './ForgotPassword';
 
 const Login = () => {
   const { login } = useAuth();
