@@ -883,7 +883,7 @@ const CompanySetup = () => {
           </Button>
 
           {currentStep < 3 ? (
-            <Button onClick={handleNext} className="flex items-center">
+            <Button onClick={handleNext} className="flex items-center bg-blue-600 hover:bg-blue-700 text-white">
               Next
               <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
@@ -891,7 +891,7 @@ const CompanySetup = () => {
             <Button 
               onClick={handleSubmit} 
               disabled={loading}
-              className="flex items-center bg-green-600 hover:bg-green-700"
+              className="flex items-center bg-blue-600 hover:bg-blue-700 text-white"
             >
               {loading ? 'Setting up...' : 'Complete Setup'}
               <CheckCircle className="w-4 h-4 ml-2" />
