@@ -70,24 +70,49 @@ const Sidebar = () => {
     return currencyIcons[companySetup?.base_currency] || DollarSign;
   };
 
-  const companySubmenuItems = [
-    { path: '/currency', label: 'Currency Management', icon: getCurrencyIcon() }
-  ];
+  const companySubmenuItems = [];
 
-  // Add group company specific items
-  if (companySetup && companySetup.business_type === 'Group Company') {
-    companySubmenuItems.push(
-      { path: '/consolidated-accounts', label: 'Consolidated Accounts', icon: FileText },
-      { path: '/company-accounts', label: 'Company Accounts', icon: Building }
-    );
+  // Add currency management if user has permission
+  if (hasPermission('currency_management')) {
+    companySubmenuItems.push({
+      path: '/currency',
+      label: 'Currency Management',
+      icon: getCurrencyIcon()
+    });
   }
 
-  // Add admin-only company items
-  if (isAdmin()) {
-    companySubmenuItems.push(
-      { path: '/users', label: 'User Management', icon: Shield },
-      { path: '/user-assignments', label: 'Company Assignments', icon: Users }
-    );
+  // Add group company specific items if user has permissions
+  if (companySetup && companySetup.business_type === 'Group Company') {
+    if (hasPermission('consolidated_accounts')) {
+      companySubmenuItems.push({
+        path: '/consolidated-accounts',
+        label: 'Consolidated Accounts',
+        icon: FileText
+      });
+    }
+    if (hasPermission('company_accounts')) {
+      companySubmenuItems.push({
+        path: '/company-accounts',
+        label: 'Company Accounts',
+        icon: Building
+      });
+    }
+  }
+
+  // Add admin-only company items if user has permissions
+  if (hasPermission('user_management')) {
+    companySubmenuItems.push({
+      path: '/users',
+      label: 'User Management',
+      icon: Shield
+    });
+  }
+  if (hasPermission('company_assignments')) {
+    companySubmenuItems.push({
+      path: '/user-assignments',
+      label: 'Company Assignments',
+      icon: Users
+    });
   }
 
   const menuItems = [
