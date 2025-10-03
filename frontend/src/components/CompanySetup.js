@@ -720,7 +720,7 @@ const CompanySetup = () => {
                     <div className="flex gap-2">
                       <Button
                         size="sm"
-                        tabIndex={10}
+                        tabIndex={15}
                         onClick={() => editSisterCompany(company.id)}
                         className="bg-blue-600 hover:bg-blue-700 text-white"
                       >
