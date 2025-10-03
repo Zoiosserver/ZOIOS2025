@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix redirection issue in company setup wizard after completing the first step, ensuring new users can finish onboarding. Implement remaining steps with scalable architecture including double-entry chart of accounts and multi-currency with online rate fetching."
+user_problem_statement: "Fix remaining issues in ZOIOS ERP: 1) Currency Exchange Rates - 'Updated undefined exchange rates' persists and currency loading fails, enable editing additional currencies, 2) INR currency symbol displays $ instead of ₹ in currency management and company accounts, 3) Account Code Auto-Generation shows '1000' for Asset type even when exists instead of next available code, 4) User Deletion - admin@zoios.com delete button not working, 5) Granular Permission System - implement menu hiding when permissions are 'No'. All test data has been cleaned for fresh testing."
 
 backend:
   - task: "Company Setup Step 1 API"
