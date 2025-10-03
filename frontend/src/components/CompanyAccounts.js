@@ -85,15 +85,12 @@ const CompanyAccounts = () => {
   };
 
   const handleAccountTypeChange = (accountType) => {
-    // Add a small delay to ensure companyAccounts is loaded
-    setTimeout(() => {
-      const nextCode = getNextAccountCode(accountType);
-      setNewAccount({
-        ...newAccount, 
-        account_type: accountType,
-        code: nextCode
-      });
-    }, 100);
+    const nextCode = getNextAccountCode(accountType);
+    setNewAccount(prev => ({
+      ...prev, 
+      account_type: accountType,
+      code: nextCode
+    }));
   };
 
   useEffect(() => {
