@@ -63,7 +63,7 @@ const CompanyAccounts = () => {
     const existingCodes = [];
     Object.values(companyAccounts.accounts_by_category).forEach(accounts => {
       accounts.forEach(account => {
-        if (account.account_type === accountType && account.code) {
+        if (account.account_type && account.account_type.toLowerCase() === accountType.toLowerCase() && account.code) {
           const codeNum = parseInt(account.code);
           if (!isNaN(codeNum) && codeNum >= range.start && codeNum < range.start + 1000) {
             existingCodes.push(codeNum);
