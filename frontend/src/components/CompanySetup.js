@@ -502,15 +502,13 @@ const CompanySetup = () => {
 
       {/* Sister Companies Section for Group Companies */}
       {formData.business_type === 'Group Company' && (
-        <Alert className="mt-4">
-          <Building className="h-4 w-4" />
-          <AlertDescription>
-            <strong>Group Company Selected!</strong> You can now add sister companies below.
-          </AlertDescription>
-        </Alert>
-      )}
-      
-      {formData.business_type === 'Group Company' && (
+        <>
+          <Alert className="mt-4">
+            <Building className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Group Company Selected!</strong> You can now add sister companies below.
+            </AlertDescription>
+          </Alert>
         <div className="mt-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">Sister Companies</h3>
