@@ -76,24 +76,24 @@ const CurrencyManagement = () => {
     }
   };
 
-  const updateOnlineRates = async () => {
+  const updateExchangeRates = async () => {
     try {
-      setLoading(true);
-      toast.info('Updating exchange rates from online sources...');
-      
+      setUpdating(true);
       const response = await axios.post(`${API}/currency/update-rates`);
       
       if (response.data.success) {
-        toast.success(`Updated ${response.data.updated_count} exchange rates`);
-        fetchExchangeRates(); // Refresh the rates
+        toast.success(`Updated ${response.data.updated_rates || 0} exchange rates`);
       } else {
-        toast.error(response.data.error || 'Failed to update rates');
+        toast.error(response.data.error || 'Failed to update exchange rates');
       }
+      
+      fetchExchangeRates();
+      fetchCompanySetup();
     } catch (error) {
-      console.error('Error updating rates:', error);
+      console.error('Error updating exchange rates:', error);
       toast.error('Failed to update exchange rates');
     } finally {
-      setLoading(false);
+      setUpdating(false);
     }
   };
 
