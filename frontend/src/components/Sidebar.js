@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/button';
 const Sidebar = () => {
   const location = useLocation();
   const { user, logout, isAdmin } = useAuth();
-  const [userPermissions, setUserPermissions] = React.useState({});
+  const { permissions, hasPermission, hasAnyPermission } = usePermissions();
   const [companySetup, setCompanySetup] = React.useState(null);
   const [crmMenuOpen, setCrmMenuOpen] = React.useState(
     ['/contacts', '/companies', '/call-logs', '/email-responses'].includes(location.pathname)
