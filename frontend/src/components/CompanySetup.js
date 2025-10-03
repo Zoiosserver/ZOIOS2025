@@ -769,12 +769,12 @@ const CompanySetup = () => {
           <SelectTrigger tabIndex={1}>
             <SelectValue placeholder="Select base currency" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="min-w-[400px] w-auto max-h-[300px] overflow-y-auto">
             {currencies.map(currency => (
               <SelectItem key={currency.code} value={currency.code}>
-                <div className="flex items-center">
-                  <span className="font-medium">{currency.code}</span>
-                  <span className="ml-2 text-gray-600">{currency.symbol} - {currency.name}</span>
+                <div className="flex items-center w-full">
+                  <span className="font-medium flex-shrink-0">{currency.code}</span>
+                  <span className="ml-2 text-gray-600 truncate">{currency.symbol} - {currency.name}</span>
                 </div>
               </SelectItem>
             ))}
