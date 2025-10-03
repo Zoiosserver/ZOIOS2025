@@ -288,13 +288,13 @@ const CompanySetup = () => {
           )}
         </div>
 
-        <div>
+        <div className="md:col-span-2">
           <Label htmlFor="business_type">Business Type *</Label>
           <Select value={formData.business_type} onValueChange={(value) => setFormData(prev => ({...prev, business_type: value}))}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select business type" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="min-w-[300px] w-auto">
               {businessTypes.map(type => (
                 <SelectItem key={type} value={type}>{type}</SelectItem>
               ))}
