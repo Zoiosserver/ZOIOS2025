@@ -47,8 +47,12 @@ const Login = () => {
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg">
-              <BarChart3 className="w-8 h-8 text-white" />
+            <div className="w-20 h-20 flex items-center justify-center">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_outreach-pulse-3/artifacts/5adajuhk_Zoios.png" 
+                alt="ZOIOS Logo" 
+                className="w-20 h-20 object-contain"
+              />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to ZOIOS</h1>
