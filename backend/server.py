@@ -269,6 +269,24 @@ async def public_signup(user_data: UserSignup):
     prepared_user = prepare_user_for_mongo(user)
     await db.users.insert_one(prepared_user)
     
+    # Send welcome email
+    try:
+        base_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+        email_sent = await send_welcome_email(
+            email=user["email"],
+            user_name=user["name"],
+            user_company=user["company"],
+            user_role=user["role"],
+            base_url=base_url
+        )
+        if email_sent:
+            print(f"✅ Welcome email sent to {user['email']}")
+        else:
+            print(f"❌ Failed to send welcome email to {user['email']}")
+    except Exception as e:
+        print(f"❌ Error sending welcome email: {str(e)}")
+        # Don't fail signup if email fails
+    
     # Create access token
     access_token_expires = timedelta(minutes=30)
     access_token = create_access_token(
