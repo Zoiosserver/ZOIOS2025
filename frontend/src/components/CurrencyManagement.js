@@ -206,8 +206,8 @@ const CurrencyManagement = () => {
           <p className="text-gray-600">Manage exchange rates and currency conversions</p>
         </div>
         <Button 
-          onClick={updateOnlineRates} 
-          disabled={loading}
+          onClick={updateExchangeRates} 
+          disabled={updating}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
