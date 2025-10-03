@@ -803,6 +803,7 @@ const CompanySetup = () => {
           <Label htmlFor="address">Address</Label>
           <Textarea
             id="address"
+            tabIndex={1}
             value={formData.address}
             onChange={(e) => setFormData(prev => ({...prev, address: e.target.value}))}
             placeholder="Enter company address"
