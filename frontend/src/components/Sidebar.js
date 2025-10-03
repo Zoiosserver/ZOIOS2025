@@ -54,9 +54,16 @@ const Sidebar = () => {
     }
   }, [user]);
   
-  // Build Company submenu items
+  // Build Company submenu items with dynamic currency icon
+  const getCurrencyIcon = () => {
+    if (companySetup?.base_currency === 'INR') {
+      return () => <span className="w-5 h-5 flex items-center justify-center text-base">₹</span>;
+    }
+    return DollarSign;
+  };
+
   const companySubmenuItems = [
-    { path: '/currency', label: 'Currency Management', icon: DollarSign }
+    { path: '/currency', label: 'Currency Management', icon: getCurrencyIcon() }
   ];
 
   // Add group company specific items
