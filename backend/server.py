@@ -787,11 +787,21 @@ async def add_sister_company(
 @api_router.get("/company/sister-companies", response_model=List[SisterCompany])
 async def get_sister_companies(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all sister companies for the group"""
-    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if not tenant_db:
+        # Fallback to main database
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
     if not company_setup:
         raise HTTPException(status_code=404, detail="Company setup not found")
     
-    sister_companies = await db.sister_companies.find({
+    sister_companies = await db_to_use.sister_companies.find({
         "group_company_id": company_setup["id"],
         "is_active": True
     }).to_list(length=None)
