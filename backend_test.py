@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
-Backend API Testing Script for Company Setup Flow
-Tests the redirection issue in company setup wizard
+Backend API Testing Script for Recent Backend Fixes
+Tests the specific fixes implemented:
+1. Currency Exchange Rate Undefined Fix
+2. User Deletion Fix  
+3. Enhanced /auth/me Endpoint with permissions
+4. User Permissions Update functionality
 """
 
 import requests
@@ -14,7 +18,11 @@ import sys
 BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://fiscal-wizard.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
-# Test credentials as specified - using timestamp to ensure fresh user
+# Test credentials as specified in review request
+ADMIN_EMAIL = "admin@zoios.com"
+ADMIN_PASSWORD = "admin123"
+
+# Additional test user for deletion testing
 import time
 timestamp = str(int(time.time()))
 TEST_EMAIL = f"testuser{timestamp}@example.com"
