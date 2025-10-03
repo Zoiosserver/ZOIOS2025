@@ -50,10 +50,17 @@ const Sidebar = () => {
   
   const menuItems = [
     { path: '/', label: 'Dashboard', icon: Home },
-    { path: '/contacts', label: 'Contacts', icon: Users },
-    { path: '/companies', label: 'Companies', icon: Building2 },
-    { path: '/call-logs', label: 'Call Logs', icon: Phone },
-    { path: '/email-responses', label: 'Email Responses', icon: Mail },
+    { 
+      label: 'CRM', 
+      icon: BarChart3, 
+      isSubmenu: true,
+      submenuItems: [
+        { path: '/contacts', label: 'Contacts', icon: Users },
+        { path: '/companies', label: 'Companies', icon: Building2 },
+        { path: '/call-logs', label: 'Call Logs', icon: Phone },
+        { path: '/email-responses', label: 'Email Responses', icon: Mail },
+      ]
+    },
     { path: '/currency', label: 'Currency Management', icon: DollarSign },
   ];
 
