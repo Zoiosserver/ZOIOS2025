@@ -1,11 +1,14 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/sonner';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './components/Dashboard';
 import Contacts from './components/Contacts';
 import Companies from './components/Companies';
 import CallLogs from './components/CallLogs';
 import EmailResponses from './components/EmailResponses';
+import UserManagement from './components/UserManagement';
 import Sidebar from './components/Sidebar';
 import './App.css';
 
