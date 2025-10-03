@@ -5,6 +5,7 @@ Supports both online rate fetching and manual rate management
 
 import asyncio
 import aiohttp
+import uuid
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel
