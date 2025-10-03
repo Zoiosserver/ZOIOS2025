@@ -37,6 +37,16 @@ const CompanySetup = () => {
   const [currencies, setCurrencies] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [accountingSystem, setAccountingSystem] = useState(null);
+  const [sisterCompanies, setSisterCompanies] = useState([]);
+  const [showSisterCompanyForm, setShowSisterCompanyForm] = useState(false);
+  const [sisterCompanyForm, setSisterCompanyForm] = useState({
+    company_name: '',
+    country_code: '',
+    base_currency: '',
+    business_type: '',
+    industry: '',
+    ownership_percentage: 100
+  });
 
   const [formData, setFormData] = useState({
     // Step 1: Company Basic Info
