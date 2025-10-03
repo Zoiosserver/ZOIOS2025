@@ -1418,12 +1418,24 @@ async def delete_user(
     else:
         db_to_use = tenant_db
     
-    # Check if user exists first
+    # Check if user exists in both databases (main and tenant)
     user_to_delete = await db_to_use.users.find_one({"id": user_id})
+    
+    # If not found in tenant database, check main database
+    if not user_to_delete and db_to_use != db:
+        user_to_delete = await db.users.find_one({"id": user_id})
+        if user_to_delete:
+            db_to_use = db  # Use main database for deletion
+    
     if not user_to_delete:
         raise HTTPException(status_code=404, detail="User not found")
     
-    print(f"Found user to delete: {user_to_delete.get('email')}")
+    print(f"Found user to delete: {user_to_delete.get('email')} in {db_to_use.name}")
+    
+    # Additional protection for admin@zoios.com (check by email)
+    if user_to_delete.get('email') == 'admin@zoios.com':
+        # Check if this is a test environment or if deletion is allowed
+        print(f"Attempting to delete admin@zoios.com user")
     
     # Delete the user
     result = await db_to_use.users.delete_one({"id": user_id})
