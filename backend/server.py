@@ -1308,8 +1308,8 @@ async def delete_user(
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
     
-    # Prevent deleting super admin (admin@zoios.com)
-    if user_id == "8f32f2f1-6320-4cf5-ba57-f2dea535a372":  # admin@zoios.com ID
+    # Prevent deleting super admin (admin@2mholding.com)
+    if user_id == "e37fd352-e291-4fb5-8543-6e21e4144b1f":  # admin@2mholding.com ID
         raise HTTPException(status_code=403, detail="Cannot delete super admin user")
     
     # Prevent users from deleting themselves
