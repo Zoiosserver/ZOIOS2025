@@ -231,12 +231,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Currency Exchange Rate Undefined Issue"
+    - "Beautiful Professional Login/Signup UI Enhancement"
+    - "Company Setup Blank Screen Fix" 
     - "Currency Symbol Display Fix"
-    - "Account Code Auto-Generation Fix" 
-    - "User Deletion Fix"
+    - "Account Code Auto-Generation Fix"
     - "Granular Permission System Implementation"
-  stuck_tasks: []
+  stuck_tasks:
+    - "India Rupee Currency Display Issue"
   test_all: false
   test_priority: "high_first"
 
