@@ -205,8 +205,12 @@ const CompanySetup = () => {
       await axios.post(`${API}/setup/company`, formData);
       toast.success('Company setup completed successfully!');
       
-      // Refresh the page to trigger auth check and redirect to dashboard
-      window.location.reload();
+      // Refresh user data to get updated onboarding_completed status
+      const refreshResult = await refreshUser();
+      if (!refreshResult.success) {
+        console.error('Failed to refresh user data:', refreshResult.error);
+        toast.error('Setup completed but failed to refresh user data. Please refresh the page.');
+      }
       
     } catch (error) {
       console.error('Error setting up company:', error);
