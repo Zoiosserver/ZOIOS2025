@@ -610,6 +610,7 @@ const CompanySetup = () => {
                   <Label htmlFor="ownership_percentage">Ownership Percentage</Label>
                   <Input
                     id="ownership_percentage"
+                    tabIndex={5}
                     type="number"
                     min="0"
                     max="100"
