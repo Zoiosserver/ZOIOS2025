@@ -45,8 +45,11 @@ const Login = () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.access_token);
-        toast.success('Login successful! Redirecting...');
-        window.location.href = '/'; // Force reload to trigger auth check
+        toast.success('Login successful! Redirecting to setup...');
+        // Force reload to trigger auth check and redirect to company setup
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
       } else {
         const errorData = await response.json();
         setError(errorData.detail || 'Login failed');
