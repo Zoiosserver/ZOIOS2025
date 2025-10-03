@@ -22,7 +22,7 @@
 ##     file: "file_path.py"
 ##     stuck_count: 0
 ##     priority: "high"  # or "medium" or "low"
-##     needs_retesting: false
+##     needs_retesting: true
 ##     status_history:
 ##         -working: true  # or false or "NA"
 ##         -agent: "main"  # or "testing" or "user"
@@ -35,7 +35,7 @@
 ##     file: "file_path.js"
 ##     stuck_count: 0
 ##     priority: "high"  # or "medium" or "low"
-##     needs_retesting: false
+##     needs_retesting: true
 ##     status_history:
 ##         -working: true  # or false or "NA"
 ##         -agent: "main"  # or "testing" or "user"
@@ -111,7 +111,7 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: false
           agent: "main"
@@ -126,7 +126,7 @@ backend:
     file: "/app/backend/auth.py"
     stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: false
           agent: "main"
@@ -141,7 +141,7 @@ backend:
     file: "/app/backend/accounting_systems.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
@@ -159,7 +159,7 @@ backend:
     file: "/app/backend/currency_service.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
@@ -178,7 +178,7 @@ frontend:
     file: "/app/frontend/src/components/CompanySetup.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: false
           agent: "main"
@@ -196,7 +196,7 @@ frontend:
     file: "/app/frontend/src/contexts/AuthContext.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: false
           agent: "main"
@@ -214,7 +214,7 @@ frontend:
     file: "/app/frontend/src/components/CurrencyManagement.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
@@ -242,7 +242,7 @@ test_plan:
     file: "/app/frontend/src/components/CompanySetup.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: false
           agent: "user"
@@ -260,7 +260,7 @@ test_plan:
     file: "/app/frontend/src/components/CompanySetup.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: false
           agent: "user"
