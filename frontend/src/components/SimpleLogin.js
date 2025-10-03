@@ -78,6 +78,18 @@ const SimpleLogin = ({ onLogin }) => {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
+        
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{' '}
+            <button
+              onClick={onLogin.switchToSignup || (() => {})}
+              className="font-medium text-blue-600 hover:text-blue-500"
+            >
+              Sign up here
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );
