@@ -326,10 +326,7 @@ const CompanySetup = () => {
             <SelectContent className="min-w-[400px] w-auto">
               {countries.map(country => (
                 <SelectItem key={country.code} value={country.code}>
-                  <div className="flex items-center justify-between w-full">
-                    <span>{country.name}</span>
-                    <span className="text-xs text-gray-500 ml-2">({country.currency})</span>
-                  </div>
+                  <span>{country.name} ({country.currency})</span>
                 </SelectItem>
               ))}
             </SelectContent>
