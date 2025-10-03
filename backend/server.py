@@ -733,12 +733,18 @@ async def set_manual_exchange_rate(
     current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Set a manual exchange rate"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    db_to_use = tenant_db if tenant_db is not None else db
+    
     # Get company setup
-    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
     if not company_setup:
         raise HTTPException(status_code=404, detail="Company setup not found")
     
-    currency_service = await get_currency_service(db)
+    currency_service = await get_currency_service(db_to_use)
     rate = await currency_service.set_manual_rate(
         company_id=company_setup["id"],
         base_currency=rate_update.base_currency,
