@@ -308,6 +308,35 @@ const CompanySetup = () => {
     setShowSisterCompanyForm(false);
   };
 
+  const editSisterCompany = (companyId) => {
+    const companyToEdit = sisterCompanies.find(company => company.id === companyId);
+    if (companyToEdit) {
+      setSisterCompanyForm({
+        company_name: companyToEdit.company_name,
+        country_code: companyToEdit.country_code,
+        base_currency: companyToEdit.base_currency,
+        business_type: companyToEdit.business_type,
+        industry: companyToEdit.industry,
+        ownership_percentage: companyToEdit.ownership_percentage
+      });
+      setEditingSisterCompanyId(companyId);
+      setShowSisterCompanyForm(true);
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingSisterCompanyId(null);
+    setSisterCompanyForm({
+      company_name: '',
+      country_code: '',
+      base_currency: '',
+      business_type: '',
+      industry: '',
+      ownership_percentage: 100
+    });
+    setShowSisterCompanyForm(false);
+  };
+
   const removeSisterCompany = (companyId) => {
     setSisterCompanies(sisterCompanies.filter(company => company.id !== companyId));
     toast.success('Sister company removed from setup!');
