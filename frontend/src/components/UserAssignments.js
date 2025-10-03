@@ -30,6 +30,8 @@ const UserAssignments = () => {
   const [loading, setLoading] = useState(false);
   const [userAssignments, setUserAssignments] = useState(null);
   const [updatingRole, setUpdatingRole] = useState(null);
+  const [editingPermissions, setEditingPermissions] = useState(null);
+  const [tempPermissions, setTempPermissions] = useState({});
 
   useEffect(() => {
     fetchUserAssignments();
