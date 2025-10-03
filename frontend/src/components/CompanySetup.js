@@ -516,12 +516,17 @@ const CompanySetup = () => {
                   <Label htmlFor="sister_country">Country *</Label>
                   <Select
                     value={sisterCompanyForm.country_code}
-                    onValueChange={(value) => {
+                    onValueChange={async (value) => {
                       const country = countries.find(c => c.code === value);
+                      
+                      // Fetch accounting system for the selected country
+                      const accountingSystemData = await fetchSisterCompanyAccountingSystem(value);
+                      
                       setSisterCompanyForm(prev => ({
                         ...prev,
                         country_code: value,
-                        base_currency: country?.currency || ''
+                        base_currency: country?.currency || '',
+                        accounting_system: accountingSystemData?.name || ''
                       }));
                     }}
                   >
