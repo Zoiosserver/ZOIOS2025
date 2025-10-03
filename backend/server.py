@@ -303,26 +303,32 @@ async def delete_user(user_id: str, current_user: UserInDB = Depends(get_admin_u
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(current_user: UserInDB = Depends(get_current_active_user)):
     """Get key statistics for the dashboard"""
+    # Get user filter
+    user_filter = get_user_filter(current_user)
+    
     # Count totals
-    total_contacts = await db.contacts.count_documents({})
-    total_companies = await db.companies.count_documents({})
-    total_calls = await db.call_logs.count_documents({})
-    total_emails = await db.email_responses.count_documents({})
+    total_contacts = await db.contacts.count_documents(user_filter)
+    total_companies = await db.companies.count_documents(user_filter)
+    total_calls = await db.call_logs.count_documents(user_filter)
+    total_emails = await db.email_responses.count_documents(user_filter)
     
     # Contact status distribution
     contact_pipeline = [
+        {"$match": user_filter},
         {"$group": {"_id": "$status", "count": {"$sum": 1}}}
     ]
     contact_status_data = await db.contacts.aggregate(contact_pipeline).to_list(length=None)
     
     # Call disposition distribution
     call_pipeline = [
+        {"$match": user_filter},
         {"$group": {"_id": "$disposition", "count": {"$sum": 1}}}
     ]
     call_disposition_data = await db.call_logs.aggregate(call_pipeline).to_list(length=None)
     
     # Email status distribution
     email_pipeline = [
+        {"$match": user_filter},
         {"$group": {"_id": "$status", "count": {"$sum": 1}}}
     ]
     email_status_data = await db.email_responses.aggregate(email_pipeline).to_list(length=None)
@@ -331,7 +337,7 @@ async def get_dashboard_stats(current_user: UserInDB = Depends(get_current_activ
     from datetime import timedelta
     thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
     activity_pipeline = [
-        {"$match": {"created_at": {"$gte": thirty_days_ago.isoformat()}}},
+        {"$match": {**user_filter, "created_at": {"$gte": thirty_days_ago.isoformat()}}},
         {"$group": {
             "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": {"$dateFromString": {"dateString": "$created_at"}}}},
             "count": {"$sum": 1}
