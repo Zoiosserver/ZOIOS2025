@@ -92,25 +92,82 @@ const Sidebar = () => {
       <nav className="mt-6">
         <ul className="space-y-1 px-4">
           {menuItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            const Icon = item.icon;
-            
-            return (
-              <li key={item.path}>
-                <Link
-                  to={item.path}
-                  className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                  data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
-                >
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`} />
-                  <span>{item.label}</span>
-                </Link>
-              </li>
-            );
+            if (item.isSubmenu) {
+              // Handle submenu items (like CRM)
+              const isAnySubmenuActive = item.submenuItems.some(subItem => location.pathname === subItem.path);
+              const Icon = item.icon;
+              
+              return (
+                <li key={item.label}>
+                  <button
+                    onClick={() => setCrmMenuOpen(!crmMenuOpen)}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      isAnySubmenuActive
+                        ? 'bg-blue-50 text-blue-700'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Icon className={`w-5 h-5 ${isAnySubmenuActive ? 'text-blue-700' : 'text-gray-500'}`} />
+                      <span>{item.label}</span>
+                    </div>
+                    {crmMenuOpen ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
+                  </button>
+                  
+                  {/* Submenu items */}
+                  {crmMenuOpen && (
+                    <ul className="mt-1 space-y-1 ml-8">
+                      {item.submenuItems.map((subItem) => {
+                        const isActive = location.pathname === subItem.path;
+                        const SubIcon = subItem.icon;
+                        
+                        return (
+                          <li key={subItem.path}>
+                            <Link
+                              to={subItem.path}
+                              className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                                isActive
+                                  ? 'bg-blue-100 text-blue-700 border-r-2 border-blue-700'
+                                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                              }`}
+                              data-testid={`nav-${subItem.label.toLowerCase().replace(' ', '-')}`}
+                            >
+                              <SubIcon className={`w-4 h-4 ${isActive ? 'text-blue-700' : 'text-gray-400'}`} />
+                              <span>{subItem.label}</span>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </li>
+              );
+            } else {
+              // Handle regular menu items
+              const isActive = location.pathname === item.path;
+              const Icon = item.icon;
+              
+              return (
+                <li key={item.path}>
+                  <Link
+                    to={item.path}
+                    className={`flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      isActive
+                        ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                    data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
+                  >
+                    <Icon className={`w-5 h-5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`} />
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              );
+            }
           })}
         </ul>
       </nav>
