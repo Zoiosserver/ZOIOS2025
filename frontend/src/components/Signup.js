@@ -45,8 +45,8 @@ const Signup = ({ onBackToLogin }) => {
     }
 
     try {
-      // Use the working external URL from supervisor config
-      const BACKEND_URL = 'https://b74cc3d4-0a98-4583-9eb2-4600dc1ad1aa.preview.emergentagent.com';
+      // Use proxy to backend
+      const BACKEND_URL = '';
       console.log('Signup - Using backend URL:', BACKEND_URL);
       
       const response = await fetch(`${BACKEND_URL}/api/auth/signup`, {
