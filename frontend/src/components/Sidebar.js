@@ -5,6 +5,7 @@ import {
   BarChart3, 
   Users, 
   Building2, 
+  Building,
   Phone, 
   Mail,
   Home,
