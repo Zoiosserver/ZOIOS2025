@@ -37,28 +37,74 @@ const SimpleCompanySetup = ({ user, onComplete }) => {
     try {
       const backendUrl = window.location.origin;
       
-      // Fetch countries
-      const countriesRes = await fetch(`${backendUrl}/api/setup/countries`);
-      if (countriesRes.ok) {
-        const countriesData = await countriesRes.json();
-        setCountries(countriesData);
+      // Fetch countries with fallback data
+      try {
+        const countriesRes = await fetch(`${backendUrl}/api/setup/countries`);
+        if (countriesRes.ok) {
+          const countriesData = await countriesRes.json();
+          setCountries(countriesData);
+        } else {
+          throw new Error('Countries API failed');
+        }
+      } catch {
+        // Fallback countries data
+        setCountries([
+          { code: 'IN', name: 'India', currency: 'INR', accounting_systems: ['indian_gaap'] },
+          { code: 'US', name: 'United States', currency: 'USD', accounting_systems: ['us_gaap'] },
+          { code: 'GB', name: 'United Kingdom', currency: 'GBP', accounting_systems: ['uk_gaap'] },
+          { code: 'CA', name: 'Canada', currency: 'CAD', accounting_systems: ['canadian_gaap'] },
+          { code: 'AU', name: 'Australia', currency: 'AUD', accounting_systems: ['australian_gaap'] }
+        ]);
       }
 
-      // Fetch currencies
-      const currenciesRes = await fetch(`${backendUrl}/api/currency/available`);
-      if (currenciesRes.ok) {
-        const currenciesData = await currenciesRes.json();
-        setCurrencies(currenciesData);
+      // Fetch currencies with fallback data
+      try {
+        const currenciesRes = await fetch(`${backendUrl}/api/currency/available`);
+        if (currenciesRes.ok) {
+          const currenciesData = await currenciesRes.json();
+          setCurrencies(currenciesData);
+        } else {
+          throw new Error('Currencies API failed');
+        }
+      } catch {
+        // Fallback currencies data
+        setCurrencies([
+          { code: 'USD', name: 'US Dollar', symbol: '$' },
+          { code: 'EUR', name: 'Euro', symbol: '€' },
+          { code: 'GBP', name: 'British Pound', symbol: '£' },
+          { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
+          { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+          { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
+          { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
+          { code: 'CHF', name: 'Swiss Franc', symbol: 'CHF' },
+          { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
+          { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$' }
+        ]);
       }
 
-      // Fetch accounting systems
-      const accountingRes = await fetch(`${backendUrl}/api/setup/accounting-systems`);
-      if (accountingRes.ok) {
-        const accountingData = await accountingRes.json();
-        setAccountingSystems(accountingData);
+      // Fetch accounting systems with fallback data
+      try {
+        const accountingRes = await fetch(`${backendUrl}/api/setup/accounting-systems`);
+        if (accountingRes.ok) {
+          const accountingData = await accountingRes.json();
+          setAccountingSystems(accountingData);
+        } else {
+          throw new Error('Accounting systems API failed');
+        }
+      } catch {
+        // Fallback accounting systems data
+        setAccountingSystems([
+          { id: 'us_gaap', name: 'US GAAP', description: 'United States Generally Accepted Accounting Principles' },
+          { id: 'ifrs', name: 'IFRS', description: 'International Financial Reporting Standards' },
+          { id: 'indian_gaap', name: 'Indian GAAP / Ind AS', description: 'Indian Accounting Standards' },
+          { id: 'uk_gaap', name: 'UK GAAP', description: 'United Kingdom Generally Accepted Accounting Practice' },
+          { id: 'canadian_gaap', name: 'Canadian GAAP', description: 'Canadian Generally Accepted Accounting Principles' },
+          { id: 'australian_gaap', name: 'Australian GAAP', description: 'Australian Accounting Standards' }
+        ]);
       }
     } catch (err) {
-      setError('Failed to load setup data: ' + err.message);
+      console.error('Error loading setup data:', err);
+      setError('Some setup data may not be available, but you can still proceed with the setup.');
     }
   };
 
