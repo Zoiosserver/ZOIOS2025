@@ -343,13 +343,15 @@ const CompanyAccounts = () => {
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="code">Account Code</Label>
+                          <Label htmlFor="code">Account Code (Auto-generated)</Label>
                           <Input
                             id="code"
                             value={newAccount.code}
                             onChange={(e) => setNewAccount({...newAccount, code: e.target.value})}
-                            placeholder="e.g., 1001"
+                            placeholder="Select account type first"
+                            disabled={!newAccount.account_type}
                           />
+                          <p className="text-xs text-gray-500 mt-1">Code is auto-generated based on account type. You can modify if needed.</p>
                         </div>
                         <div>
                           <Label htmlFor="name">Account Name</Label>
