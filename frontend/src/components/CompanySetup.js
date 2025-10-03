@@ -251,6 +251,7 @@ const CompanySetup = () => {
               company_name: company.company_name,
               country_code: company.country_code,
               base_currency: company.base_currency,
+              accounting_system: company.accounting_system,
               business_type: company.business_type,
               industry: company.industry,
               ownership_percentage: company.ownership_percentage
