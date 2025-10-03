@@ -801,12 +801,105 @@ class BackendTester:
                 else:
                     self.log("❌ updated_rates field missing - undefined issue not fixed")
                     return False
+            elif response.status_code == 404 and "Company setup not found" in response.text:
+                self.log("⚠️ Company setup not found - testing with fresh user setup")
+                # Create a fresh user with company setup to test currency functionality
+                return self.test_currency_with_fresh_user()
             else:
                 self.log(f"❌ Currency update failed: {response.text}")
                 return False
                 
         except Exception as e:
             self.log(f"❌ Currency update error: {str(e)}")
+            return False
+
+    def test_currency_with_fresh_user(self):
+        """Test currency functionality with a fresh user that has company setup"""
+        self.log("Testing currency with fresh user setup...")
+        
+        # Create a fresh user
+        fresh_email = f"currencytest{int(time.time())}@example.com"
+        signup_data = {
+            "email": fresh_email,
+            "password": "testpass123",
+            "name": "Currency Test User",
+            "company": "Currency Test Company"
+        }
+        
+        try:
+            # Sign up fresh user
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            if response.status_code != 200:
+                self.log(f"❌ Fresh user signup failed: {response.text}")
+                return False
+            
+            fresh_token = response.json().get('access_token')
+            headers = {
+                "Authorization": f"Bearer {fresh_token}",
+                "Content-Type": "application/json"
+            }
+            
+            # Setup company with additional currencies
+            setup_data = {
+                "company_name": "Currency Test Company",
+                "country_code": "US",
+                "base_currency": "USD",
+                "additional_currencies": ["EUR", "GBP"],
+                "business_type": "Corporation",
+                "industry": "Technology",
+                "address": "123 Test Street",
+                "city": "Test City",
+                "state": "CA",
+                "postal_code": "12345",
+                "phone": "+1-555-123-4567",
+                "email": fresh_email,
+                "website": "https://testcompany.com",
+                "tax_number": "123456789",
+                "registration_number": "REG123456"
+            }
+            
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            if response.status_code != 200:
+                self.log(f"❌ Fresh user company setup failed: {response.text}")
+                return False
+            
+            self.log("✅ Fresh user and company setup created")
+            
+            # Now test currency update rates
+            response = self.session.post(f"{API_BASE}/currency/update-rates", headers=headers)
+            self.log(f"Fresh user currency update response status: {response.status_code}")
+            self.log(f"Fresh user currency update response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log("✅ Currency update rates endpoint working with fresh user")
+                
+                # Check for proper response format
+                updated_rates = data.get('updated_rates')
+                if updated_rates is not None:
+                    self.log("✅ updated_rates field present (no undefined)")
+                    self.log(f"Updated rates: {updated_rates}")
+                    
+                    # Check for other required fields
+                    required_fields = ['base_currency', 'target_currencies', 'last_updated']
+                    all_fields_present = True
+                    for field in required_fields:
+                        if field not in data:
+                            self.log(f"❌ Missing required field: {field}")
+                            all_fields_present = False
+                        else:
+                            self.log(f"✅ Field present: {field} = {data[field]}")
+                    
+                    return all_fields_present
+                else:
+                    self.log("❌ updated_rates field missing - undefined issue not fixed")
+                    return False
+            else:
+                self.log(f"❌ Fresh user currency update failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Fresh user currency test error: {str(e)}")
             return False
 
     def test_create_test_user_for_deletion(self):
