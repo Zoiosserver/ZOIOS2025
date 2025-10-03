@@ -457,21 +457,24 @@ async def get_contact_call_logs(contact_id: str, current_user: UserInDB = Depend
 
 # Email Response Routes
 @api_router.post("/email-responses", response_model=EmailResponse)
-async def create_email_response(email_response: EmailResponseCreate):
+async def create_email_response(email_response: EmailResponseCreate, current_user: UserInDB = Depends(get_current_active_user)):
     email_dict = email_response.dict()
+    email_dict['user_id'] = current_user.id  # Add user_id
     email_obj = EmailResponse(**email_dict)
     prepared_data = prepare_for_mongo(email_obj.dict())
     await db.email_responses.insert_one(prepared_data)
     return email_obj
 
 @api_router.get("/email-responses", response_model=List[EmailResponse])
-async def get_email_responses(skip: int = 0, limit: int = 100):
-    email_responses = await db.email_responses.find().sort("date", -1).skip(skip).limit(limit).to_list(length=None)
+async def get_email_responses(current_user: UserInDB = Depends(get_current_active_user), skip: int = 0, limit: int = 100):
+    user_filter = get_user_filter(current_user)
+    email_responses = await db.email_responses.find(user_filter).sort("date", -1).skip(skip).limit(limit).to_list(length=None)
     return [EmailResponse(**parse_from_mongo(email_response)) for email_response in email_responses]
 
 @api_router.get("/email-responses/contact/{contact_id}", response_model=List[EmailResponse])
-async def get_contact_email_responses(contact_id: str):
-    email_responses = await db.email_responses.find({"contact_id": contact_id}).sort("date", -1).to_list(length=None)
+async def get_contact_email_responses(contact_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    user_filter = get_user_filter(current_user)
+    email_responses = await db.email_responses.find({**user_filter, "contact_id": contact_id}).sort("date", -1).to_list(length=None)
     return [EmailResponse(**parse_from_mongo(email_response)) for email_response in email_responses]
 
 # Include the router in the main app
