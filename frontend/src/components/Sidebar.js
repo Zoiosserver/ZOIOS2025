@@ -11,7 +11,8 @@ import {
   Settings,
   LogOut,
   Shield,
-  User
+  User,
+  DollarSign
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
