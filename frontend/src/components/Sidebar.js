@@ -20,6 +20,30 @@ import { Button } from '@/components/ui/button';
 const Sidebar = () => {
   const location = useLocation();
   const { user, logout, isAdmin } = useAuth();
+  const [companySetup, setCompanySetup] = React.useState(null);
+  
+  React.useEffect(() => {
+    const fetchCompanySetup = async () => {
+      try {
+        const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+        const response = await fetch(`${BACKEND_URL}/api/setup/company`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setCompanySetup(data);
+        }
+      } catch (error) {
+        console.error('Error fetching company setup:', error);
+      }
+    };
+
+    if (user && user.onboarding_completed) {
+      fetchCompanySetup();
+    }
+  }, [user]);
   
   const menuItems = [
     { path: '/', label: 'Dashboard', icon: Home },
@@ -29,6 +53,11 @@ const Sidebar = () => {
     { path: '/email-responses', label: 'Email Responses', icon: Mail },
     { path: '/currency', label: 'Currency Management', icon: DollarSign },
   ];
+
+  // Add consolidated accounts for group companies
+  if (companySetup && companySetup.business_type === 'Group Company') {
+    menuItems.push({ path: '/consolidated-accounts', label: 'Consolidated Accounts', icon: FileText });
+  }
 
   // Add admin-only menu items
   if (isAdmin()) {
