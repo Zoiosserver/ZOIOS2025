@@ -653,8 +653,18 @@ async def get_company_exchange_rates(current_user: UserInDB = Depends(get_curren
 @api_router.post("/currency/update-rates")
 async def update_exchange_rates(current_user: UserInDB = Depends(get_current_active_user)):
     """Update exchange rates from online sources"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        # Fallback to main database
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
     # Get company setup
-    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
     if not company_setup:
         raise HTTPException(status_code=404, detail="Company setup not found")
     
@@ -664,7 +674,7 @@ async def update_exchange_rates(current_user: UserInDB = Depends(get_current_act
     if not additional_currencies:
         return {"success": True, "message": "No additional currencies configured"}
     
-    currency_service = await get_currency_service(db)
+    currency_service = await get_currency_service(db_to_use)
     result = await currency_service.update_company_rates(
         company_id=company_setup["id"],
         base_currency=base_currency,
