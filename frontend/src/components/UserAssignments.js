@@ -86,6 +86,30 @@ const UserAssignments = () => {
     }
   };
 
+  const updateUserPermissions = async (userId, permissions) => {
+    try {
+      await axios.post(`${API}/users/${userId}/permissions`, { permissions });
+      toast.success('User permissions updated successfully');
+      fetchUserAssignments();
+      setEditingPermissions(null);
+    } catch (error) {
+      console.error('Error updating permissions:', error);
+      toast.error('Failed to update permissions');
+    }
+  };
+
+  const handlePermissionToggle = (permission, value) => {
+    setTempPermissions(prev => ({
+      ...prev,
+      [permission]: value
+    }));
+  };
+
+  const startEditingPermissions = (userId, currentPermissions) => {
+    setEditingPermissions(userId);
+    setTempPermissions(currentPermissions || {});
+  };
+
   const getRoleBadgeColor = (role) => {
     switch (role.toLowerCase()) {
       case 'admin': return 'bg-red-100 text-red-800 border-red-200';
