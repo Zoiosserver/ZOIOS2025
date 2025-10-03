@@ -133,7 +133,7 @@ const CallLogs = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Call Logs</h1>
-          <p className="text-gray-600 mt-1">Track your calling activities and outcomes</p>
+          <p className="text-gray-600 mt-1">Track your business calls and outcomes</p>
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
