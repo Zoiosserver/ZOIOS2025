@@ -760,7 +760,7 @@ const CompanySetup = () => {
               Each sister company will have its own chart of accounts that can be consolidated for reporting.
             </AlertDescription>
           </Alert>
-        </>
+        </div>
       )}
     </div>
   );
