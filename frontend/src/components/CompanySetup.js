@@ -412,7 +412,7 @@ const CompanySetup = () => {
         <div className="md:col-span-2">
           <Label htmlFor="country">Country *</Label>
           <Select value={formData.country_code} onValueChange={handleCountryChange}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full" tabIndex={2}>
               <div className="flex items-center justify-between w-full">
                 {selectedCountry ? (
                   <>
