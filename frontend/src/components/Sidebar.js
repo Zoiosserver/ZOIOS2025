@@ -70,6 +70,7 @@ const Sidebar = () => {
   // Add consolidated accounts for group companies
   if (companySetup && companySetup.business_type === 'Group Company') {
     menuItems.push({ path: '/consolidated-accounts', label: 'Consolidated Accounts', icon: FileText });
+    menuItems.push({ path: '/company-accounts', label: 'Company Accounts', icon: Building });
   }
 
   // Add admin-only menu items
