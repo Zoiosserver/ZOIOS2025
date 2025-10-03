@@ -18,21 +18,29 @@ function App() {
     <div className="App">
       <AuthProvider>
         <Router>
-          <ProtectedRoute>
-            <div className="flex min-h-screen bg-gray-50">
-              <Sidebar />
-              <main className="flex-1 ml-64 p-6">
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/contacts" element={<Contacts />} />
-                  <Route path="/companies" element={<Companies />} />
-                  <Route path="/call-logs" element={<CallLogs />} />
-                  <Route path="/email-responses" element={<EmailResponses />} />
-                  <Route path="/users" element={<UserManagement />} />
-                </Routes>
-              </main>
-            </div>
-          </ProtectedRoute>
+          <Routes>
+            {/* Public route for password reset */}
+            <Route path="/reset-password" element={<ResetPassword />} />
+            
+            {/* Protected routes */}
+            <Route path="/*" element={
+              <ProtectedRoute>
+                <div className="flex min-h-screen bg-gray-50">
+                  <Sidebar />
+                  <main className="flex-1 ml-64 p-6">
+                    <Routes>
+                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/contacts" element={<Contacts />} />
+                      <Route path="/companies" element={<Companies />} />
+                      <Route path="/call-logs" element={<CallLogs />} />
+                      <Route path="/email-responses" element={<EmailResponses />} />
+                      <Route path="/users" element={<UserManagement />} />
+                    </Routes>
+                  </main>
+                </div>
+              </ProtectedRoute>
+            } />
+          </Routes>
           <Toaster position="top-right" />
         </Router>
       </AuthProvider>
