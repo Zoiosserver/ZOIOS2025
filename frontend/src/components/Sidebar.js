@@ -36,8 +36,12 @@ const Sidebar = () => {
     <div className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-sm z-10">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center">
-            <BarChart3 className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 flex items-center justify-center">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_outreach-pulse-3/artifacts/5adajuhk_Zoios.png" 
+              alt="ZOIOS Logo" 
+              className="w-8 h-8 object-contain"
+            />
           </div>
           <h1 className="text-xl font-bold text-gray-900">ZOIOS</h1>
         </div>
