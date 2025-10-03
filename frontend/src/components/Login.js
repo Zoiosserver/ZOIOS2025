@@ -129,7 +129,37 @@ const Login = () => {
               >
                 {loading ? 'Signing in...' : 'Sign In'}
               </Button>
+
+              {/* Forgot Password Link */}
+              <div className="text-center pt-4">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setCurrentView('forgot-password')}
+                  className="text-sm text-blue-600 hover:text-blue-700"
+                  data-testid="forgot-password-link"
+                >
+                  Forgot your password?
+                </Button>
+              </div>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* Sign Up Link */}
+        <Card className="mt-6 bg-gray-50 border-gray-200">
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-gray-600 mb-2">
+              Don't have an account?
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => setCurrentView('signup')}
+              className="text-blue-600 border-blue-600 hover:bg-blue-50"
+              data-testid="signup-link"
+            >
+              Create Account
+            </Button>
           </CardContent>
         </Card>
 
