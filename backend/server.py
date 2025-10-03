@@ -27,6 +27,8 @@ from currency_service import (
     CurrencyService, ExchangeRate, CurrencyRateUpdate, 
     get_currency_service, format_currency_amount
 )
+from tenant_service import get_tenant_service, TenantService
+from tenant_middleware import get_tenant_middleware
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
