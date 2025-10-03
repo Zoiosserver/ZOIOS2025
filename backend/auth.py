@@ -7,7 +7,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Dict
 import uuid
 
 # Configuration
