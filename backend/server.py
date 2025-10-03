@@ -563,6 +563,94 @@ async def get_user_chart_of_accounts(current_user: UserInDB = Depends(get_curren
     
     return [ChartOfAccount(**parse_from_mongo(account)) for account in accounts]
 
+# Currency Management Routes
+@api_router.get("/currency/rates", response_model=List[ExchangeRate])
+async def get_company_exchange_rates(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get all exchange rates for the current user's company"""
+    # Get company setup to find company_id
+    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    currency_service = await get_currency_service(db)
+    rates = await currency_service.get_company_rates(
+        company_id=company_setup["id"],
+        base_currency=company_setup.get("base_currency")
+    )
+    
+    return rates
+
+@api_router.post("/currency/update-rates")
+async def update_exchange_rates(current_user: UserInDB = Depends(get_current_active_user)):
+    """Update exchange rates from online sources"""
+    # Get company setup
+    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    base_currency = company_setup.get("base_currency")
+    additional_currencies = company_setup.get("additional_currencies", [])
+    
+    if not additional_currencies:
+        return {"success": True, "message": "No additional currencies configured"}
+    
+    currency_service = await get_currency_service(db)
+    result = await currency_service.update_company_rates(
+        company_id=company_setup["id"],
+        base_currency=base_currency,
+        target_currencies=additional_currencies,
+        source="online"
+    )
+    
+    return result
+
+@api_router.post("/currency/set-manual-rate")
+async def set_manual_exchange_rate(
+    rate_update: CurrencyRateUpdate,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Set a manual exchange rate"""
+    # Get company setup
+    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    currency_service = await get_currency_service(db)
+    rate = await currency_service.set_manual_rate(
+        company_id=company_setup["id"],
+        base_currency=rate_update.base_currency,
+        target_currency=rate_update.target_currency,
+        rate=rate_update.rate
+    )
+    
+    return rate
+
+@api_router.post("/currency/convert")
+async def convert_currency(
+    amount: float,
+    from_currency: str,
+    to_currency: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Convert amount between currencies"""
+    # Get company setup
+    company_setup = await db.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    currency_service = await get_currency_service(db)
+    
+    try:
+        result = await currency_service.convert_amount(
+            amount=amount,
+            from_currency=from_currency,
+            to_currency=to_currency,
+            company_id=company_setup["id"]
+        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 # Dashboard and Analytics
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(current_user: UserInDB = Depends(get_current_active_user)):
