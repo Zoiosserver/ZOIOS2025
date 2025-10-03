@@ -478,7 +478,7 @@ async def setup_company(
     company_data: CompanySetupCreate, 
     current_user: UserInDB = Depends(get_current_active_user)
 ):
-    """Setup company details and accounting system"""
+    """Setup company details and accounting system with multi-tenant support"""
     # Check if user already has completed setup
     if current_user.onboarding_completed:
         raise HTTPException(status_code=400, detail="Company setup already completed")
@@ -494,7 +494,7 @@ async def setup_company(
         accounting_system=accounting_system["name"],
         base_currency=company_data.base_currency,
         additional_currencies=company_data.additional_currencies,
-        fiscal_year_start=accounting_system["fiscal_year_start"],
+        fiscal_year_start=company_data.fiscal_year_start or accounting_system["fiscal_year_start"],
         business_type=company_data.business_type,
         industry=company_data.industry,
         address=company_data.address,
@@ -508,6 +508,15 @@ async def setup_company(
         registration_number=company_data.registration_number,
         setup_completed=True
     )
+    
+    # Initialize multi-tenant architecture
+    tenant_service = await get_tenant_service(MONGO_URL)
+    
+    # Create tenant database for this company
+    tenant_db = await tenant_service.get_tenant_database(company_setup.id)
+    
+    # Assign user to this tenant
+    await tenant_service.assign_user_to_tenant(current_user.email, company_setup.id)
     
     # Save company setup
     prepared_company = prepare_for_mongo(company_setup.dict())
