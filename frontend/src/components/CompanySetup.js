@@ -229,6 +229,28 @@ const CompanySetup = () => {
       await axios.post(`${API}/setup/company`, formData);
       toast.success('Company setup completed successfully!');
       
+      // If this is a group company with sister companies, save them now
+      if (formData.business_type === 'Group Company' && sisterCompanies.length > 0) {
+        try {
+          const sisterCompanyPromises = sisterCompanies.map(company => 
+            axios.post(`${API}/company/sister-companies`, {
+              company_name: company.company_name,
+              country_code: company.country_code,
+              base_currency: company.base_currency,
+              business_type: company.business_type,
+              industry: company.industry,
+              ownership_percentage: company.ownership_percentage
+            })
+          );
+          
+          await Promise.all(sisterCompanyPromises);
+          toast.success(`Added ${sisterCompanies.length} sister companies successfully!`);
+        } catch (sisterError) {
+          console.error('Error saving sister companies:', sisterError);
+          toast.error('Main setup completed, but some sister companies failed to save. You can add them later from the consolidated accounts page.');
+        }
+      }
+      
       // Refresh user data to get updated onboarding_completed status
       const refreshResult = await refreshUser();
       if (!refreshResult.success) {
