@@ -303,6 +303,81 @@ test_plan:
           agent: "testing"
           comment: "✅ SISTER COMPANY FUNCTIONALITY WORKING PERFECTLY: Comprehensive end-to-end testing confirms all sister company features are working correctly. VERIFIED: 1) **Group Company Available**: 'Group Company' option is present in business type dropdown 2) **Sister Company Section Appears**: When 'Group Company' is selected, the sister company section appears immediately 3) **'Group Company Selected!' Message**: Confirmation message displays properly 4) **'Add Sister Company' Button**: Button is visible and clickable 5) **Sister Company Form**: Form opens correctly with all required fields (company name, country, business type, industry, fiscal year) 6) **Form Functionality**: All form fields are functional and working properly. TEST SEQUENCE COMPLETED: Created new account → navigated to company setup → filled company details → selected 'Group Company' → sister company section appeared → clicked 'Add Sister Company' button → form opened successfully. The user's reported issue 'can't see sister company options in the setup screen' has been resolved - all sister company functionality is working as expected."
 
+  - task: "Currency Exchange Rate Undefined Fix"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "User reports 'Updated undefined exchange rates' message appears instead of proper count. Currency loading also fails."
+        - working: "NA"
+          agent: "main"
+          comment: "Fixed backend response format in /currency/update-rates endpoint to always include updated_rates field, even when no additional currencies are configured. Added proper response structure with updated_rates: 0, base_currency, target_currencies: [], and last_updated timestamp."
+
+  - task: "Currency Symbol Display Fix"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/CurrencyManagement.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "INR currency symbol displays $ instead of ₹ in currency management configuration and company accounts when selecting a company."
+        - working: "NA"
+          agent: "main"
+          comment: "Enhanced CurrencyManagement.js and Sidebar.js with dynamic currency icons. Added support for INR (₹), EUR (€), GBP (£), JPY (¥), CNY (¥) with proper fallback to DollarSign for unknown currencies. Updated both header icon and base currency display sections."
+
+  - task: "Account Code Auto-Generation Fix"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/CompanyAccounts.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Account code auto-generation shows '1000' for Asset type even when '1000' already exists, instead of generating next available code."
+        - working: "NA"
+          agent: "main"
+          comment: "Improved getNextAccountCode function logic to properly wait for companyAccounts data to load before generating codes. Enhanced handleAccountTypeChange to clear code during calculation and use setTimeout to ensure state updates properly. Fixed gap-finding algorithm to correctly identify next available code in sequence."
+
+  - task: "User Deletion Fix"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Delete button for admin@zoios.com test user is not working. Super admin admin@2mholding.com is correctly protected."
+        - working: "NA"
+          agent: "main"
+          comment: "Enhanced user deletion endpoint to check both tenant and main databases for user lookup. Added logic to search in main database if user not found in tenant database. Improved logging and error handling for cross-database user deletion scenarios."
+
+  - task: "Granular Permission System Implementation"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/hooks/usePermissions.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Granular permission system needs to actually hide menu items when permissions are set to 'No'. Currently permissions can be set but don't affect menu visibility."
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented complete granular permission system: 1) Added permissions field to User model in auth.py, 2) Enhanced /auth/me endpoint to fetch and return user permissions, 3) Created usePermissions hook with hasPermission and hasAnyPermission functions, 4) Updated Sidebar.js to dynamically show/hide menu items based on user permissions (Dashboard, CRM submenus, Company submenus), 5) Added default permissions for admin users with user-specific overrides taking priority."
+
 agent_communication:
     - agent: "main"
       message: "Starting fresh implementation cycle. All test data has been cleaned except protected super admin (admin@2mholding.com) and test user (admin@zoios.com). Ready to implement fixes for: 1) Currency Exchange Rate undefined issue, 2) Currency symbol display (INR showing $ instead of ₹), 3) Account code auto-generation fix, 4) User deletion for admin@zoios.com, 5) Granular permission system to hide menu items. Will start with backend fixes first."
