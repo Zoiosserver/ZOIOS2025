@@ -1,13 +1,19 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   BarChart3, 
   Users, 
   Building2, 
   Phone, 
   Mail,
-  Home
+  Home,
+  Settings,
+  LogOut,
+  Shield,
+  User
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Sidebar = () => {
   const location = useLocation();
