@@ -58,6 +58,18 @@ class UserSignup(BaseModel):
     name: str
     company: str
 
+class PasswordResetToken(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    token: str
+    expires_at: datetime
+    used: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PasswordReset(BaseModel):
+    token: str
+    new_password: str
+
 class UserLogin(BaseModel):
     email: str
     password: str
