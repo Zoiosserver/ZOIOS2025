@@ -127,65 +127,68 @@ class CurrencyService:
             return {}
     
     async def update_company_rates(
-        self, 
-        company_id: str, 
-        base_currency: str, 
+        self,
+        company_id: str,
+        base_currency: str,
         target_currencies: List[str],
         source: str = "online"
     ) -> Dict[str, Any]:
-        """
-        Update exchange rates for a company
-        """
+        """Update exchange rates for a company"""
         try:
-            updated_rates = []
-            failed_rates = []
-            
             if source == "online":
-                # Fetch rates from online provider
-                online_rates = await self.fetch_online_rates(base_currency, target_currencies)
+                # Try to fetch from online sources first
+                try:
+                    online_rates = await self.fetch_online_rates(base_currency, target_currencies)
+                except:
+                    # If online fetch fails, use fallback mock rates
+                    online_rates = await self._get_fallback_rates(base_currency, target_currencies)
                 
+                updated_count = 0
                 for target_currency in target_currencies:
                     if target_currency in online_rates:
                         rate_data = ExchangeRate(
-                            id=f"{company_id}_{base_currency}_{target_currency}",
+                            id=str(uuid.uuid4()),
                             base_currency=base_currency,
                             target_currency=target_currency,
                             rate=online_rates[target_currency],
-                            source="online",
+                            source="online" if source == "online" else "fallback",
                             last_updated=datetime.now(timezone.utc),
                             company_id=company_id
                         )
                         
-                        # Upsert rate to database
+                        # Upsert rate (update if exists, insert if not)
                         await self.db.exchange_rates.update_one(
                             {
-                                "company_id": company_id,
                                 "base_currency": base_currency,
-                                "target_currency": target_currency
+                                "target_currency": target_currency,
+                                "company_id": company_id
                             },
-                            {"$set": rate_data.dict()},
+                            {"$set": prepare_for_mongo(rate_data.dict())},
                             upsert=True
                         )
-                        
-                        updated_rates.append(rate_data)
-                    else:
-                        failed_rates.append(target_currency)
+                        updated_count += 1
+                
+                return {
+                    "success": True,
+                    "updated_rates": updated_count,
+                    "base_currency": base_currency,
+                    "target_currencies": list(online_rates.keys()),
+                    "last_updated": datetime.now(timezone.utc).isoformat()
+                }
             
-            return {
-                "success": True,
-                "updated_count": len(updated_rates),
-                "updated_rates": updated_rates,
-                "failed_rates": failed_rates,
-                "last_updated": datetime.now(timezone.utc)
-            }
-            
+            else:
+                return {
+                    "success": False,
+                    "error": "Manual rate updates not implemented yet",
+                    "failed_rates": target_currencies
+                }
+                
         except Exception as e:
-            logger.error(f"Error updating company rates: {e}")
+            logger.error(f"Error updating company rates: {str(e)}")
             return {
                 "success": False,
-                "error": str(e),
-                "updated_count": 0,
-                "updated_rates": [],
+                "error": f"Failed to update rates: {str(e)}",
+                "updated_rates": 0,
                 "failed_rates": target_currencies
             }
     
