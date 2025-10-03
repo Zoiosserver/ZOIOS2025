@@ -606,6 +606,20 @@ const CompanySetup = () => {
                   />
                 </div>
 
+                {/* Accounting System Display for Sister Company */}
+                {sisterCompanyAccountingSystem && sisterCompanyForm.country_code && (
+                  <div className="md:col-span-2">
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertDescription>
+                        <strong>Accounting System:</strong> {sisterCompanyAccountingSystem.name} <br />
+                        <strong>Base Currency:</strong> {sisterCompanyForm.base_currency} <br />
+                        <strong>Fiscal Year:</strong> Starts {sisterCompanyAccountingSystem.fiscal_year_start}
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+                )}
+
                 <div className="md:col-span-2 flex gap-2">
                   <Button 
                     type="button" 
