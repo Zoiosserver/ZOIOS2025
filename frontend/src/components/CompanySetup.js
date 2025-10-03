@@ -797,7 +797,7 @@ const CompanySetup = () => {
           {currencies.filter(c => c.code !== formData.base_currency).map(currency => (
             <div 
               key={currency.code} 
-              className={`w-full p-4 border rounded-lg cursor-pointer transition-colors ${
+              className={`w-full p-4 border rounded-lg cursor-pointer transition-colors no-truncate ${
                 formData.additional_currencies.includes(currency.code)
                   ? 'bg-blue-50 border-blue-300' 
                   : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
@@ -805,10 +805,10 @@ const CompanySetup = () => {
               onClick={() => handleCurrencyToggle(currency.code)}
               title={`${currency.code} - ${currency.symbol} - ${currency.name}`}
             >
-              <div className="flex items-center space-x-3">
-                <div className="text-sm font-bold text-gray-900 flex-shrink-0">{currency.code}</div>
-                <div className="text-sm text-gray-700 flex-shrink-0">{currency.symbol}</div>
-                <div className="text-sm text-gray-600 flex-grow">{currency.name}</div>
+              <div className="flex items-center space-x-3 no-truncate">
+                <span className="text-sm font-bold text-gray-900 no-truncate">{currency.code}</span>
+                <span className="text-sm text-gray-700 no-truncate">{currency.symbol}</span>
+                <span className="text-sm text-gray-600 no-truncate">{currency.name}</span>
               </div>
             </div>
           ))}
