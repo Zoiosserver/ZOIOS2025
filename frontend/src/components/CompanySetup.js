@@ -848,6 +848,7 @@ const CompanySetup = () => {
           <Label htmlFor="phone">Phone</Label>
           <Input
             id="phone"
+            tabIndex={5}
             value={formData.phone}
             onChange={(e) => setFormData(prev => ({...prev, phone: e.target.value}))}
             placeholder="Enter phone number"
