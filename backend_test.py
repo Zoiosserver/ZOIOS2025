@@ -153,12 +153,12 @@ class BackendTester:
             "Content-Type": "application/json"
         }
         
-        # Company setup data
+        # Company setup data - using review request specifications
         setup_data = {
-            "company_name": TEST_COMPANY,
+            "company_name": "Test Company Inc",
             "country_code": "US",
             "base_currency": "USD",
-            "additional_currencies": ["EUR", "GBP"],
+            "additional_currencies": ["EUR", "GBP", "JPY"],
             "business_type": "Corporation",
             "industry": "Technology",
             "address": "123 Test Street",
