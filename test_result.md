@@ -151,16 +151,19 @@ backend:
           comment: "Implemented comprehensive chart of accounts with country-specific templates (US GAAP, UK GAAP, Indian GAAP) and automatic account creation during company setup."
 
   - task: "Multi-Currency Online Rate Fetching"
-    implemented: false
+    implemented: true
     working: "NA"
-    file: "/app/backend/server.py"
+    file: "/app/backend/currency_service.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Need to implement online currency rate fetching with automatic updates and manual override capability."
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented comprehensive currency service with online rate fetching from exchangerate-api.com, manual rate setting, currency conversion, and automatic rate updates during company setup. Added full REST API endpoints and frontend management interface."
 
 frontend:
   - task: "Company Setup Wizard UI"
