@@ -401,6 +401,7 @@ const CompanySetup = () => {
           <Label htmlFor="company_name">Company Name *</Label>
           <Input
             id="company_name"
+            tabIndex={1}
             value={formData.company_name}
             onChange={(e) => setFormData(prev => ({...prev, company_name: e.target.value}))}
             placeholder="Enter your company name"
