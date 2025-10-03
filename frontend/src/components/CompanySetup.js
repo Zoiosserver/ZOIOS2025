@@ -859,6 +859,7 @@ const CompanySetup = () => {
           <Label htmlFor="email">Company Email</Label>
           <Input
             id="email"
+            tabIndex={6}
             type="email"
             value={formData.email}
             onChange={(e) => setFormData(prev => ({...prev, email: e.target.value}))}
