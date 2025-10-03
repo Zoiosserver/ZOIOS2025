@@ -14,8 +14,12 @@ SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "your-secret-key-change-this-in-pr
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
+# Simple password hashing using hashlib (for demo purposes)
+def hash_password(password: str) -> str:
+    return hashlib.sha256(f"{password}salt_zoios".encode()).hexdigest()
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return hash_password(plain_password) == hashed_password
 
 # OAuth2 scheme
 security = HTTPBearer()
