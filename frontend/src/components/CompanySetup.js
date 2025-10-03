@@ -319,9 +319,7 @@ const CompanySetup = () => {
           <Label htmlFor="country">Country *</Label>
           <Select value={formData.country_code} onValueChange={handleCountryChange}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select your country" className="text-left">
-                {selectedCountry ? `${selectedCountry.name} (${selectedCountry.currency})` : "Select your country"}
-              </SelectValue>
+              <SelectValue placeholder="Select your country" />
             </SelectTrigger>
             <SelectContent className="min-w-[400px] w-auto">
               {countries.map(country => (
