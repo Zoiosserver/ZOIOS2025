@@ -51,6 +51,12 @@ class UserCreate(BaseModel):
     company: str
     role: str = "user"
 
+class UserSignup(BaseModel):
+    email: str
+    password: str
+    name: str
+    company: str
+
 class UserLogin(BaseModel):
     email: str
     password: str
