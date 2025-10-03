@@ -431,17 +431,14 @@ const CompanySetup = () => {
                 {selectedCountry ? `${selectedCountry.name} (${selectedCountry.currency})` : "Select your country"}
               </SelectValue>
             </SelectTrigger>
-            <SelectContent className="min-w-[400px] w-auto max-h-[200px] overflow-y-auto">
+            <SelectContent className="min-w-[450px] w-auto max-h-[200px] overflow-y-auto">
               {countries.map(country => (
                 <SelectItem 
                   key={country.code} 
                   value={country.code}
                   className="cursor-pointer"
                 >
-                  <div className="flex items-center w-full">
-                    <span className="flex-1">{country.name}</span>
-                    <span className="text-xs text-gray-500 ml-2">({country.currency})</span>
-                  </div>
+                  <span>{country.name} ({country.currency})</span>
                 </SelectItem>
               ))}
             </SelectContent>
