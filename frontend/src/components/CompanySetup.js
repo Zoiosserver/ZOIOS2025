@@ -493,6 +493,7 @@ const CompanySetup = () => {
             <Button
               type="button"
               size="sm"
+              tabIndex={0}
               onClick={() => {
                 if (editingSisterCompanyId) {
                   cancelEdit();
