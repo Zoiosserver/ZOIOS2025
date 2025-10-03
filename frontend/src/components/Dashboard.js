@@ -53,6 +53,25 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
+  const fetchCompanySetup = async () => {
+    try {
+      const response = await axios.get(`${API}/setup/company`);
+      setCompanySetup(response.data);
+    } catch (error) {
+      console.error('Error fetching company setup:', error);
+    }
+  };
+
+  const fetchSisterCompanies = async () => {
+    try {
+      const response = await axios.get(`${API}/company/sister-companies`);
+      setSisterCompanies(response.data);
+    } catch (error) {
+      console.error('Error fetching sister companies:', error);
+      // This might fail for non-group companies, which is expected
+    }
+  };
   
   if (loading) {
     return (
