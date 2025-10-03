@@ -265,7 +265,7 @@ async def public_signup(user_data: UserSignup):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Create new user with 'user' role (not admin)
+    # Create new user with 'admin' role by default
     hashed_password = hash_password(user_data.password)
     user = {
         "id": str(uuid.uuid4()),
@@ -273,7 +273,7 @@ async def public_signup(user_data: UserSignup):
         "hashed_password": hashed_password,
         "name": user_data.name,
         "company": user_data.company,
-        "role": "user",  # Always create as regular user
+        "role": "admin",  # New users are admin by default
         "is_active": True,
         "onboarding_completed": False,  # Require company setup
         "created_at": datetime.now(timezone.utc)
