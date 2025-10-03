@@ -729,7 +729,7 @@ const CompanySetup = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        tabIndex={11}
+                        tabIndex={16}
                         onClick={() => removeSisterCompany(company.id)}
                         className="text-red-600 hover:text-red-700"
                       >
