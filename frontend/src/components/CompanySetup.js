@@ -41,10 +41,12 @@ const CompanySetup = () => {
   const [sisterCompanies, setSisterCompanies] = useState([]);
   const [showSisterCompanyForm, setShowSisterCompanyForm] = useState(false);
   const [editingSisterCompanyId, setEditingSisterCompanyId] = useState(null);
+  const [sisterCompanyAccountingSystem, setSisterCompanyAccountingSystem] = useState(null);
   const [sisterCompanyForm, setSisterCompanyForm] = useState({
     company_name: '',
     country_code: '',
     base_currency: '',
+    accounting_system: '',
     business_type: '',
     industry: '',
     ownership_percentage: 100
