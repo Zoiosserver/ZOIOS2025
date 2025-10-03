@@ -219,6 +219,7 @@ async def create_default_admin():
             "company": "ZOIOS",
             "role": "admin",
             "is_active": True,
+            "onboarding_completed": True,  # Admin doesn't need onboarding
             "created_at": datetime.now(timezone.utc)
         }
         prepared_admin = prepare_user_for_mongo(admin_user)
