@@ -14,45 +14,12 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
   const [expandedSections, setExpandedSections] = useState({ overview: true }); // Start with overview expanded
   const [dashboardData, setDashboardData] = useState({});
 
-  // Mock business intelligence data
-  const revenueData = [
-    { month: 'Jan', revenue: 65000, expense: 45000, profit: 20000 },
-    { month: 'Feb', revenue: 72000, expense: 48000, profit: 24000 },
-    { month: 'Mar', revenue: 68000, expense: 52000, profit: 16000 },
-    { month: 'Apr', revenue: 78000, expense: 55000, profit: 23000 },
-    { month: 'May', revenue: 85000, expense: 58000, profit: 27000 },
-    { month: 'Jun', revenue: 92000, expense: 62000, profit: 30000 },
-  ];
-
-  const expenseBreakdown = [
-    { name: 'Operations', value: 35, amount: 21700 },
-    { name: 'Marketing', value: 25, amount: 15500 },
-    { name: 'HR & Payroll', value: 20, amount: 12400 },
-    { name: 'Technology', value: 12, amount: 7440 },
-    { name: 'Administration', value: 8, amount: 4960 },
-  ];
-
-  const accountsData = [
-    { category: 'Assets', current: 245000, previous: 220000 },
-    { category: 'Liabilities', current: 89000, previous: 95000 },
-    { category: 'Equity', current: 156000, previous: 125000 },
-    { category: 'Revenue', current: 92000, previous: 85000 },
-    { category: 'Expenses', current: 62000, previous: 58000 },
-  ];
-
-  const kpiData = [
-    { title: 'Total Revenue', value: 462000, change: 8.2, trend: 'up', color: 'green' },
-    { title: 'Net Profit', value: 140000, change: 12.5, trend: 'up', color: 'blue' },
-    { title: 'Total Assets', value: 245000, change: 11.4, trend: 'up', color: 'purple' },
-    { title: 'Cash Flow', value: 45000, change: -2.1, trend: 'down', color: 'orange' },
-  ];
-
-  const salesData = [
-    { week: 'W1', sales: 12000, target: 15000 },
-    { week: 'W2', sales: 18000, target: 15000 },
-    { week: 'W3', sales: 14000, target: 15000 },
-    { week: 'W4', sales: 22000, target: 15000 },
-  ];
+  // Real business intelligence data from backend
+  const [revenueData, setRevenueData] = useState([]);
+  const [expenseBreakdown, setExpenseBreakdown] = useState([]);
+  const [accountsData, setAccountsData] = useState([]);
+  const [kpiData, setKpiData] = useState([]);
+  const [salesData, setSalesData] = useState([]);
 
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
 
