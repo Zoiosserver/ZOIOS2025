@@ -5017,69 +5017,6 @@ def main():
         sys.exit(0)
     else:
         sys.exit(1)
-
-def test_existing_accounts(self):
-        """Test existing common test accounts as requested in review"""
-        self.log("Testing existing common test accounts...")
-        
-        # Common test accounts to try
-        test_accounts = [
-            {"email": "admin@zoios.com", "password": "password123"},
-            {"email": "admin@zoios.com", "password": "admin123"},
-            {"email": "admin@2mholding.com", "password": "admin123"},
-            {"email": "admin@2mholding.com", "password": "password123"},
-            {"email": "testuser@example.com", "password": "password123"},
-            {"email": "test@zoios.com", "password": "password123"}
-        ]
-        
-        working_accounts = []
-        
-        for account in test_accounts:
-            self.log(f"Testing account: {account['email']}")
-            
-            login_data = {
-                "email": account["email"],
-                "password": account["password"]
-            }
-            
-            try:
-                response = self.session.post(f"{API_BASE}/auth/login", json=login_data)
-                self.log(f"Login response status: {response.status_code}")
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    self.auth_token = data.get('access_token')
-                    self.user_data = data.get('user')
-                    self.log(f"✅ WORKING ACCOUNT FOUND: {account['email']} / {account['password']}")
-                    self.log(f"User ID: {self.user_data.get('id')}")
-                    self.log(f"Role: {self.user_data.get('role')}")
-                    self.log(f"Onboarding completed: {self.user_data.get('onboarding_completed')}")
-                    working_accounts.append(account)
-                    
-                    # Test /auth/me to verify token works
-                    headers = {"Authorization": f"Bearer {self.auth_token}"}
-                    me_response = self.session.get(f"{API_BASE}/auth/me", headers=headers)
-                    if me_response.status_code == 200:
-                        self.log("✅ Token validation working")
-                    else:
-                        self.log("❌ Token validation failed")
-                        
-                else:
-                    self.log(f"❌ Login failed: {response.text}")
-                    
-            except Exception as e:
-                self.log(f"❌ Login error: {str(e)}")
-        
-        if working_accounts:
-            self.log(f"\n🎉 FOUND {len(working_accounts)} WORKING ACCOUNT(S):")
-            for account in working_accounts:
-                self.log(f"   📧 {account['email']} / 🔑 {account['password']}")
-            return True
-        else:
-            self.log("❌ NO EXISTING ACCOUNTS WORK - Need to create fresh account")
-            return False
-
-    def test_create_fresh_account(self):
         """Create a fresh test account with simple credentials"""
         self.log("Creating fresh test account...")
         
