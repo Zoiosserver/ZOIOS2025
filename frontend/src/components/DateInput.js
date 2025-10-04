@@ -20,30 +20,51 @@ const DateInput = ({
     // Remove any non-numeric characters except /
     inputValue = inputValue.replace(/[^\d\/]/g, '');
     
-    // Auto-add slashes
-    if (inputValue.length === 2 && !inputValue.includes('/')) {
-      inputValue += '/';
-    } else if (inputValue.length === 5 && inputValue.split('/').length === 2) {
-      inputValue += '/';
+    // Remove duplicate slashes
+    inputValue = inputValue.replace(/\/+/g, '/');
+    
+    // Auto-format as user types
+    let formattedValue = '';
+    let numericOnly = inputValue.replace(/\//g, '');
+    
+    if (numericOnly.length >= 2) {
+      formattedValue = numericOnly.substring(0, 2);
+      if (numericOnly.length >= 4) {
+        formattedValue += '/' + numericOnly.substring(2, 4);
+        if (numericOnly.length >= 8) {
+          formattedValue += '/' + numericOnly.substring(4, 8);
+        } else if (numericOnly.length > 4) {
+          formattedValue += '/' + numericOnly.substring(4);
+        }
+      } else if (numericOnly.length > 2) {
+        formattedValue += '/' + numericOnly.substring(2);
+      }
+    } else {
+      formattedValue = numericOnly;
     }
     
-    // Limit to dd/mm/yyyy format
-    if (inputValue.length <= 10) {
-      setDisplayValue(inputValue);
+    // Add slash after day and month if not present and we have enough digits
+    if (inputValue.length === 2 && !inputValue.includes('/')) {
+      formattedValue += '/';
+    } else if (inputValue.length === 5 && inputValue.split('/').length === 2) {
+      formattedValue += '/';
+    }
+    
+    // Limit to 10 characters (dd/mm/yyyy)
+    if (formattedValue.length <= 10) {
+      setDisplayValue(formattedValue);
       
       // If we have a complete date, convert and call onChange
-      if (inputValue.length === 10) {
-        const parts = inputValue.split('/');
-        if (parts.length === 3) {
-          const day = parts[0];
-          const month = parts[1];
-          const year = parts[2];
-          
-          // Basic validation
-          if (day <= 31 && month <= 12 && year.length === 4) {
-            const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-            onChange({ target: { name, value: isoDate } });
-          }
+      if (formattedValue.length === 10 && formattedValue.split('/').length === 3) {
+        const parts = formattedValue.split('/');
+        const day = parts[0];
+        const month = parts[1];
+        const year = parts[2];
+        
+        // Basic validation
+        if (day <= 31 && month <= 12 && year.length === 4) {
+          const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          onChange({ target: { name, value: isoDate } });
         }
       }
     }
