@@ -9,7 +9,7 @@ import os
 import time
 
 # Get backend URL from environment
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://zoios-erp-1.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://zoios-erp-2.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 def test_erp_endpoints():

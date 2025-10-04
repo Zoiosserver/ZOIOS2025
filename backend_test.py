@@ -18,7 +18,7 @@ import time
 import random
 
 # Get backend URL from environment
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://zoios-erp-1.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://zoios-erp-2.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 # Generate unique test credentials for fresh testing
@@ -3615,7 +3615,7 @@ class BackendTester:
                 "headers": {
                     "Authorization": f"Bearer {self.auth_token}",
                     "Content-Type": "application/json",
-                    "Origin": "https://zoios-erp-1.preview.emergentagent.com"
+                    "Origin": "https://zoios-erp-2.preview.emergentagent.com"
                 }
             },
             {
