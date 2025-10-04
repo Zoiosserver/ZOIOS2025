@@ -1757,7 +1757,7 @@ async def get_all_companies(current_user: UserInDB = Depends(get_current_active_
         db_to_use = tenant_db
     
     companies = await db_to_use.company_setups.find().to_list(length=None)
-    return [CompanySetup(**company) for company in companies]
+    return [CompanySetup(**parse_from_mongo(company)) for company in companies]
 
 @api_router.get("/companies/management/{company_id}", response_model=CompanySetup)
 async def get_company_details(company_id: str, current_user: UserInDB = Depends(get_current_active_user)):
