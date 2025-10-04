@@ -4998,19 +4998,24 @@ class BackendTester:
         return result
 
 def main():
-    """Main function to run the sister company API test as requested in review"""
+    """Main function to run the sister company setup test as requested in review"""
+    print("🚀 Starting ZOIOS ERP Backend API Testing...")
+    print(f"Backend URL: {BACKEND_URL}")
+    print(f"API Base: {API_BASE}")
+    print("=" * 80)
+    
     tester = BackendTester()
     
-    # Run the specific sister company API test as requested in review
-    print("🎯 RUNNING SISTER COMPANY API RESPONSE STRUCTURE TEST")
-    print("="*80)
-    result = tester.test_sister_company_api_response_structure()
+    # Run ONLY the sister company test as requested
+    result = tester.run_sister_company_test_only()
+    
+    print("\n" + "=" * 80)
+    print("🏁 TESTING COMPLETED!")
+    print("=" * 80)
     
     if result:
-        print("\n✅ Sister Company API Response Structure Test PASSED")
         sys.exit(0)
     else:
-        print("\n❌ Sister Company API Response Structure Test FAILED")
         sys.exit(1)
 
 def test_existing_accounts(self):
