@@ -39,7 +39,7 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
     setLoading(true);
     try {
       const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts`, {
+      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts/enhanced`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -47,7 +47,7 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
 
       if (response.ok) {
         const data = await response.json();
-        setAccounts(data);
+        setAccounts(data.accounts || []);
       } else {
         setError('Failed to load accounts');
       }
