@@ -1928,14 +1928,16 @@ async def get_enhanced_consolidated_accounts(current_user: UserInDB = Depends(ge
         db_to_use = tenant_db
     
     # Get all companies
-    companies = await db_to_use.company_setups.find().to_list(length=None)
+    companies_raw = await db_to_use.company_setups.find().to_list(length=None)
+    companies = [parse_from_mongo(company) for company in companies_raw]
     
     consolidated_data = []
     total_accounts = 0
     
     for company in companies:
         company_id = company.get('id')
-        accounts = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
+        accounts_raw = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
+        accounts = [parse_from_mongo(account) for account in accounts_raw]
         
         # Add company name to each account
         for account in accounts:
