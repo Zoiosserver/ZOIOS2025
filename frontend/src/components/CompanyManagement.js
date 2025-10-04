@@ -253,10 +253,12 @@ const CompanyManagement = ({ user, onBack }) => {
         const errorData = await response.json().catch(() => ({}));
         console.log('DEBUG: API error response:', errorData);
         setError(errorData.detail || 'Failed to convert company to Group Company');
+        alert('Error: ' + (errorData.detail || 'Failed to convert company to Group Company'));
       }
     } catch (err) {
       console.log('DEBUG: Exception caught:', err);
       setError('Connection failed: ' + err.message);
+      alert('Connection failed: ' + err.message);
     }
   };
 
