@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ZoiosLogo from './ZoiosLogo';
 
 const SimpleLogin = ({ onLogin, onSwitchToSignup }) => {
   const [email, setEmail] = useState('');
