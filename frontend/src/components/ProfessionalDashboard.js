@@ -782,10 +782,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
   };
 
   const renderStudentsDataContent = () => {
-    const studentsData = [
-      { id: 1, name: 'Alex Johnson', course: 'Elevator Safety Training', level: 'Beginner', progress: '75%', enrollDate: '2024-09-15', status: 'Active', photo: '👨‍🎓' },
-      { id: 2, name: 'Maria Garcia', course: 'Advanced Maintenance', level: 'Advanced', progress: '90%', enrollDate: '2024-08-20', status: 'Active', photo: '👩‍🎓' },
-      { id: 3, name: 'David Kim', course: 'Installation Techniques', level: 'Intermediate', progress: '60%', enrollDate: '2024-09-10', status: 'Active', photo: '👨‍💼' },
+    const studentsData = [];
       { id: 4, name: 'Lisa Chen', course: 'Quality Assurance', level: 'Beginner', progress: '30%', enrollDate: '2024-09-25', status: 'Active', photo: '👩‍💼' },
     ];
 
