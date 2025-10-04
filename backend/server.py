@@ -569,9 +569,14 @@ async def setup_company(
     current_user: UserInDB = Depends(get_current_active_user)
 ):
     """Setup company details and accounting system with multi-tenant support"""
-    # Check if user already has completed setup
+    # Allow company setup modification for users who want to add sister companies
+    # Only prevent setup if they're trying to create a completely new company
     if current_user.onboarding_completed:
-        raise HTTPException(status_code=400, detail="Company setup already completed")
+        # Check if they're trying to modify to Group Company (allow this)
+        if company_data.business_type == "Group Company":
+            print("DEBUG: Allowing Group Company modification for completed user")
+        else:
+            raise HTTPException(status_code=400, detail="Company setup already completed. To add sister companies, change business type to 'Group Company'")
     
     # Get accounting system details
     accounting_system = get_accounting_system(company_data.country_code)
