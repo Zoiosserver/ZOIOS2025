@@ -737,9 +737,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
   };
 
   const renderStudentsDataContent = () => {
-    const studentsData = [
-      { id: 4, name: 'Lisa Chen', course: 'Quality Assurance', level: 'Beginner', progress: '30%', enrollDate: '2024-09-25', status: 'Active', photo: '👩‍💼' },
-    ];
+    const studentsData = [];
 
     return (
       <div className="space-y-6">
