@@ -449,9 +449,9 @@ class SpecificEndpointsTester:
         
         test_results = {}
         
-        # Step 1: Login
-        if not self.test_login():
-            self.log("❌ Login failed - cannot proceed with tests")
+        # Step 1: Signup and Login
+        if not self.test_signup_and_login():
+            self.log("❌ Signup/Login failed - cannot proceed with tests")
             return False
         
         # Step 2: Get company setup
