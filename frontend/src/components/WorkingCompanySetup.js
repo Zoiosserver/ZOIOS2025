@@ -146,23 +146,24 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse delay-1000"></div>
       </div>
 
-      <div className="relative max-w-4xl w-full">
+      <div className="relative max-w-4xl w-full mx-auto">
         {/* Logo/Brand Section with Logout */}
-        <div className="text-center mb-8 relative">
-          <div className="inline-flex items-center justify-center bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100">
+        <div className="text-center mb-6 sm:mb-8 relative">
+          <div className="inline-flex items-center justify-center bg-white p-4 sm:p-6 rounded-2xl shadow-lg mb-4 sm:mb-6 border border-gray-100">
             <ZoiosLogo size="xl" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             Company Setup
           </h1>
-          <p className="text-gray-600 text-lg mb-4">Complete Your Company Setup</p>
+          <p className="text-base sm:text-lg text-gray-600 mb-4">Complete Your Company Setup</p>
           
-          {/* Logout Button */}
+          {/* Logout Button - Responsive positioning */}
           <button
             onClick={handleLogout}
-            className="absolute top-0 right-0 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors text-sm"
+            className="absolute top-0 right-0 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors text-xs sm:text-sm"
           >
-            Logout & Continue Later
+            <span className="hidden sm:inline">Logout & Continue Later</span>
+            <span className="sm:hidden">Logout</span>
           </button>
         </div>
         
