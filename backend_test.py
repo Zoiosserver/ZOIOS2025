@@ -2551,6 +2551,12 @@ class BackendTester:
                 status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
                 self.log(f"  {test_name.replace('_', ' ').title()}: {status}")
         
+        self.log("\n🏢 SISTER COMPANY FUNCTIONALITY:")
+        for test_name in sister_company_tests:
+            if test_name in test_results:
+                status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
+                self.log(f"  {test_name.replace('_', ' ').title()}: {status}")
+        
         self.log("\n🏢 COMPANY SETUP & MULTI-TENANCY:")
         for test_name in company_tests:
             if test_name in test_results:
