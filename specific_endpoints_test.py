@@ -105,6 +105,73 @@ class SpecificEndpointsTester:
             self.log(f"❌ Login error: {str(e)}")
             return False
     
+    def setup_company_with_sisters(self):
+        """Setup company as Group Company with sister companies"""
+        self.log("Setting up Group Company with sister companies...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Company setup data with sister companies
+        setup_data = {
+            "company_name": TEST_COMPANY,
+            "country_code": "US",
+            "base_currency": "USD",
+            "additional_currencies": ["EUR", "GBP"],
+            "business_type": "Group Company",
+            "industry": "Technology",
+            "address": "123 Test Street",
+            "city": "Test City",
+            "state": "CA",
+            "postal_code": "12345",
+            "phone": "+1-555-123-4567",
+            "email": TEST_EMAIL,
+            "website": "https://testcompany.com",
+            "tax_number": "123456789",
+            "registration_number": "REG123456",
+            "sister_companies": [
+                {
+                    "company_name": "Sister Company Alpha",
+                    "country": "US",
+                    "base_currency": "USD",
+                    "business_type": "Private Limited Company",
+                    "industry": "Technology"
+                },
+                {
+                    "company_name": "Sister Company Beta",
+                    "country": "GB",
+                    "base_currency": "GBP",
+                    "business_type": "Limited Company",
+                    "industry": "Finance"
+                }
+            ]
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            self.log(f"Company setup response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log("✅ Group Company setup successful")
+                self.log(f"Company ID: {data.get('id')}")
+                self.log(f"Company name: {data.get('company_name')}")
+                self.log(f"Business type: {data.get('business_type')}")
+                return True
+            else:
+                self.log(f"❌ Company setup failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Company setup error: {str(e)}")
+            return False
+
     def get_company_setup(self):
         """Get company setup to find company ID"""
         self.log("Getting company setup...")
