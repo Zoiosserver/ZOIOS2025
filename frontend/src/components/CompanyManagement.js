@@ -290,6 +290,27 @@ const CompanyManagement = ({ user, onBack }) => {
     });
   };
 
+  const resetSisterForm = () => {
+    setSisterCompanyForm({
+      company_name: '',
+      country_code: 'IN',
+      business_type: 'Private Limited Company',
+      industry: 'Technology',
+      base_currency: 'INR',
+      accounting_system: 'indian_gaap',
+      address: '',
+      city: '',
+      state: '',
+      postal_code: '',
+      phone: '',
+      email: '',
+      website: '',
+      tax_number: '',
+      registration_number: '',
+      parent_company_id: ''
+    });
+  };
+
   const startEdit = (company) => {
     setEditingCompany(company);
     setCompanyForm({ ...company });
