@@ -1755,14 +1755,32 @@ async def create_company(company: CompanyCreate, current_user: UserInDB = Depend
 async def get_all_companies(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all companies for management purposes including sister companies"""
     try:
-        # Get tenant database for user
-        tenant_service = await get_tenant_service(mongo_url)
-        tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+        # Check if user has permission to view companies
+        user_permissions = current_user.permissions or {}
         
-        if tenant_db is None:
-            db_to_use = db
+        # Super admin can see all companies across all tenants
+        if current_user.role == "super_admin" or user_permissions.get("view_all_companies", False):
+            # For super admin, we need to collect companies from all tenant databases
+            tenant_service = await get_tenant_service(mongo_url)
+            all_companies = []
+            
+            # Get all tenant databases and collect companies
+            # For now, let's start with their own tenant first
+            tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+            databases_to_check = [tenant_db] if tenant_db else [db]
+            
+            # TODO: Add logic to iterate through all tenant databases for super admin
+            
+            db_to_use = databases_to_check[0] if databases_to_check else db
         else:
-            db_to_use = tenant_db
+            # Regular users can only see companies in their tenant database
+            tenant_service = await get_tenant_service(mongo_url)
+            tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+            
+            if tenant_db is None:
+                db_to_use = db
+            else:
+                db_to_use = tenant_db
         
         print(f"DEBUG: Using database: {db_to_use.name}")
         
