@@ -44,10 +44,16 @@ const CompanyManagement = ({ user, onBack }) => {
       if (response.ok) {
         const companiesData = await response.json();
         
+        console.log('DEBUG: Received companies data:', companiesData);
+        console.log('DEBUG: Total companies count:', companiesData.length);
+        
         // The backend now returns both main companies and sister companies in one list
         // Group them for better display
         const mainCompanies = companiesData.filter(company => company.is_main_company);
         const sisterCompanies = companiesData.filter(company => !company.is_main_company);
+        
+        console.log('DEBUG: Main companies:', mainCompanies.length);
+        console.log('DEBUG: Sister companies:', sisterCompanies.length);
         
         // Add sister companies info to main companies
         const companiesWithSisters = mainCompanies.map(company => ({
