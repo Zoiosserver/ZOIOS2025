@@ -200,15 +200,18 @@ backend:
 
   - task: "Enhanced Chart of Accounts API Endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Added enhanced chart of accounts API endpoints: GET /companies/{id}/accounts/enhanced (detailed view with grouping), GET /companies/consolidated-accounts/enhanced (consolidated view), POST /companies/{id}/accounts/enhanced (create), PUT /companies/{id}/accounts/{id}/enhanced (update), DELETE /companies/{id}/accounts/{id}/enhanced (delete). Includes account validation, conflict checking, and cascading deletes."
+        - working: true
+          agent: "testing"
+          comment: "Enhanced Chart of Accounts API endpoints working perfectly. All endpoints tested successfully. GET enhanced accounts returns detailed view with 26 accounts and proper grouping. GET consolidated enhanced working with multi-company view. POST create account successful. PUT update account functional. DELETE account working correctly. Fixed critical MongoDB ObjectId serialization issue by implementing proper parse_from_mongo function. All CRUD operations verified with tenant database isolation."
 
   - task: "Export and Print API Endpoints"
     implemented: true
