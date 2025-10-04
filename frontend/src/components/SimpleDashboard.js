@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import ZoiosLogo from './ZoiosLogo';
 
 const SimpleDashboard = ({ user, onLogout }) => {
   const [companySetup, setCompanySetup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [setupProgress, setSetupProgress] = useState(0);
 
   useEffect(() => {
     fetchDashboardData();
@@ -22,6 +24,7 @@ const SimpleDashboard = ({ user, onLogout }) => {
       if (response.ok) {
         const data = await response.json();
         setCompanySetup(data);
+        calculateSetupProgress(data);
       } else {
         setError('Failed to load company data');
       }
@@ -30,6 +33,19 @@ const SimpleDashboard = ({ user, onLogout }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateSetupProgress = (data) => {
+    if (!data) return;
+    
+    const requiredFields = [
+      'company_name', 'country_code', 'business_type', 'industry', 
+      'base_currency', 'accounting_system', 'address'
+    ];
+    
+    const completedFields = requiredFields.filter(field => data[field] && data[field] !== '');
+    const progress = Math.round((completedFields.length / requiredFields.length) * 100);
+    setSetupProgress(progress);
   };
 
   const handleLogout = () => {
