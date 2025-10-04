@@ -557,6 +557,32 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
     }
   };
 
+  const fetchNextAccountCode = async (accountType) => {
+    if (!selectedCompany || !accountType) return;
+    
+    setNextCodeLoading(true);
+    try {
+      const backendUrl = window.location.origin;
+      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts/next-code/${accountType}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAccountForm(prev => ({
+          ...prev,
+          account_code: data.next_code
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to fetch next account code:', err);
+    } finally {
+      setNextCodeLoading(false);
+    }
+  };
+
   const resetAccountForm = () => {
     setAccountForm({
       account_name: '',
