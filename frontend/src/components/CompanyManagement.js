@@ -362,22 +362,26 @@ const CompaniesTab = ({ companies, loading, error, onAdd, onEdit, onDelete, onSe
       </div>
     )}
 
-    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
       {companies.map((company) => (
-        <div key={company.id} className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-6">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{company.company_name}</h3>
+        <div key={company.id} className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 space-y-3 sm:space-y-0">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 truncate">{company.company_name}</h3>
               <div className="space-y-1 text-sm text-gray-600">
-                <p><span className="font-medium">Type:</span> {company.business_type}</p>
-                <p><span className="font-medium">Industry:</span> {company.industry}</p>
+                <p><span className="font-medium">Type:</span> <span className="break-words">{company.business_type}</span></p>
+                <p><span className="font-medium">Industry:</span> <span className="break-words">{company.industry}</span></p>
                 <p><span className="font-medium">Currency:</span> {company.base_currency}</p>
+                {company.sister_companies && company.sister_companies.length > 0 && (
+                  <p><span className="font-medium">Sister Companies:</span> {company.sister_companies.length}</p>
+                )}
               </div>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex space-x-2 sm:flex-col sm:space-x-0 sm:space-y-2 justify-end">
               <button
                 onClick={() => onEdit(company)}
                 className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                title="Edit Company"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -386,6 +390,7 @@ const CompaniesTab = ({ companies, loading, error, onAdd, onEdit, onDelete, onSe
               <button
                 onClick={() => onDelete(company.id)}
                 className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                title="Delete Company"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -396,7 +401,7 @@ const CompaniesTab = ({ companies, loading, error, onAdd, onEdit, onDelete, onSe
           
           <button
             onClick={() => onSelectCompany(company)}
-            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-2 px-4 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 font-medium"
+            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-2 px-4 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 font-medium text-sm sm:text-base"
           >
             View Chart of Accounts
           </button>
