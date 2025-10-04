@@ -1010,7 +1010,7 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
           <p className="text-gray-600">View accounts from all companies in one consolidated view</p>
         </div>
         
-        <div className="flex space-x-3">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
           <select
             value={groupBy}
             onChange={(e) => setGroupBy(e.target.value)}
@@ -1021,18 +1021,20 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
             <option value="category">Group by Category</option>
           </select>
           
-          <button
-            onClick={() => exportConsolidatedAccounts('excel')}
-            className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 font-medium text-sm"
-          >
-            Export Excel
-          </button>
-          <button
-            onClick={() => exportConsolidatedAccounts('pdf')}
-            className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-200 font-medium text-sm"
-          >
-            Export PDF
-          </button>
+          <div className="flex space-x-2 sm:space-x-3">
+            <button
+              onClick={() => exportConsolidatedAccounts('excel')}
+              className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 sm:px-4 py-2 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 font-medium text-sm"
+            >
+              Excel
+            </button>
+            <button
+              onClick={() => exportConsolidatedAccounts('pdf')}
+              className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 sm:px-4 py-2 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-200 font-medium text-sm"
+            >
+              PDF
+            </button>
+          </div>
         </div>
       </div>
 
