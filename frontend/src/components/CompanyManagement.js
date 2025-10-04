@@ -423,7 +423,7 @@ const CompanyManagement = ({ user, onBack }) => {
                   <button
                     type="button"
                     onClick={() => {
-                      setShowAddModal(false);
+                      setShowAddCompanyModal(false);
                       setEditingCompany(null);
                       resetForm();
                     }}
