@@ -66,9 +66,12 @@ const CompanyManagement = ({ user, onBack }) => {
         // Include all companies in the display (main + sister)
         setCompanies(companiesData);
       } else {
-        setError('Failed to load companies');
+        const errorText = await response.text();
+        console.error('DEBUG: API Error Response:', response.status, errorText);
+        setError(`Failed to load companies: ${response.status} ${response.statusText}`);
       }
     } catch (err) {
+      console.error('DEBUG: Network Error:', err);
       setError('Connection failed: ' + err.message);
     } finally {
       setLoading(false);
