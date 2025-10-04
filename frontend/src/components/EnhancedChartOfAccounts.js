@@ -391,7 +391,23 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Chart of Accounts</h2>
-              <p className="text-sm text-gray-600">{selectedCompany.company_name}</p>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Company:</span>
+                <select
+                  value={selectedCompany?.id || ''}
+                  onChange={(e) => {
+                    const company = companies.find(c => c.id === e.target.value);
+                    onSelectCompany(company);
+                  }}
+                  className="text-sm px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  {companies.map((company) => (
+                    <option key={company.id} value={company.id}>
+                      {company.company_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
           
