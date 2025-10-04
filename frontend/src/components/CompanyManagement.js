@@ -1584,21 +1584,16 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
       });
       
       // Summary at bottom
-      const finalY = doc.lastAutoTable.finalY + 10;
+      yPos += 10;
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.text('Summary', 14, finalY);
+      doc.text('Summary', 14, yPos);
       
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      let summaryY = finalY + 8;
-      doc.text(`Total Companies: ${pdfData.total_companies}`, 14, summaryY);
-      doc.text(`Total Accounts: ${pdfData.total_accounts}`, 14, summaryY + 6);
-      doc.text(`Assets: ${pdfData.summary.assets}`, 14, summaryY + 12);
-      doc.text(`Liabilities: ${pdfData.summary.liabilities}`, 14, summaryY + 18);
-      doc.text(`Equity: ${pdfData.summary.equity}`, 90, summaryY + 6);
-      doc.text(`Revenue: ${pdfData.summary.revenue}`, 90, summaryY + 12);
-      doc.text(`Expenses: ${pdfData.summary.expense}`, 90, summaryY + 18);
+      yPos += 8;
+      doc.text(`Total Companies: ${companyNames ? companyNames.length : 0}`, 14, yPos);
+      doc.text(`Total Accounts: ${consolidatedAccounts.length}`, 14, yPos + 6);
       
       // Save PDF
       doc.save('consolidated_chart_of_accounts.pdf');
