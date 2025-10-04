@@ -4368,6 +4368,359 @@ class BackendTester:
             self.log(f"❌ Sister company API test error: {str(e)}")
             return False
 
+    def test_existing_accounts(self):
+        """Test existing common test accounts as requested in review"""
+        self.log("Testing existing common test accounts...")
+        
+        # Common test accounts to try
+        test_accounts = [
+            {"email": "admin@zoios.com", "password": "password123"},
+            {"email": "admin@zoios.com", "password": "admin123"},
+            {"email": "admin@2mholding.com", "password": "admin123"},
+            {"email": "admin@2mholding.com", "password": "password123"},
+            {"email": "testuser@example.com", "password": "password123"},
+            {"email": "test@zoios.com", "password": "password123"}
+        ]
+        
+        working_accounts = []
+        
+        for account in test_accounts:
+            self.log(f"Testing account: {account['email']}")
+            
+            login_data = {
+                "email": account["email"],
+                "password": account["password"]
+            }
+            
+            try:
+                response = self.session.post(f"{API_BASE}/auth/login", json=login_data)
+                self.log(f"Login response status: {response.status_code}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    self.auth_token = data.get('access_token')
+                    self.user_data = data.get('user')
+                    self.log(f"✅ WORKING ACCOUNT FOUND: {account['email']} / {account['password']}")
+                    self.log(f"User ID: {self.user_data.get('id')}")
+                    self.log(f"Role: {self.user_data.get('role')}")
+                    self.log(f"Onboarding completed: {self.user_data.get('onboarding_completed')}")
+                    working_accounts.append(account)
+                    
+                    # Test /auth/me to verify token works
+                    headers = {"Authorization": f"Bearer {self.auth_token}"}
+                    me_response = self.session.get(f"{API_BASE}/auth/me", headers=headers)
+                    if me_response.status_code == 200:
+                        self.log("✅ Token validation working")
+                    else:
+                        self.log("❌ Token validation failed")
+                        
+                else:
+                    self.log(f"❌ Login failed: {response.text}")
+                    
+            except Exception as e:
+                self.log(f"❌ Login error: {str(e)}")
+        
+        if working_accounts:
+            self.log(f"\n🎉 FOUND {len(working_accounts)} WORKING ACCOUNT(S):")
+            for account in working_accounts:
+                self.log(f"   📧 {account['email']} / 🔑 {account['password']}")
+            return True
+        else:
+            self.log("❌ NO EXISTING ACCOUNTS WORK - Need to create fresh account")
+            return False
+
+    def test_create_fresh_account(self):
+        """Create a fresh test account with simple credentials"""
+        self.log("Creating fresh test account...")
+        
+        # Generate unique email to avoid conflicts
+        timestamp = str(int(time.time()))
+        fresh_email = f"testuser{timestamp}@example.com"
+        fresh_password = "password123"
+        
+        signup_data = {
+            "email": fresh_email,
+            "password": fresh_password,
+            "name": "Test User",
+            "company": "Test Company"
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            self.log(f"Signup response status: {response.status_code}")
+            self.log(f"Signup response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.auth_token = data.get('access_token')
+                self.user_data = data.get('user')
+                
+                self.log(f"✅ FRESH ACCOUNT CREATED SUCCESSFULLY!")
+                self.log(f"📧 Email: {fresh_email}")
+                self.log(f"🔑 Password: {fresh_password}")
+                self.log(f"User ID: {self.user_data.get('id')}")
+                self.log(f"Role: {self.user_data.get('role')}")
+                
+                # Test login with new account
+                login_data = {
+                    "email": fresh_email,
+                    "password": fresh_password
+                }
+                
+                login_response = self.session.post(f"{API_BASE}/auth/login", json=login_data)
+                if login_response.status_code == 200:
+                    self.log("✅ Fresh account login verification successful")
+                    return {"email": fresh_email, "password": fresh_password}
+                else:
+                    self.log("❌ Fresh account login verification failed")
+                    return None
+                    
+            else:
+                self.log(f"❌ Fresh account creation failed: {response.text}")
+                return None
+                
+        except Exception as e:
+            self.log(f"❌ Fresh account creation error: {str(e)}")
+            return None
+
+    def test_authentication_endpoints(self):
+        """Test all authentication endpoints comprehensively"""
+        self.log("Testing authentication endpoints...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        endpoints_tested = 0
+        endpoints_passed = 0
+        
+        # Test /auth/me
+        try:
+            response = self.session.get(f"{API_BASE}/auth/me", headers=headers)
+            endpoints_tested += 1
+            if response.status_code == 200:
+                endpoints_passed += 1
+                self.log("✅ GET /auth/me - Working")
+            else:
+                self.log(f"❌ GET /auth/me - Failed: {response.status_code}")
+        except Exception as e:
+            self.log(f"❌ GET /auth/me - Error: {str(e)}")
+            endpoints_tested += 1
+        
+        # Test protected endpoints to verify token validation
+        protected_endpoints = [
+            "/setup/countries",
+            "/setup/currencies", 
+            "/dashboard/stats"
+        ]
+        
+        for endpoint in protected_endpoints:
+            try:
+                response = self.session.get(f"{API_BASE}{endpoint}", headers=headers)
+                endpoints_tested += 1
+                if response.status_code == 200:
+                    endpoints_passed += 1
+                    self.log(f"✅ GET {endpoint} - Token validation working")
+                else:
+                    self.log(f"❌ GET {endpoint} - Token validation failed: {response.status_code}")
+            except Exception as e:
+                self.log(f"❌ GET {endpoint} - Error: {str(e)}")
+                endpoints_tested += 1
+        
+        success_rate = (endpoints_passed / endpoints_tested * 100) if endpoints_tested > 0 else 0
+        self.log(f"Authentication endpoints test: {endpoints_passed}/{endpoints_tested} passed ({success_rate:.1f}%)")
+        
+        return endpoints_passed == endpoints_tested
+
+    def check_backend_logs(self):
+        """Check backend logs for any authentication errors"""
+        self.log("Checking backend logs for authentication errors...")
+        
+        try:
+            import subprocess
+            result = subprocess.run(['tail', '-n', '50', '/var/log/supervisor/backend.err.log'], 
+                                  capture_output=True, text=True, timeout=10)
+            
+            if result.returncode == 0:
+                logs = result.stdout
+                if logs.strip():
+                    self.log("Backend error logs (last 50 lines):")
+                    self.log(logs)
+                    
+                    # Look for authentication-related errors
+                    auth_errors = []
+                    for line in logs.split('\n'):
+                        if any(keyword in line.lower() for keyword in ['auth', 'login', 'token', 'password', 'jwt']):
+                            auth_errors.append(line)
+                    
+                    if auth_errors:
+                        self.log("Authentication-related log entries found:")
+                        for error in auth_errors[-10:]:  # Last 10 auth-related entries
+                            self.log(f"  {error}")
+                    else:
+                        self.log("No authentication-related errors found in logs")
+                else:
+                    self.log("No error logs found")
+            else:
+                self.log("Could not read backend error logs")
+                
+        except Exception as e:
+            self.log(f"Error checking backend logs: {str(e)}")
+
+    def test_database_connectivity(self):
+        """Test database connectivity"""
+        self.log("Testing database connectivity...")
+        
+        try:
+            # Test a simple endpoint that requires database access
+            response = self.session.get(f"{API_BASE}/setup/countries")
+            self.log(f"Database test response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list) and len(data) > 0:
+                    self.log(f"✅ Database connectivity working - found {len(data)} countries")
+                    return True
+                else:
+                    self.log("❌ Database returns empty data")
+                    return False
+            else:
+                self.log(f"❌ Database connectivity failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Database connectivity error: {str(e)}")
+            return False
+
+    def test_jwt_functionality(self):
+        """Test JWT token functionality"""
+        self.log("Testing JWT token functionality...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token to test")
+            return False
+        
+        # Test token format
+        try:
+            import base64
+            import json
+            
+            # JWT tokens have 3 parts separated by dots
+            parts = self.auth_token.split('.')
+            if len(parts) != 3:
+                self.log(f"❌ Invalid JWT format - has {len(parts)} parts instead of 3")
+                return False
+            
+            # Try to decode header (first part)
+            header_data = parts[0] + '=' * (4 - len(parts[0]) % 4)  # Add padding
+            header = json.loads(base64.urlsafe_b64decode(header_data))
+            self.log(f"✅ JWT header decoded: {header}")
+            
+            # Try to decode payload (second part)  
+            payload_data = parts[1] + '=' * (4 - len(parts[1]) % 4)  # Add padding
+            payload = json.loads(base64.urlsafe_b64decode(payload_data))
+            self.log(f"✅ JWT payload decoded - subject: {payload.get('sub')}")
+            
+            # Test token with API call
+            headers = {"Authorization": f"Bearer {self.auth_token}"}
+            response = self.session.get(f"{API_BASE}/auth/me", headers=headers)
+            
+            if response.status_code == 200:
+                self.log("✅ JWT token validation working")
+                return True
+            else:
+                self.log(f"❌ JWT token validation failed: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ JWT token test error: {str(e)}")
+            return False
+
+    def run_login_issue_investigation(self):
+        """Run focused tests to investigate and resolve login issues"""
+        self.log("=" * 80)
+        self.log("🔍 ZOIOS ERP LOGIN ISSUE INVESTIGATION")
+        self.log("=" * 80)
+        
+        # Step 1: Test existing accounts
+        self.log("\n📋 STEP 1: Testing existing common test accounts")
+        self.log("-" * 50)
+        existing_accounts_work = self.test_existing_accounts()
+        
+        # Step 2: Create fresh account if needed
+        working_credentials = None
+        if not existing_accounts_work:
+            self.log("\n🆕 STEP 2: Creating fresh test account")
+            self.log("-" * 50)
+            working_credentials = self.test_create_fresh_account()
+        
+        # Step 3: Test authentication endpoints
+        self.log("\n🔐 STEP 3: Testing authentication endpoints")
+        self.log("-" * 50)
+        auth_endpoints_work = self.test_authentication_endpoints()
+        
+        # Step 4: Check backend logs
+        self.log("\n📋 STEP 4: Checking backend logs for issues")
+        self.log("-" * 50)
+        self.check_backend_logs()
+        
+        # Step 5: Test database connectivity
+        self.log("\n💾 STEP 5: Testing database connectivity")
+        self.log("-" * 50)
+        db_connectivity = self.test_database_connectivity()
+        
+        # Step 6: Test JWT token generation
+        self.log("\n🎫 STEP 6: Testing JWT token generation and validation")
+        self.log("-" * 50)
+        jwt_working = self.test_jwt_functionality()
+        
+        # Generate final report
+        self.log("\n" + "=" * 80)
+        self.log("🎯 LOGIN ISSUE INVESTIGATION RESULTS")
+        self.log("=" * 80)
+        
+        if existing_accounts_work:
+            self.log("✅ EXISTING ACCOUNTS WORKING - User can login with existing credentials")
+        elif working_credentials:
+            self.log(f"✅ FRESH ACCOUNT CREATED - User can login with: {working_credentials['email']} / {working_credentials['password']}")
+        else:
+            self.log("❌ CRITICAL: No working login credentials found")
+        
+        if auth_endpoints_work:
+            self.log("✅ Authentication endpoints working properly")
+        else:
+            self.log("❌ Authentication endpoints have issues")
+            
+        if db_connectivity:
+            self.log("✅ Database connectivity working")
+        else:
+            self.log("❌ Database connectivity issues detected")
+            
+        if jwt_working:
+            self.log("✅ JWT token generation and validation working")
+        else:
+            self.log("❌ JWT token issues detected")
+        
+        # Provide working credentials for user
+        if existing_accounts_work or working_credentials:
+            self.log("\n🎉 SOLUTION FOR USER:")
+            self.log("The user can now login with these working credentials:")
+            if working_credentials:
+                self.log(f"📧 Email: {working_credentials['email']}")
+                self.log(f"🔑 Password: {working_credentials['password']}")
+            self.log("These credentials will provide access to the dashboard and all features.")
+        else:
+            self.log("\n❌ ISSUE REQUIRES FURTHER INVESTIGATION:")
+            self.log("No working login credentials could be established.")
+            self.log("Backend authentication system may need debugging.")
+        
+        return existing_accounts_work or working_credentials is not None
+
 def main():
     """Main function to run the sister company API test as requested in review"""
     tester = BackendTester()
