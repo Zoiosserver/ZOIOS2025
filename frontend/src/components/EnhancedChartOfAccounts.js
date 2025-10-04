@@ -83,12 +83,16 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
     setLoading(true);
 
     try {
-      const backendUrl = window.location.origin;
+      // Use environment variable for backend URL
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const url = editingAccount 
-        ? `${backendUrl}/api/companies/${selectedCompany.id}/accounts/${editingAccount.id}/enhanced` 
-        : `${backendUrl}/api/companies/${selectedCompany.id}/accounts/enhanced`;
+        ? `${backendUrl}/api/company/${selectedCompany.id}/chart-of-accounts/${editingAccount.id}` 
+        : `${backendUrl}/api/company/${selectedCompany.id}/chart-of-accounts`;
       
       const method = editingAccount ? 'PUT' : 'POST';
+      
+      console.log('DEBUG: Submitting account with URL:', url);
+      console.log('DEBUG: Account data:', accountForm);
 
       // Map form fields to API expected format
       const requestData = {
