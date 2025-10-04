@@ -1449,7 +1449,8 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
     try {
       if (format === 'excel') {
         // Create Excel file directly from frontend data
-        const { utils, writeFile } = await import('xlsx');
+        const XLSX = await import('xlsx');
+        const { utils, writeFile } = XLSX;
         const workbook = utils.book_new();
         
         // Prepare consolidated data for Excel - TRUE CONSOLIDATED FORMAT
