@@ -285,6 +285,263 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
     </div>
   );
 
+  const handleModuleNavigation = (moduleKey) => {
+    if (moduleKey === 'company-management') {
+      onNavigateToCompanyManagement();
+      return;
+    }
+    setActiveModule(moduleKey);
+  };
+
+  const renderModuleContent = () => {
+    switch (activeModule) {
+      case 'dashboard':
+        return renderOverviewContent();
+      case 'analytics':
+        return renderAnalyticsContent();
+      case 'reports':
+        return renderReportsContent();
+      case 'company-overview':
+        return renderCompanyOverviewContent();
+      case 'sister-companies':
+        return renderSisterCompaniesContent();
+      case 'user-management':
+        return renderUserManagementContent();
+      case 'chart-accounts':
+        return renderChartAccountsContent();
+      case 'accounts-ledger':
+        return renderAccountsLedgerContent();
+      case 'financial-reports':
+        return renderFinancialReportsContent();
+      case 'currency-management':
+        return renderCurrencyManagementContent();
+      case 'crm-dashboard':
+        return renderCRMDashboardContent();
+      case 'leads':
+        return renderLeadsContent();
+      default:
+        return renderComingSoonContent(activeModule);
+    }
+  };
+
+  const renderComingSoonContent = (moduleName) => (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="text-center">
+        <div className="text-6xl mb-4">🚀</div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Coming Soon</h2>
+        <p className="text-gray-600 mb-4">The {moduleName.replace('-', ' ')} module is under development</p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+          <p className="text-blue-800 text-sm">
+            This feature will be available in the next update. We're working hard to bring you the best ERP experience.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderAnalyticsContent = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">Advanced Analytics</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-6">
+          <h3 className="text-lg font-semibold mb-4">Revenue Analytics</h3>
+          <p className="text-gray-600">Detailed revenue analysis and forecasting tools will be available here.</p>
+        </div>
+        <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-6">
+          <h3 className="text-lg font-semibold mb-4">Performance Metrics</h3>
+          <p className="text-gray-600">KPI tracking and performance measurement tools coming soon.</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderReportsContent = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">Financial Reports</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {['Profit & Loss', 'Balance Sheet', 'Cash Flow', 'Trial Balance', 'General Ledger', 'Aged Receivables'].map((report) => (
+          <div key={report} className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-6 hover:shadow-2xl transition-all duration-200 cursor-pointer">
+            <h3 className="text-lg font-semibold mb-2">{report}</h3>
+            <p className="text-gray-600 text-sm mb-4">Generate {report.toLowerCase()} report</p>
+            <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-2 px-4 rounded-lg hover:from-blue-600 hover:to-indigo-600 transition-all duration-200">
+              Generate Report
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderCompanyOverviewContent = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">Company Overview</h2>
+      <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Company Information</h3>
+            <div className="space-y-3">
+              <div><span className="font-medium">Name:</span> {dashboardData.companyName}</div>
+              <div><span className="font-medium">Type:</span> {dashboardData.businessType}</div>
+              <div><span className="font-medium">Currency:</span> {dashboardData.currency}</div>
+              <div><span className="font-medium">Status:</span> <span className="text-green-600">Active</span></div>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Quick Stats</h3>
+            <div className="space-y-3">
+              <div><span className="font-medium">Users:</span> 1</div>
+              <div><span className="font-medium">Modules:</span> 9</div>
+              <div><span className="font-medium">Setup:</span> <span className="text-green-600">Complete</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSisterCompaniesContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Sister Companies</h2>
+        <button className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-200">
+          Add Sister Company
+        </button>
+      </div>
+      <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-8 text-center">
+        <div className="text-4xl mb-4">🏢</div>
+        <h3 className="text-xl font-semibold mb-2">No Sister Companies Found</h3>
+        <p className="text-gray-600 mb-4">Create sister companies to manage multiple entities under one group.</p>
+        <button className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200">
+          Create Sister Company
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderUserManagementContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
+        <button className="bg-gradient-to-r from-purple-500 to-violet-500 text-white px-4 py-2 rounded-xl hover:from-purple-600 hover:to-violet-600 transition-all duration-200">
+          Add User
+        </button>
+      </div>
+      <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 overflow-hidden">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Current Users</h3>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                  {user?.name?.charAt(0) || 'U'}
+                </div>
+                <div>
+                  <div className="font-medium">{user?.name}</div>
+                  <div className="text-sm text-gray-600">{user?.email}</div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Admin</span>
+                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderChartAccountsContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Chart of Accounts</h2>
+        <button 
+          onClick={onNavigateToCompanyManagement}
+          className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200"
+        >
+          Manage Accounts
+        </button>
+      </div>
+      <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-6">
+        <p className="text-gray-600 mb-4">
+          Access the full chart of accounts management through the Company Management section.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+          {['Assets', 'Liabilities', 'Equity', 'Revenue', 'Expenses'].map((type, index) => (
+            <div key={type} className="text-center p-4 bg-gray-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">{[8, 5, 3, 4, 7][index]}</div>
+              <div className="text-sm text-gray-600">{type}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderAccountsLedgerContent = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">General Ledger</h2>
+      <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-6">
+        <p className="text-gray-600">General ledger functionality coming soon. This will include transaction history, account balances, and detailed financial records.</p>
+      </div>
+    </div>
+  );
+
+  const renderFinancialReportsContent = () => renderReportsContent();
+
+  const renderCurrencyManagementContent = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">Currency Management</h2>
+      <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Base Currency</h3>
+            <div className="text-2xl font-bold text-blue-600">{dashboardData.currency}</div>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Exchange Rates</h3>
+            <p className="text-gray-600">Multi-currency support and exchange rate management coming soon.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderCRMDashboardContent = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">CRM Dashboard</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { title: 'Total Leads', value: 156, color: 'blue' },
+          { title: 'Qualified Leads', value: 42, color: 'green' },
+          { title: 'Active Customers', value: 78, color: 'purple' },
+          { title: 'Conversion Rate', value: '27%', color: 'orange' }
+        ].map((metric, index) => (
+          <div key={index} className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-6">
+            <div className="text-2xl font-bold text-gray-900">{metric.value}</div>
+            <div className="text-gray-600 text-sm">{metric.title}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderLeadsContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Lead Management</h2>
+        <button className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-200">
+          Add Lead
+        </button>
+      </div>
+      <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-8 text-center">
+        <div className="text-4xl mb-4">📈</div>
+        <h3 className="text-xl font-semibold mb-2">Lead Management System</h3>
+        <p className="text-gray-600">Comprehensive lead tracking and conversion tools coming soon.</p>
+      </div>
+    </div>
+  );
+
   const renderOverviewContent = () => (
     <div className="space-y-6">
       {/* Welcome Header */}
