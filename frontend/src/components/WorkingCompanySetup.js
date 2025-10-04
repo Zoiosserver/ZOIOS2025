@@ -41,13 +41,35 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
     try {
       const backendUrl = window.location.origin;
       
+      // Transform form data to match backend schema
+      const backendData = {
+        company_name: formData.company_name,
+        country_code: formData.country, // Frontend uses 'country', backend expects 'country_code'
+        base_currency: formData.base_currency,
+        additional_currencies: formData.additional_currencies || [],
+        fiscal_year_start: formData.fiscal_year_start,
+        business_type: formData.business_type,
+        industry: formData.industry,
+        // Transform nested address object to individual fields
+        address: formData.address.street_address || '',
+        city: formData.address.city || '',
+        state: formData.address.state || '',
+        postal_code: formData.address.postal_code || '',
+        phone: '', // Optional field
+        email: '', // Optional field  
+        website: '', // Optional field
+        tax_number: '', // Optional field
+        registration_number: '', // Optional field
+        sister_companies: formData.sister_companies || []
+      };
+      
       const response = await fetch(`${backendUrl}/api/setup/company`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(backendData)
       });
 
       if (response.ok) {
