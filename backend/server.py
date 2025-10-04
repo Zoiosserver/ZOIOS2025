@@ -2682,8 +2682,12 @@ logger = logging.getLogger(__name__)
 async def startup_event():
     # Initialize super admin and default admin
     from auth import ensure_super_admin, create_default_admin
-    await ensure_super_admin(db)
-    await create_default_admin(db)
+    try:
+        await ensure_super_admin(db)
+        await create_default_admin(db)
+        print("DEBUG: Super admin and default admin initialization completed")
+    except Exception as e:
+        print(f"ERROR: Failed to initialize admin users: {e}")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
