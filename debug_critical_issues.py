@@ -37,9 +37,10 @@ class CriticalIssuesDebugger:
         print(f"[{timestamp}] {level}: {message}")
         
     def admin_login(self):
-        """Login with admin credentials"""
-        self.log("Logging in with admin credentials...")
+        """Login with admin credentials or create test user"""
+        self.log("Attempting to login or create test user...")
         
+        # First try admin login
         login_data = {
             "email": ADMIN_EMAIL,
             "password": ADMIN_PASSWORD
@@ -57,10 +58,45 @@ class CriticalIssuesDebugger:
                 return True
             else:
                 self.log(f"❌ Admin login failed: {response.text}")
-                return False
+                # Try to create a test user instead
+                return self.create_test_user()
                 
         except Exception as e:
             self.log(f"❌ Admin login error: {str(e)}")
+            return self.create_test_user()
+
+    def create_test_user(self):
+        """Create a test user for debugging"""
+        self.log("Creating test user for debugging...")
+        
+        # Generate unique test credentials
+        timestamp = str(int(time.time()))
+        test_email = f"debugtest{timestamp}@example.com"
+        test_password = "debugpass123"
+        
+        signup_data = {
+            "email": test_email,
+            "password": test_password,
+            "name": "Debug Test User",
+            "company": "Debug Test Company"
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            self.log(f"Test user signup response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.auth_token = data.get('access_token')
+                self.user_data = data.get('user')
+                self.log(f"✅ Test user created successfully: {test_email}")
+                return True
+            else:
+                self.log(f"❌ Test user creation failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Test user creation error: {str(e)}")
             return False
 
     def setup_test_company(self):
