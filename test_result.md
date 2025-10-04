@@ -614,6 +614,9 @@ test_plan:
         - working: true
           agent: "testing"
           comment: "🎉 SISTER COMPANY FUNCTIONALITY COMPLETELY WORKING! Comprehensive testing confirms all sister company features are working perfectly. VERIFIED RESULTS: ✅ **COMPANY SETUP WITH SISTER COMPANIES**: Successfully created Group Company with 2 sister companies (Sister Company 1 - Private Limited Company, Sister Company 2 - Partnership) ✅ **DATABASE PERSISTENCE**: Sister companies properly saved to sister_companies collection with correct group_company_id linkage ✅ **API ENDPOINTS WORKING**: GET /api/company/sister-companies returns 2 sister companies with complete data structure ✅ **COMPANY MANAGEMENT INTEGRATION**: GET /api/companies/management shows 3 companies (1 main + 2 sister) with proper is_main_company flags ✅ **CHART OF ACCOUNTS**: Each sister company has 23 accounts with proper categorization ✅ **TENANT DATABASE ISOLATION**: Multi-tenant architecture working correctly ✅ **DEBUG LOGGING**: Backend logs show proper DEBUG messages for sister company processing ✅ **DATA STRUCTURE VERIFICATION**: All required fields present (id, group_company_id, company_name, country_code, business_type, industry, base_currency, is_active). The sister company functionality is production-ready and working as designed. Previous testing issues were resolved."
+        - working: false
+          agent: "main"
+          comment: "Fixed critical issue in CompanyManagement.js where companiesWithSisters data was not being set to state properly. The code was creating proper sister company attachments but using original companiesData instead. Also enhanced sister company display to show individual company names and business types instead of just count. Ready for retesting."
 
   - task: "Super Admin Initialization and Permissions"
     implemented: true
