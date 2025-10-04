@@ -243,12 +243,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Complete Company Setup API Integration"
+    - "Beautiful Professional Dashboard Testing"
     - "Currency Symbol Display Fix"
     - "Account Code Auto-Generation Fix"
   stuck_tasks:
     - "India Rupee Currency Display Issue"
-    - "Complete Company Setup API Integration"
   test_all: false
   test_priority: "high_first"
 
