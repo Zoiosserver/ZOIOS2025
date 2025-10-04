@@ -82,6 +82,11 @@ function App() {
     );
   }
 
+  // Temporarily show demo for enhanced company setup
+  if (currentView === 'login' || true) {
+    return <DemoCompanySetup />;
+  }
+
   if (currentView === 'login') {
     return (
       <SimpleLogin 
