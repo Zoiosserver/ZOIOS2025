@@ -2106,6 +2106,62 @@ async def get_enhanced_consolidated_accounts(current_user: UserInDB = Depends(ge
         }
     }
 
+@api_router.get("/companies/{company_id}/accounts/next-code/{account_type}")
+async def get_next_account_code(
+    company_id: str,
+    account_type: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Get the next available account code for a specific account type"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Define base codes for different account types
+    base_codes = {
+        "asset": 1000,
+        "liability": 2000,
+        "equity": 3000,
+        "revenue": 4000,
+        "expense": 5000
+    }
+    
+    base_code = base_codes.get(account_type.lower(), 9000)
+    
+    # Find all accounts of this type for the company
+    existing_accounts = await db_to_use.chart_of_accounts.find({
+        "company_id": company_id,
+        "account_type": account_type.lower()
+    }).to_list(length=None)
+    
+    # Extract numeric codes and find the highest one
+    numeric_codes = []
+    for account in existing_accounts:
+        code = account.get('code', '0')
+        try:
+            numeric_code = int(code)
+            if numeric_code >= base_code and numeric_code < base_code + 1000:
+                numeric_codes.append(numeric_code)
+        except ValueError:
+            continue
+    
+    # Calculate next available code
+    if not numeric_codes:
+        next_code = base_code
+    else:
+        next_code = max(numeric_codes) + 1
+    
+    return {
+        "next_code": str(next_code),
+        "account_type": account_type,
+        "base_range": f"{base_code}-{base_code + 999}"
+    }
+
 @api_router.post("/companies/{company_id}/accounts/enhanced")
 async def create_account(
     company_id: str,
