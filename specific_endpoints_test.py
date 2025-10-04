@@ -251,7 +251,7 @@ class SpecificEndpointsTester:
         """Test GET /api/companies/{company_id}/chart-of-accounts endpoint"""
         self.log("=" * 60)
         self.log("TESTING: Chart of Accounts Functionality")
-        self.log(f"Endpoint: GET /api/companies/{self.company_id}/chart-of-accounts")
+        self.log(f"Endpoint: GET /api/company/{self.company_id}/chart-of-accounts")
         self.log("=" * 60)
         
         if not self.auth_token or not self.company_id:
