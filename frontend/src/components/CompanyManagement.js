@@ -196,6 +196,30 @@ const CompanyManagement = ({ user, onBack }) => {
     }
   };
 
+  const handleConvertToGroupCompany = async () => {
+    if (!window.confirm('Convert your company to Group Company? This will enable you to add sister companies.')) return;
+
+    try {
+      const backendUrl = window.location.origin;
+      const response = await fetch(`${backendUrl}/api/companies/convert-to-group`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        await fetchCompanies();
+        alert('Company successfully converted to Group Company! You can now add sister companies.');
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.detail || 'Failed to convert company to Group Company');
+      }
+    } catch (err) {
+      setError('Connection failed: ' + err.message);
+    }
+  };
+
   const resetForm = () => {
     setCompanyForm({
       company_name: '',
