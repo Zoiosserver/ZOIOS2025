@@ -243,13 +243,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Beautiful Professional Login/Signup UI Enhancement"
-    - "Company Setup Blank Screen Fix" 
+    - "Complete Company Setup API Integration"
     - "Currency Symbol Display Fix"
     - "Account Code Auto-Generation Fix"
-    - "Granular Permission System Implementation"
   stuck_tasks:
     - "India Rupee Currency Display Issue"
+    - "Complete Company Setup API Integration"
   test_all: false
   test_priority: "high_first"
 
