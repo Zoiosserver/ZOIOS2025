@@ -47,6 +47,24 @@ set_database(db)
 # Create the main app without a prefix
 app = FastAPI()
 
+# Add global exception handler for validation errors
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": "Validation error",
+            "errors": [
+                {
+                    "field": ".".join(str(loc) for loc in error["loc"]),
+                    "message": error["msg"],
+                    "type": error["type"]
+                }
+                for error in exc.errors()
+            ]
+        }
+    )
+
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
