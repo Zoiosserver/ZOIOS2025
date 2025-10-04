@@ -1774,11 +1774,11 @@ async def get_all_companies(current_user: UserInDB = Depends(get_current_active_
             # Get all tenant databases and collect companies
             # For now, let's start with their own tenant first
             tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
-            databases_to_check = [tenant_db] if tenant_db else [db]
+            databases_to_check = [tenant_db] if tenant_db is not None else [db]
             
             # TODO: Add logic to iterate through all tenant databases for super admin
             
-            db_to_use = databases_to_check[0] if databases_to_check else db
+            db_to_use = databases_to_check[0] if len(databases_to_check) > 0 else db
         else:
             # Regular users can only see companies in their tenant database
             tenant_service = await get_tenant_service(mongo_url)
