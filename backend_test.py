@@ -4721,6 +4721,282 @@ class BackendTester:
         
         return existing_accounts_work or working_credentials is not None
 
+    def test_sister_company_setup_for_user(self):
+        """Create a FRESH account specifically for testing sister company functionality"""
+        self.log("Creating FRESH account for sister company testing...")
+        
+        # Use specific credentials as requested
+        sister_test_email = "usertestsister@example.com"
+        sister_test_password = "testsister123"
+        
+        # Step 1: Create new account
+        signup_data = {
+            "email": sister_test_email,
+            "password": sister_test_password,
+            "name": "Sister Test User",
+            "company": "User Test Group Company"
+        }
+        
+        try:
+            # Clean up any existing user first (ignore errors)
+            try:
+                # Try to login and delete existing user if exists
+                login_response = self.session.post(f"{API_BASE}/auth/login", json={
+                    "email": sister_test_email,
+                    "password": sister_test_password
+                })
+                if login_response.status_code == 200:
+                    self.log("⚠️ User already exists, will proceed with existing account")
+                    token = login_response.json().get('access_token')
+                    self.auth_token = token
+                    return self.test_sister_company_group_setup()
+            except:
+                pass
+            
+            # Create new user
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            self.log(f"Sister test user creation response status: {response.status_code}")
+            self.log(f"Sister test user creation response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.auth_token = data.get('access_token')
+                self.user_data = data.get('user')
+                self.log("✅ Sister test user created successfully")
+                self.log(f"Email: {sister_test_email}")
+                self.log(f"Password: {sister_test_password}")
+                
+                # Step 2: Setup Group Company with sister companies
+                return self.test_sister_company_group_setup()
+                
+            elif response.status_code == 400 and "already registered" in response.text:
+                self.log("⚠️ User already exists, proceeding with login")
+                login_response = self.session.post(f"{API_BASE}/auth/login", json={
+                    "email": sister_test_email,
+                    "password": sister_test_password
+                })
+                if login_response.status_code == 200:
+                    self.auth_token = login_response.json().get('access_token')
+                    return self.test_sister_company_group_setup()
+                else:
+                    self.log(f"❌ Login failed: {login_response.text}")
+                    return False
+            else:
+                self.log(f"❌ Sister test user creation failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Sister test user creation error: {str(e)}")
+            return False
+
+    def test_sister_company_group_setup(self):
+        """Setup Group Company with sister companies as specified"""
+        self.log("Setting up Group Company with sister companies...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Company setup data as specified in the request
+        setup_data = {
+            "company_name": "User Test Group Company",
+            "country_code": "US",
+            "base_currency": "USD",
+            "additional_currencies": ["EUR"],
+            "business_type": "Group Company",  # This is key for sister companies
+            "industry": "Technology",
+            "address": "123 Test Street",
+            "city": "Test City",
+            "state": "CA",
+            "postal_code": "12345",
+            "phone": "+1-555-123-4567",
+            "email": "usertestsister@example.com",
+            "website": "https://usertestgroup.com",
+            "tax_number": "123456789",
+            "registration_number": "REG123456",
+            # Sister companies as specified
+            "sister_companies": [
+                {
+                    "company_name": "User Sister Company A",
+                    "country": "US",
+                    "business_type": "Private Limited Company",
+                    "industry": "Technology",
+                    "base_currency": "USD",
+                    "fiscal_year_start": "01-01"
+                },
+                {
+                    "company_name": "User Sister Company B", 
+                    "country": "GB",
+                    "business_type": "Partnership",
+                    "industry": "Technology",
+                    "base_currency": "EUR",
+                    "fiscal_year_start": "01-01"
+                }
+            ]
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            self.log(f"Group company setup response status: {response.status_code}")
+            self.log(f"Group company setup response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log("✅ Group Company setup successful")
+                self.log(f"Main Company: {data.get('company_name')}")
+                self.log(f"Business Type: {data.get('business_type')}")
+                
+                # Step 3: Verify the setup worked
+                return self.test_sister_company_verification()
+                
+            elif response.status_code == 400 and "already completed" in response.text:
+                self.log("⚠️ Company setup already completed, proceeding to verification")
+                return self.test_sister_company_verification()
+            else:
+                self.log(f"❌ Group company setup failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Group company setup error: {str(e)}")
+            return False
+
+    def test_sister_company_verification(self):
+        """Verify the sister company setup worked correctly"""
+        self.log("Verifying sister company setup...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # Test GET /api/companies/management to verify 3 companies (1 main + 2 sisters)
+            response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            self.log(f"Companies management response status: {response.status_code}")
+            self.log(f"Companies management response: {response.text}")
+            
+            if response.status_code == 200:
+                companies = response.json()
+                self.log(f"✅ Found {len(companies)} companies")
+                
+                # Verify we have exactly 3 companies (1 main + 2 sisters)
+                if len(companies) == 3:
+                    self.log("✅ Correct number of companies (1 main + 2 sisters)")
+                    
+                    # Analyze companies
+                    main_company = None
+                    sister_companies = []
+                    
+                    for company in companies:
+                        if company.get('is_main_company'):
+                            main_company = company
+                        else:
+                            sister_companies.append(company)
+                    
+                    # Verify main company
+                    if main_company:
+                        self.log(f"✅ Main Company: {main_company.get('company_name')}")
+                        self.log(f"   Business Type: {main_company.get('business_type')}")
+                        
+                        if main_company.get('business_type') == 'Group Company':
+                            self.log("✅ Main company has correct business_type 'Group Company'")
+                        else:
+                            self.log(f"❌ Main company business_type is '{main_company.get('business_type')}', expected 'Group Company'")
+                            return False
+                    else:
+                        self.log("❌ No main company found")
+                        return False
+                    
+                    # Verify sister companies
+                    if len(sister_companies) == 2:
+                        self.log("✅ Found 2 sister companies")
+                        
+                        for i, sister in enumerate(sister_companies, 1):
+                            self.log(f"✅ Sister Company {i}: {sister.get('company_name')}")
+                            self.log(f"   Business Type: {sister.get('business_type')}")
+                            self.log(f"   Parent Company ID: {sister.get('parent_company_id')}")
+                            
+                            # Verify linking
+                            if sister.get('parent_company_id') == main_company.get('id'):
+                                self.log(f"✅ Sister Company {i} correctly linked to main company")
+                            else:
+                                self.log(f"❌ Sister Company {i} not properly linked to main company")
+                                return False
+                        
+                        # Final verification - check specific company names
+                        sister_names = [s.get('company_name') for s in sister_companies]
+                        expected_names = ["User Sister Company A", "User Sister Company B"]
+                        
+                        if all(name in sister_names for name in expected_names):
+                            self.log("✅ Sister companies have correct names")
+                            
+                            # SUCCESS - provide credentials for user
+                            self.log("\n" + "=" * 60)
+                            self.log("🎉 SISTER COMPANY SETUP COMPLETE!")
+                            self.log("=" * 60)
+                            self.log("✅ WORKING CREDENTIALS FOR USER:")
+                            self.log("   Email: usertestsister@example.com")
+                            self.log("   Password: testsister123")
+                            self.log("")
+                            self.log("✅ SETUP VERIFIED:")
+                            self.log(f"   Main Company: {main_company.get('company_name')} (Group Company)")
+                            self.log(f"   Sister Company 1: {sister_companies[0].get('company_name')} ({sister_companies[0].get('business_type')})")
+                            self.log(f"   Sister Company 2: {sister_companies[1].get('company_name')} ({sister_companies[1].get('business_type')})")
+                            self.log("")
+                            self.log("✅ USER CAN NOW:")
+                            self.log("   - Login with provided credentials")
+                            self.log("   - Navigate to Company Management")
+                            self.log("   - See main company with sister companies listed")
+                            self.log("=" * 60)
+                            
+                            return True
+                        else:
+                            self.log(f"❌ Sister company names don't match. Found: {sister_names}, Expected: {expected_names}")
+                            return False
+                    else:
+                        self.log(f"❌ Found {len(sister_companies)} sister companies, expected 2")
+                        return False
+                else:
+                    self.log(f"❌ Found {len(companies)} companies, expected 3 (1 main + 2 sisters)")
+                    return False
+            else:
+                self.log(f"❌ Companies management failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Sister company verification error: {str(e)}")
+            return False
+
+    def run_sister_company_test_only(self):
+        """Run ONLY the sister company setup test as requested"""
+        self.log("=" * 80)
+        self.log("🎯 SISTER COMPANY SETUP FOR USER - PRIORITY TEST")
+        self.log("=" * 80)
+        
+        result = self.test_sister_company_setup_for_user()
+        
+        self.log("\n" + "=" * 80)
+        self.log("SISTER COMPANY TEST RESULT")
+        self.log("=" * 80)
+        
+        if result:
+            self.log("✅ SISTER COMPANY SETUP SUCCESSFUL!")
+            self.log("🎉 User can now login and test sister company functionality")
+        else:
+            self.log("❌ SISTER COMPANY SETUP FAILED!")
+            self.log("🚨 Need to investigate and fix the issue")
+        
+        return result
+
 def main():
     """Main function to run the sister company API test as requested in review"""
     tester = BackendTester()
