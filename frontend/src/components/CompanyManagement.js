@@ -405,7 +405,16 @@ const CompaniesTab = ({ companies, loading, error, onAdd, onEdit, onDelete, onSe
                 <p><span className="font-medium">Industry:</span> <span className="break-words">{company.industry}</span></p>
                 <p><span className="font-medium">Currency:</span> {company.base_currency}</p>
                 {company.is_main_company && company.sister_companies && company.sister_companies.length > 0 && (
-                  <p><span className="font-medium">Sister Companies:</span> {company.sister_companies.length}</p>
+                  <div>
+                    <p><span className="font-medium">Sister Companies ({company.sister_companies.length}):</span></p>
+                    <div className="mt-1 ml-2 space-y-1">
+                      {company.sister_companies.map((sister, index) => (
+                        <p key={index} className="text-xs text-blue-600 font-medium">
+                          • {sister.company_name} ({sister.business_type})
+                        </p>
+                      ))}
+                    </div>
+                  </div>
                 )}
                 {!company.is_main_company && company.parent_company_id && (
                   <p><span className="font-medium">Parent Company ID:</span> <span className="text-xs font-mono">{company.parent_company_id.substring(0, 8)}...</span></p>
