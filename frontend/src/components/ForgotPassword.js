@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import ZoiosLogo from './ZoiosLogo';
 
-const BACKEND_URL = window.location.origin.replace(':3000', '');
-const API = `${BACKEND_URL}/api`;
-
 const ForgotPassword = ({ onBackToLogin }) => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,13 +13,22 @@ const ForgotPassword = ({ onBackToLogin }) => {
     setError('');
 
     try {
-      await axios.post(`${API}/auth/forgot-password`, { email });
-      setSent(true);
-      toast.success('Password reset link sent to your email!');
+      const backendUrl = window.location.origin;
+      
+      const response = await fetch(`${backendUrl}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      if (response.ok) {
+        setSent(true);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.detail || 'Failed to send reset email');
+      }
     } catch (error) {
-      const errorMessage = error.response?.data?.detail || 'Failed to send reset email';
-      setError(errorMessage);
-      toast.error(errorMessage);
+      setError('Connection failed: ' + error.message);
     }
     
     setLoading(false);
