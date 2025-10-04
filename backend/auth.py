@@ -32,6 +32,109 @@ def set_database(database):
     global db
     db = database
 
+def get_default_permissions(role: str) -> Dict[str, bool]:
+    """Get default permissions based on user role"""
+    if role == "super_admin":
+        return {
+            "view_all_companies": True,
+            "manage_all_companies": True,
+            "create_companies": True,
+            "delete_companies": True,
+            "manage_users": True,
+            "view_all_accounts": True,
+            "manage_accounts": True,
+            "export_data": True,
+            "view_reports": True,
+            "manage_sister_companies": True,
+            "access_hr_module": True,
+            "access_crm_module": True,
+            "access_sales_module": True,
+            "access_purchase_module": True,
+            "access_inventory_module": True,
+            "access_academy_module": True,
+            "access_email_module": True
+        }
+    elif role == "admin":
+        return {
+            "view_all_companies": False,  # Only own company
+            "manage_all_companies": False,
+            "create_companies": True,
+            "delete_companies": True,
+            "manage_users": True,
+            "view_all_accounts": True,
+            "manage_accounts": True,
+            "export_data": True,
+            "view_reports": True,
+            "manage_sister_companies": True,
+            "access_hr_module": True,
+            "access_crm_module": True,
+            "access_sales_module": True,
+            "access_purchase_module": True,
+            "access_inventory_module": True,
+            "access_academy_module": True,
+            "access_email_module": True
+        }
+    elif role == "manager":
+        return {
+            "view_all_companies": False,
+            "manage_all_companies": False,
+            "create_companies": False,
+            "delete_companies": False,
+            "manage_users": False,
+            "view_all_accounts": True,
+            "manage_accounts": True,
+            "export_data": True,
+            "view_reports": True,
+            "manage_sister_companies": False,
+            "access_hr_module": True,
+            "access_crm_module": True,
+            "access_sales_module": True,
+            "access_purchase_module": True,
+            "access_inventory_module": False,
+            "access_academy_module": True,
+            "access_email_module": True
+        }
+    elif role == "user":
+        return {
+            "view_all_companies": False,
+            "manage_all_companies": False,
+            "create_companies": False,
+            "delete_companies": False,
+            "manage_users": False,
+            "view_all_accounts": True,
+            "manage_accounts": False,
+            "export_data": False,
+            "view_reports": True,
+            "manage_sister_companies": False,
+            "access_hr_module": False,
+            "access_crm_module": True,
+            "access_sales_module": True,
+            "access_purchase_module": False,
+            "access_inventory_module": False,
+            "access_academy_module": True,
+            "access_email_module": False
+        }
+    else:  # viewer
+        return {
+            "view_all_companies": False,
+            "manage_all_companies": False,
+            "create_companies": False,
+            "delete_companies": False,
+            "manage_users": False,
+            "view_all_accounts": True,
+            "manage_accounts": False,
+            "export_data": False,
+            "view_reports": True,
+            "manage_sister_companies": False,
+            "access_hr_module": False,
+            "access_crm_module": False,
+            "access_sales_module": False,
+            "access_purchase_module": False,
+            "access_inventory_module": False,
+            "access_academy_module": False,
+            "access_email_module": False
+        }
+
 # Models
 class User(BaseModel):
     id: str
