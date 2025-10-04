@@ -1806,6 +1806,264 @@ class BackendTester:
             self.log(f"❌ Data validation test error: {str(e)}")
             return False
 
+    def test_company_filtering_issue(self):
+        """Test the specific company filtering issue where only Group Companies are showing up"""
+        self.log("Testing Company Filtering Issue - Debug Group Companies Only Problem...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # 1. Company Management API Testing - GET /api/companies/management endpoint
+            self.log("\n1. TESTING COMPANY MANAGEMENT API")
+            response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            self.log(f"GET /api/companies/management response status: {response.status_code}")
+            self.log(f"GET /api/companies/management response: {response.text}")
+            
+            if response.status_code != 200:
+                self.log(f"❌ Company Management API failed: {response.text}")
+                return False
+            
+            companies = response.json()
+            self.log(f"✅ Company Management API working - found {len(companies)} companies")
+            
+            # 2. Database Investigation - Check business_type field values
+            self.log("\n2. DATABASE INVESTIGATION - BUSINESS TYPE ANALYSIS")
+            business_type_distribution = {}
+            
+            for company in companies:
+                business_type = company.get('business_type', 'Unknown')
+                if business_type in business_type_distribution:
+                    business_type_distribution[business_type] += 1
+                else:
+                    business_type_distribution[business_type] = 1
+                
+                self.log(f"Company: {company.get('company_name', 'Unknown')} | Business Type: {business_type}")
+            
+            self.log(f"\nBUSINESS TYPE DISTRIBUTION:")
+            for btype, count in business_type_distribution.items():
+                self.log(f"  {btype}: {count} companies")
+            
+            # Check if only Group Companies are present (this would indicate the issue)
+            if len(business_type_distribution) == 1 and 'Group Company' in business_type_distribution:
+                self.log("❌ ISSUE CONFIRMED: Only Group Companies are showing up!")
+                self.log("This indicates a filtering problem in the Company Management endpoint")
+            elif 'Group Company' not in business_type_distribution:
+                self.log("✅ No Group Companies found - issue may be resolved or no Group Companies exist")
+            else:
+                self.log("✅ Multiple business types found - filtering appears to be working correctly")
+            
+            # 3. Test creating companies with different business types
+            self.log("\n3. BUSINESS TYPE INVESTIGATION - CREATING TEST COMPANIES")
+            expected_business_types = [
+                "Private Limited Company",
+                "Public Limited Company", 
+                "Partnership",
+                "Sole Proprietorship",
+                "Group Company"
+            ]
+            
+            created_companies = []
+            for i, business_type in enumerate(expected_business_types):
+                test_company_data = {
+                    "company_name": f"Test {business_type} {int(time.time())}{i}",
+                    "country_code": "US",
+                    "base_currency": "USD",
+                    "additional_currencies": [],
+                    "business_type": business_type,
+                    "industry": "Technology",
+                    "address": f"123 Test Street {i}",
+                    "city": "Test City",
+                    "state": "CA",
+                    "postal_code": "12345",
+                    "phone": f"+1-555-123-456{i}",
+                    "email": f"test{business_type.lower().replace(' ', '')}{int(time.time())}{i}@example.com",
+                    "website": f"https://test{business_type.lower().replace(' ', '')}.com",
+                    "tax_number": f"TAX{i}123456789",
+                    "registration_number": f"REG{i}987654321"
+                }
+                
+                # Create a new user for each company type to avoid conflicts
+                signup_data = {
+                    "email": test_company_data["email"],
+                    "password": "testpass123",
+                    "name": f"Test User {business_type}",
+                    "company": test_company_data["company_name"]
+                }
+                
+                try:
+                    # Sign up new user
+                    signup_response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+                    if signup_response.status_code == 200:
+                        user_token = signup_response.json().get('access_token')
+                        user_headers = {
+                            "Authorization": f"Bearer {user_token}",
+                            "Content-Type": "application/json"
+                        }
+                        
+                        # Create company setup
+                        setup_response = self.session.post(f"{API_BASE}/setup/company", 
+                                                         json=test_company_data, headers=user_headers)
+                        
+                        if setup_response.status_code == 200:
+                            company_data = setup_response.json()
+                            created_companies.append({
+                                'id': company_data.get('id'),
+                                'name': company_data.get('company_name'),
+                                'business_type': company_data.get('business_type'),
+                                'user_email': test_company_data["email"]
+                            })
+                            self.log(f"✅ Created {business_type} company: {company_data.get('company_name')}")
+                        else:
+                            self.log(f"❌ Failed to create {business_type} company: {setup_response.text}")
+                    else:
+                        self.log(f"❌ Failed to create user for {business_type}: {signup_response.text}")
+                        
+                except Exception as e:
+                    self.log(f"❌ Error creating {business_type} company: {str(e)}")
+            
+            self.log(f"\nSuccessfully created {len(created_companies)} test companies")
+            
+            # 4. Re-test Company Management API to see if all business types appear
+            self.log("\n4. RE-TESTING COMPANY MANAGEMENT API AFTER CREATING DIVERSE COMPANIES")
+            
+            # Wait a moment for database consistency
+            time.sleep(2)
+            
+            response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            if response.status_code == 200:
+                updated_companies = response.json()
+                self.log(f"Updated company count: {len(updated_companies)} companies")
+                
+                updated_business_type_distribution = {}
+                for company in updated_companies:
+                    business_type = company.get('business_type', 'Unknown')
+                    if business_type in updated_business_type_distribution:
+                        updated_business_type_distribution[business_type] += 1
+                    else:
+                        updated_business_type_distribution[business_type] = 1
+                
+                self.log(f"\nUPDATED BUSINESS TYPE DISTRIBUTION:")
+                for btype, count in updated_business_type_distribution.items():
+                    self.log(f"  {btype}: {count} companies")
+                
+                # Check if the filtering issue is resolved
+                if len(updated_business_type_distribution) > 1:
+                    self.log("✅ FILTERING ISSUE RESOLVED: Multiple business types now visible")
+                    return True
+                elif len(updated_business_type_distribution) == 1 and 'Group Company' in updated_business_type_distribution:
+                    self.log("❌ FILTERING ISSUE PERSISTS: Still only showing Group Companies")
+                    return False
+                else:
+                    self.log("⚠️ Unexpected result - need further investigation")
+                    return False
+            else:
+                self.log(f"❌ Failed to re-test company management API: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Company filtering test error: {str(e)}")
+            return False
+
+    def test_user_permission_filtering(self):
+        """Test if user permissions are affecting company visibility"""
+        self.log("Testing User Permission Filtering...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # Test with different user roles
+            self.log("\n1. TESTING WITH CURRENT USER ROLE")
+            
+            # Get current user info
+            auth_response = self.session.get(f"{API_BASE}/auth/me", headers=headers)
+            if auth_response.status_code == 200:
+                user_data = auth_response.json()
+                self.log(f"Current user role: {user_data.get('role')}")
+                self.log(f"Current user permissions: {user_data.get('permissions', {})}")
+                
+                # Test company access
+                companies_response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+                if companies_response.status_code == 200:
+                    companies = companies_response.json()
+                    self.log(f"Companies visible to {user_data.get('role')} user: {len(companies)}")
+                    
+                    # Log business types visible to this user
+                    visible_types = set()
+                    for company in companies:
+                        visible_types.add(company.get('business_type', 'Unknown'))
+                    
+                    self.log(f"Business types visible: {list(visible_types)}")
+                    
+                    return len(visible_types) >= 1  # Should see at least one business type
+                else:
+                    self.log(f"❌ Failed to get companies: {companies_response.text}")
+                    return False
+            else:
+                self.log(f"❌ Failed to get user info: {auth_response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ User permission filtering test error: {str(e)}")
+            return False
+
+    def test_database_direct_investigation(self):
+        """Test direct database investigation of company data"""
+        self.log("Testing Direct Database Investigation...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # Get tenant info to understand database structure
+            tenant_response = self.session.get(f"{API_BASE}/tenant/info", headers=headers)
+            if tenant_response.status_code == 200:
+                tenant_data = tenant_response.json()
+                self.log(f"Tenant info: {tenant_data}")
+                
+                if tenant_data.get('tenant_assigned'):
+                    self.log(f"Using tenant database: {tenant_data.get('database_name')}")
+                else:
+                    self.log("Using main database")
+            
+            # Test company setup endpoint to see raw data
+            setup_response = self.session.get(f"{API_BASE}/setup/company", headers=headers)
+            if setup_response.status_code == 200:
+                setup_data = setup_response.json()
+                self.log(f"Current user's company setup:")
+                self.log(f"  Company Name: {setup_data.get('company_name')}")
+                self.log(f"  Business Type: {setup_data.get('business_type')}")
+                self.log(f"  Country: {setup_data.get('country_code')}")
+                self.log(f"  Base Currency: {setup_data.get('base_currency')}")
+                
+                return True
+            else:
+                self.log(f"❌ Failed to get company setup: {setup_response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Database investigation error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run comprehensive backend testing as requested in review"""
         self.log("=" * 80)
