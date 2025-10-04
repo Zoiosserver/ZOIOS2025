@@ -2129,12 +2129,15 @@ async def export_chart_of_accounts(
         db_to_use = tenant_db
     
     # Get company information
-    company = await db_to_use.company_setups.find_one({"id": company_id})
-    if not company:
+    company_raw = await db_to_use.company_setups.find_one({"id": company_id})
+    if not company_raw:
         raise HTTPException(status_code=404, detail="Company not found")
     
+    company = parse_from_mongo(company_raw)
+    
     # Get chart of accounts
-    accounts = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
+    accounts_raw = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
+    accounts = [parse_from_mongo(account) for account in accounts_raw]
     
     if export_request.format.lower() == "excel":
         # Create Excel export data
