@@ -3067,6 +3067,286 @@ class BackendTester:
             self.log(f"❌ PDF export test error: {str(e)}")
             return False
 
+    def test_company_management_api_comprehensive(self):
+        """Comprehensive test for Company Management API endpoint as requested in review"""
+        self.log("Testing Company Management API endpoint comprehensively...")
+        
+        # Test scenarios as requested in review:
+        # 1. GET /api/companies/management with proper authentication
+        # 2. Check if the endpoint is working correctly
+        # 3. Verify the response format and data structure
+        # 4. Test with different user roles (admin, super_admin)
+        # 5. Authentication Issues - JWT token validation
+        # 6. Database Issues - check if companies exist and tenant isolation
+        # 7. Response Format Validation
+        # 8. Permission Issues - test view_all_companies permission
+        
+        test_results = {}
+        
+        # First, create a test user and company setup
+        self.log("Setting up test user and company for comprehensive testing...")
+        
+        # Create fresh test user
+        timestamp = str(int(time.time()))
+        test_email = f"companytest{timestamp}@example.com"
+        signup_data = {
+            "email": test_email,
+            "password": "testpass123",
+            "name": "Company Test User",
+            "company": "Company Test Inc"
+        }
+        
+        try:
+            # Sign up test user
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            if response.status_code != 200:
+                self.log(f"❌ Test user creation failed: {response.text}")
+                return False
+            
+            test_token = response.json().get('access_token')
+            test_user_data = response.json().get('user')
+            
+            headers = {
+                "Authorization": f"Bearer {test_token}",
+                "Content-Type": "application/json"
+            }
+            
+            # Setup company for test user
+            setup_data = {
+                "company_name": "Company Management Test Corp",
+                "country_code": "US",
+                "base_currency": "USD",
+                "additional_currencies": ["EUR", "GBP"],
+                "business_type": "Group Company",  # Test with Group Company for sister companies
+                "industry": "Technology",
+                "address": "123 Test Street",
+                "city": "Test City",
+                "state": "CA",
+                "postal_code": "12345",
+                "phone": "+1-555-123-4567",
+                "email": test_email,
+                "website": "https://testcompany.com",
+                "tax_number": "123456789",
+                "registration_number": "REG123456",
+                "sister_companies": [
+                    {
+                        "company_name": "Sister Company 1",
+                        "country": "US",
+                        "business_type": "Private Limited Company",
+                        "industry": "Technology",
+                        "fiscal_year_start": "01/01"
+                    },
+                    {
+                        "company_name": "Sister Company 2", 
+                        "country": "GB",
+                        "business_type": "Partnership",
+                        "industry": "Finance",
+                        "fiscal_year_start": "04/01"
+                    }
+                ]
+            }
+            
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            if response.status_code != 200:
+                self.log(f"❌ Company setup failed: {response.text}")
+                return False
+            
+            self.log("✅ Test user and company setup completed")
+            
+            # TEST 1: GET /api/companies/management with proper authentication
+            self.log("\n--- TEST 1: GET /api/companies/management with proper authentication ---")
+            response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            self.log(f"Response status: {response.status_code}")
+            self.log(f"Response body: {response.text}")
+            
+            if response.status_code == 200:
+                companies_data = response.json()
+                self.log(f"✅ API endpoint working - returned {len(companies_data)} companies")
+                test_results['api_endpoint_working'] = True
+                
+                # TEST 2: Verify response format and data structure
+                self.log("\n--- TEST 2: Response format and data structure validation ---")
+                if isinstance(companies_data, list) and len(companies_data) > 0:
+                    company = companies_data[0]
+                    required_fields = ['id', 'company_name', 'business_type', 'country_code', 'base_currency']
+                    
+                    all_fields_present = True
+                    for field in required_fields:
+                        if field in company:
+                            self.log(f"✅ Field '{field}': {company[field]}")
+                        else:
+                            self.log(f"❌ Missing required field: {field}")
+                            all_fields_present = False
+                    
+                    # Check for sister company flags
+                    if 'is_main_company' in company:
+                        self.log(f"✅ is_main_company flag: {company['is_main_company']}")
+                    
+                    if 'parent_company_id' in company:
+                        self.log(f"✅ parent_company_id field: {company.get('parent_company_id')}")
+                    
+                    test_results['response_format_valid'] = all_fields_present
+                    
+                    # TEST 3: Check if sister companies are returned properly
+                    self.log("\n--- TEST 3: Sister companies validation ---")
+                    main_companies = [c for c in companies_data if c.get('is_main_company', True)]
+                    sister_companies = [c for c in companies_data if not c.get('is_main_company', True)]
+                    
+                    self.log(f"Main companies: {len(main_companies)}")
+                    self.log(f"Sister companies: {len(sister_companies)}")
+                    
+                    if len(companies_data) >= 3:  # 1 main + 2 sister companies
+                        self.log("✅ Sister companies returned correctly")
+                        test_results['sister_companies_working'] = True
+                    else:
+                        self.log(f"⚠️ Expected 3 companies (1 main + 2 sister), got {len(companies_data)}")
+                        test_results['sister_companies_working'] = False
+                        
+                else:
+                    self.log("❌ Invalid response format - expected array of companies")
+                    test_results['response_format_valid'] = False
+                    
+            else:
+                self.log(f"❌ API endpoint failed: {response.text}")
+                test_results['api_endpoint_working'] = False
+                test_results['response_format_valid'] = False
+            
+            # TEST 4: Authentication Issues - JWT token validation
+            self.log("\n--- TEST 4: JWT token validation ---")
+            
+            # Test with invalid token
+            invalid_headers = {
+                "Authorization": "Bearer invalid_token_12345",
+                "Content-Type": "application/json"
+            }
+            
+            response = self.session.get(f"{API_BASE}/companies/management", headers=invalid_headers)
+            if response.status_code == 401:
+                self.log("✅ Invalid token correctly rejected (401)")
+                test_results['jwt_validation_working'] = True
+            else:
+                self.log(f"❌ Invalid token not rejected properly: {response.status_code}")
+                test_results['jwt_validation_working'] = False
+            
+            # Test without token
+            response = self.session.get(f"{API_BASE}/companies/management")
+            if response.status_code == 401 or response.status_code == 403:
+                self.log("✅ No token correctly rejected")
+            else:
+                self.log(f"❌ No token not rejected properly: {response.status_code}")
+            
+            # TEST 5: Test with super admin credentials (admin@2mholding.com)
+            self.log("\n--- TEST 5: Super admin access test ---")
+            super_admin_login = {
+                "email": "admin@2mholding.com",
+                "password": "admin123"
+            }
+            
+            response = self.session.post(f"{API_BASE}/auth/login", json=super_admin_login)
+            if response.status_code == 200:
+                super_admin_token = response.json().get('access_token')
+                super_admin_headers = {
+                    "Authorization": f"Bearer {super_admin_token}",
+                    "Content-Type": "application/json"
+                }
+                
+                # Test super admin access to companies/management
+                response = self.session.get(f"{API_BASE}/companies/management", headers=super_admin_headers)
+                self.log(f"Super admin access status: {response.status_code}")
+                
+                if response.status_code == 200:
+                    super_admin_companies = response.json()
+                    self.log(f"✅ Super admin can access endpoint - sees {len(super_admin_companies)} companies")
+                    test_results['super_admin_access'] = True
+                else:
+                    self.log(f"❌ Super admin access failed: {response.text}")
+                    test_results['super_admin_access'] = False
+            else:
+                self.log(f"❌ Super admin login failed: {response.text}")
+                test_results['super_admin_access'] = False
+            
+            # TEST 6: Database Issues - tenant database isolation
+            self.log("\n--- TEST 6: Tenant database isolation test ---")
+            
+            # Create another user to test isolation
+            isolation_email = f"isolation{timestamp}@example.com"
+            isolation_signup = {
+                "email": isolation_email,
+                "password": "testpass123",
+                "name": "Isolation Test User",
+                "company": "Isolation Test Company"
+            }
+            
+            response = self.session.post(f"{API_BASE}/auth/signup", json=isolation_signup)
+            if response.status_code == 200:
+                isolation_token = response.json().get('access_token')
+                isolation_headers = {
+                    "Authorization": f"Bearer {isolation_token}",
+                    "Content-Type": "application/json"
+                }
+                
+                # This user should see 0 companies (no setup yet)
+                response = self.session.get(f"{API_BASE}/companies/management", headers=isolation_headers)
+                if response.status_code == 200:
+                    isolation_companies = response.json()
+                    if len(isolation_companies) == 0:
+                        self.log("✅ Tenant isolation working - new user sees 0 companies")
+                        test_results['tenant_isolation'] = True
+                    else:
+                        self.log(f"❌ Tenant isolation failed - new user sees {len(isolation_companies)} companies")
+                        test_results['tenant_isolation'] = False
+                else:
+                    self.log(f"❌ Isolation test failed: {response.text}")
+                    test_results['tenant_isolation'] = False
+            else:
+                self.log("❌ Could not create isolation test user")
+                test_results['tenant_isolation'] = False
+            
+            # TEST 7: Permission Issues - view_all_companies permission
+            self.log("\n--- TEST 7: Permission system test ---")
+            
+            # Test /auth/me to check permissions
+            response = self.session.get(f"{API_BASE}/auth/me", headers=headers)
+            if response.status_code == 200:
+                user_data = response.json()
+                permissions = user_data.get('permissions', {})
+                self.log(f"User permissions: {permissions}")
+                
+                # Check if user has appropriate permissions
+                if permissions.get('company_accounts', True):  # Default should be True for admin
+                    self.log("✅ User has company access permissions")
+                    test_results['permissions_working'] = True
+                else:
+                    self.log("❌ User lacks company access permissions")
+                    test_results['permissions_working'] = False
+            else:
+                self.log("❌ Could not check user permissions")
+                test_results['permissions_working'] = False
+            
+            # Summary of comprehensive test
+            self.log("\n--- COMPREHENSIVE TEST SUMMARY ---")
+            passed_tests = sum(1 for result in test_results.values() if result)
+            total_tests = len(test_results)
+            
+            self.log(f"Passed: {passed_tests}/{total_tests} tests")
+            
+            for test_name, result in test_results.items():
+                status = "✅ PASS" if result else "❌ FAIL"
+                self.log(f"{test_name}: {status}")
+            
+            # Overall result
+            overall_success = passed_tests >= (total_tests * 0.8)  # 80% pass rate
+            
+            if overall_success:
+                self.log("✅ Company Management API comprehensive test PASSED")
+            else:
+                self.log("❌ Company Management API comprehensive test FAILED")
+            
+            return overall_success
+            
+        except Exception as e:
+            self.log(f"❌ Comprehensive test error: {str(e)}")
+            return False
     def run_all_tests(self):
         """Run comprehensive backend testing as requested in review"""
         self.log("=" * 80)
