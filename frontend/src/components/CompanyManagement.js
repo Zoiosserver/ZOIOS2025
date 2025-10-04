@@ -610,24 +610,24 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
         </div>
         
         {selectedCompany && (
-          <div className="flex space-x-3">
+          <div className="flex flex-wrap gap-2 sm:space-x-3">
             <button
               onClick={() => exportAccounts('excel')}
-              className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 font-medium text-sm"
+              className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 sm:px-4 py-2 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 font-medium text-sm"
             >
-              Export Excel
+              <span className="hidden sm:inline">Export </span>Excel
             </button>
             <button
               onClick={() => exportAccounts('pdf')}
-              className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-200 font-medium text-sm"
+              className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 sm:px-4 py-2 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-200 font-medium text-sm"
             >
-              Export PDF
+              <span className="hidden sm:inline">Export </span>PDF
             </button>
             <button
               onClick={() => setShowAddModal(true)}
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 font-medium text-sm"
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 sm:px-4 py-2 rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 font-medium text-sm"
             >
-              Add Account
+              <span className="hidden sm:inline">Add </span>Account
             </button>
           </div>
         )}
