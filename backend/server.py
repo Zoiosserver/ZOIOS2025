@@ -2163,11 +2163,53 @@ async def get_enhanced_consolidated_accounts(current_user: UserInDB = Depends(ge
         
         total_accounts += len(accounts_raw)
     
-    print(f"DEBUG: Total consolidated accounts: {total_accounts}")
+    print(f"DEBUG: Total accounts collected: {total_accounts}")
     
-    # Group by account type
-    grouped_accounts = {}
+    # Create TRUE consolidated accounts - one row per account code/name with columns for each company
+    consolidated_accounts_map = {}
+    
+    # Group accounts by account code and name
     for account in consolidated_data:
+        account_code = account.get('account_code', '')
+        account_name = account.get('account_name', '')
+        account_key = f"{account_code}|{account_name}"
+        
+        if account_key not in consolidated_accounts_map:
+            consolidated_accounts_map[account_key] = {
+                'account_code': account_code,
+                'account_name': account_name,
+                'account_type': account.get('account_type', ''),
+                'category': account.get('category', ''),
+                'companies': {},
+                'total_balance': 0
+            }
+        
+        # Add company balance to this account
+        company_name = account.get('company_name', 'Unknown')
+        company_balance = float(account.get('current_balance', 0) or account.get('opening_balance', 0) or 0)
+        
+        consolidated_accounts_map[account_key]['companies'][company_name] = company_balance
+        consolidated_accounts_map[account_key]['total_balance'] += company_balance
+    
+    # Convert to list and sort by account code
+    true_consolidated_accounts = []
+    for account_data in consolidated_accounts_map.values():
+        # Ensure all companies are represented (with 0 balance if missing)
+        for company in all_companies:
+            company_name = company.get('company_name', 'Unknown')
+            if company_name not in account_data['companies']:
+                account_data['companies'][company_name] = 0
+        
+        true_consolidated_accounts.append(account_data)
+    
+    # Sort by account code
+    true_consolidated_accounts.sort(key=lambda x: x.get('account_code', ''))
+    
+    print(f"DEBUG: Consolidated to {len(true_consolidated_accounts)} unique accounts across {len(all_companies)} companies")
+    
+    # Group by account type for display
+    grouped_accounts = {}
+    for account in true_consolidated_accounts:
         account_type = account.get('account_type', 'Other')
         if account_type not in grouped_accounts:
             grouped_accounts[account_type] = []
@@ -2175,16 +2217,18 @@ async def get_enhanced_consolidated_accounts(current_user: UserInDB = Depends(ge
     
     return {
         "companies": all_companies,
-        "consolidated_accounts": consolidated_data,
+        "consolidated_accounts": true_consolidated_accounts,
         "grouped_accounts": grouped_accounts,
         "total_companies": len(all_companies),
-        "total_accounts": total_accounts,
+        "total_unique_accounts": len(true_consolidated_accounts),
+        "total_account_entries": total_accounts,
+        "company_names": [company.get('company_name', 'Unknown') for company in all_companies],
         "summary": {
-            "assets": len([a for a in consolidated_data if a.get('account_type') == 'asset']),
-            "liabilities": len([a for a in consolidated_data if a.get('account_type') == 'liability']),
-            "equity": len([a for a in consolidated_data if a.get('account_type') == 'equity']),
-            "revenue": len([a for a in consolidated_data if a.get('account_type') == 'revenue']),
-            "expense": len([a for a in consolidated_data if a.get('account_type') == 'expense'])
+            "total_assets": sum([a.get('total_balance', 0) for a in true_consolidated_accounts if a.get('account_type') == 'asset']),
+            "total_liabilities": sum([a.get('total_balance', 0) for a in true_consolidated_accounts if a.get('account_type') == 'liability']),
+            "total_equity": sum([a.get('total_balance', 0) for a in true_consolidated_accounts if a.get('account_type') == 'equity']),
+            "total_revenue": sum([a.get('total_balance', 0) for a in true_consolidated_accounts if a.get('account_type') == 'revenue']),
+            "total_expense": sum([a.get('total_balance', 0) for a in true_consolidated_accounts if a.get('account_type') == 'expense'])
         }
     }
 
