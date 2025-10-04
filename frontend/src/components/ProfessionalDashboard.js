@@ -817,7 +817,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
                       <div 
                         key={item.key}
                         className={`flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer transition-all duration-200 ${
-                          item.active 
+                          item.key === activeModule || item.active 
                             ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg' 
                             : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                         }`}
@@ -825,7 +825,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
                           if (item.onClick) {
                             item.onClick();
                           } else {
-                            setActiveModule(item.key);
+                            handleModuleNavigation(item.key);
                           }
                         }}
                       >
