@@ -545,7 +545,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
   const renderOverviewContent = () => (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl p-8 text-white">
+      <div className="bg-blue-600 rounded-2xl p-8 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">
