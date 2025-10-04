@@ -264,8 +264,13 @@ def prepare_for_mongo(data):
     return data
 
 def parse_from_mongo(item):
-    """Convert ISO strings back to datetime objects"""
+    """Convert ISO strings back to datetime objects and remove MongoDB ObjectIds"""
     if isinstance(item, dict):
+        # Remove MongoDB ObjectId field
+        if '_id' in item:
+            del item['_id']
+        
+        # Convert datetime strings back to datetime objects
         for key, value in item.items():
             if key in ['created_at', 'updated_at', 'date', 'follow_up_date'] and isinstance(value, str):
                 try:
