@@ -2174,10 +2174,10 @@ async def get_enhanced_consolidated_accounts(current_user: UserInDB = Depends(ge
         grouped_accounts[account_type].append(account)
     
     return {
-        "companies": companies,
+        "companies": all_companies,
         "consolidated_accounts": consolidated_data,
         "grouped_accounts": grouped_accounts,
-        "total_companies": len(companies),
+        "total_companies": len(all_companies),
         "total_accounts": total_accounts,
         "summary": {
             "assets": len([a for a in consolidated_data if a.get('account_type') == 'asset']),
