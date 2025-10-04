@@ -35,41 +35,30 @@ const CompanyManagement = ({ user, onBack }) => {
   const fetchCompanies = async () => {
     try {
       const backendUrl = window.location.origin;
-      const [companiesResponse, sisterCompaniesResponse] = await Promise.all([
-        fetch(`${backendUrl}/api/companies/management`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        }),
-        fetch(`${backendUrl}/api/company/sister-companies`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        }).catch(() => ({ ok: false }))  // Don't fail if sister companies endpoint fails
-      ]);
-
-      if (companiesResponse.ok) {
-        const companiesData = await companiesResponse.json();
-        
-        // Fetch sister companies if available
-        let sisterCompaniesData = [];
-        if (sisterCompaniesResponse.ok) {
-          try {
-            sisterCompaniesData = await sisterCompaniesResponse.json();
-          } catch (e) {
-            console.log('Sister companies data not available:', e);
-          }
+      const response = await fetch(`${backendUrl}/api/companies/management`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
+      });
+
+      if (response.ok) {
+        const companiesData = await response.json();
+        
+        // The backend now returns both main companies and sister companies in one list
+        // Group them for better display
+        const mainCompanies = companiesData.filter(company => company.is_main_company);
+        const sisterCompanies = companiesData.filter(company => !company.is_main_company);
         
         // Add sister companies info to main companies
-        const companiesWithSisters = companiesData.map(company => ({
+        const companiesWithSisters = mainCompanies.map(company => ({
           ...company,
-          sister_companies: sisterCompaniesData.filter(sister => 
-            sister.group_company_id === company.id  // Changed from parent_company_id to group_company_id
+          sister_companies: sisterCompanies.filter(sister => 
+            sister.parent_company_id === company.id
           )
         }));
         
-        setCompanies(companiesWithSisters);
+        // Include all companies in the display (main + sister)
+        setCompanies(companiesData);
       } else {
         setError('Failed to load companies');
       }
