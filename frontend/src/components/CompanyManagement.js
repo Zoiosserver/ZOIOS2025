@@ -35,15 +35,37 @@ const CompanyManagement = ({ user, onBack }) => {
   const fetchCompanies = async () => {
     try {
       const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies/management`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+      const [companiesResponse, sisterCompaniesResponse] = await Promise.all([
+        fetch(`${backendUrl}/api/companies/management`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        }),
+        fetch(`${backendUrl}/api/company/sister-companies`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+      ]);
 
-      if (response.ok) {
-        const data = await response.json();
-        setCompanies(data);
+      if (companiesResponse.ok) {
+        const companiesData = await companiesResponse.json();
+        
+        // Fetch sister companies if available
+        let sisterCompaniesData = [];
+        if (sisterCompaniesResponse.ok) {
+          sisterCompaniesData = await sisterCompaniesResponse.json();
+        }
+        
+        // Add sister companies info to main companies
+        const companiesWithSisters = companiesData.map(company => ({
+          ...company,
+          sister_companies: sisterCompaniesData.filter(sister => 
+            sister.parent_company_id === company.id
+          )
+        }));
+        
+        setCompanies(companiesWithSisters);
       } else {
         setError('Failed to load companies');
       }
