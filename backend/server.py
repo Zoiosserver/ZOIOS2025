@@ -210,6 +210,48 @@ class EmailResponseCreate(BaseModel):
     response_type: Optional[str] = None
     notes: Optional[str] = None
 
+# Company Management Models
+class CompanyUpdate(BaseModel):
+    company_name: Optional[str] = None
+    country_code: Optional[str] = None
+    business_type: Optional[str] = None
+    industry: Optional[str] = None
+    fiscal_year_start: Optional[str] = None
+    fiscal_year_end: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    postal_code: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
+    tax_number: Optional[str] = None
+    registration_number: Optional[str] = None
+    additional_currencies: Optional[List[str]] = None
+
+class AccountCreate(BaseModel):
+    account_name: str
+    account_code: str
+    account_type: str
+    category: str
+    parent_account_id: Optional[str] = None
+    description: Optional[str] = None
+    opening_balance: Optional[float] = 0.0
+
+class AccountUpdate(BaseModel):
+    account_name: Optional[str] = None
+    account_code: Optional[str] = None
+    account_type: Optional[str] = None
+    category: Optional[str] = None
+    parent_account_id: Optional[str] = None
+    description: Optional[str] = None
+    opening_balance: Optional[float] = None
+
+class ExportRequest(BaseModel):
+    format: str  # "pdf" or "excel"
+    company_ids: Optional[List[str]] = None  # For consolidated reports
+    filters: Optional[Dict[str, Any]] = None
+
 # Helper functions
 def prepare_for_mongo(data):
     """Convert datetime objects to ISO strings for MongoDB storage"""
