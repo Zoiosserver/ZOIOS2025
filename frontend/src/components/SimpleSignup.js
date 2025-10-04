@@ -106,13 +106,11 @@ const SimpleSignup = ({ onSignup, onSwitchToLogin }) => {
       <div className="relative max-w-md w-full">
         {/* Logo/Brand Section */}
         <div className="text-center mb-8">
-          <div className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 p-4 rounded-2xl shadow-lg mb-6">
-            <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M3 6l3 1v13l-3-1V6zm6 0l3 1v13l-3-1V6zm6 0l3 1v13l-3-1V6zm3-3v2H6V3h12zM6 21h12v2H6v-2z"/>
-            </svg>
+          <div className="inline-flex items-center justify-center bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100">
+            <ZoiosLogo size="xl" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-            ZOIOS ERP
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            ERP System
           </h1>
           <p className="text-gray-600 text-lg">Join thousands of businesses</p>
         </div>
