@@ -93,6 +93,9 @@ class EmailStatus(str, Enum):
     NO_RESPONSE = "no_response"
 
 # Models
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
 class Contact(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str  # Add user_id for data isolation
