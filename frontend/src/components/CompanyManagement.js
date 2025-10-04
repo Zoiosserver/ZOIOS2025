@@ -50,24 +50,58 @@ const CompanyManagement = ({ user, onBack }) => {
       if (response.ok) {
         const companiesData = await response.json();
         
+        console.log('DEBUG: ===== COMPANY DATA ANALYSIS =====');
         console.log('DEBUG: Received companies data:', companiesData);
         console.log('DEBUG: Total companies count:', companiesData.length);
-        console.log('DEBUG: Sample company structure:', companiesData[0]);
+        console.log('DEBUG: Data type check:', Array.isArray(companiesData) ? 'Array' : typeof companiesData);
         
-        // The backend now returns both main companies and sister companies in one list
+        if (companiesData.length > 0) {
+          console.log('DEBUG: First company structure:', companiesData[0]);
+          console.log('DEBUG: First company fields:', Object.keys(companiesData[0]));
+        }
+        
+        // Ensure we have an array to work with
+        const companiesArray = Array.isArray(companiesData) ? companiesData : [];
+        
+        if (companiesArray.length === 0) {
+          console.log('DEBUG: No companies found in response');
+          setCompanies([]);
+          return;
+        }
+        
+        // The backend returns both main companies and sister companies in one list
         // Group them for better display
-        const mainCompanies = companiesData.filter(company => company.is_main_company);
-        const sisterCompanies = companiesData.filter(company => !company.is_main_company);
+        const mainCompanies = companiesArray.filter(company => {
+          const isMain = company.is_main_company === true;
+          console.log(`DEBUG: Company ${company.company_name} - is_main_company: ${company.is_main_company} (${typeof company.is_main_company}) - filtered as main: ${isMain}`);
+          return isMain;
+        });
         
-        console.log('DEBUG: Main companies:', mainCompanies.length, mainCompanies);
-        console.log('DEBUG: Sister companies:', sisterCompanies.length, sisterCompanies);
+        const sisterCompanies = companiesArray.filter(company => {
+          const isSister = company.is_main_company === false;
+          console.log(`DEBUG: Company ${company.company_name} - is_main_company: ${company.is_main_company} (${typeof company.is_main_company}) - filtered as sister: ${isSister}`);
+          return isSister;
+        });
+        
+        console.log('DEBUG: ===== FILTERING RESULTS =====');
+        console.log('DEBUG: Main companies count:', mainCompanies.length);
+        console.log('DEBUG: Main companies:', mainCompanies.map(c => ({ name: c.company_name, id: c.id, is_main: c.is_main_company })));
+        console.log('DEBUG: Sister companies count:', sisterCompanies.length);
+        console.log('DEBUG: Sister companies:', sisterCompanies.map(c => ({ name: c.company_name, id: c.id, is_main: c.is_main_company, parent_id: c.parent_company_id })));
         
         // Add sister companies info to main companies
         const companiesWithSisters = mainCompanies.map(company => {
-          const attachedSisters = sisterCompanies.filter(sister => 
-            sister.parent_company_id === company.id
-          );
-          console.log(`DEBUG: Main company ${company.company_name} (ID: ${company.id}) has ${attachedSisters.length} sister companies:`, attachedSisters);
+          const attachedSisters = sisterCompanies.filter(sister => {
+            const matches = sister.parent_company_id === company.id;
+            console.log(`DEBUG: Sister ${sister.company_name} (parent_id: ${sister.parent_company_id}) matches main company ${company.company_name} (id: ${company.id}): ${matches}`);
+            return matches;
+          });
+          
+          console.log(`DEBUG: ===== FINAL ATTACHMENT =====`);
+          console.log(`DEBUG: Main company ${company.company_name} (ID: ${company.id}) has ${attachedSisters.length} sister companies attached`);
+          if (attachedSisters.length > 0) {
+            console.log('DEBUG: Attached sisters:', attachedSisters.map(s => s.company_name));
+          }
           
           return {
             ...company,
@@ -75,11 +109,20 @@ const CompanyManagement = ({ user, onBack }) => {
           };
         });
         
-        console.log('DEBUG: Companies with sisters attached:', companiesWithSisters);
+        console.log('DEBUG: ===== FINAL STATE =====');
+        console.log('DEBUG: Companies with sisters attached:', companiesWithSisters.map(c => ({ 
+          name: c.company_name, 
+          id: c.id, 
+          sister_count: c.sister_companies?.length || 0,
+          sisters: c.sister_companies?.map(s => s.company_name) || []
+        })));
         
-        // Set companies with proper sister company attachment for main companies
-        // Include both main companies (with sister company data) and individual sister companies
-        setCompanies([...companiesWithSisters, ...sisterCompanies]);
+        // Set companies - include both main companies (with sister data) and individual sister companies
+        const finalCompanies = [...companiesWithSisters, ...sisterCompanies];
+        console.log('DEBUG: Final companies array length:', finalCompanies.length);
+        console.log('DEBUG: Final companies:', finalCompanies.map(c => ({ name: c.company_name, is_main: c.is_main_company, has_sisters: c.sister_companies?.length > 0 })));
+        
+        setCompanies(finalCompanies);
       } else {
         const errorText = await response.text();
         console.error('DEBUG: API Error Response:', response.status, errorText);
