@@ -10,10 +10,13 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone, timedelta
 from enum import Enum
+import json
+import base64
+from io import BytesIO
 from auth import (
     get_current_active_user, get_admin_user, create_access_token, 
     authenticate_user, hash_password, set_database, create_default_admin,
