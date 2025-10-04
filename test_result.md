@@ -621,11 +621,14 @@ test_plan:
     file: "/app/backend/server.py"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "testing"
           comment: "❌ SUPER ADMIN INITIALIZATION FAILED: Testing admin@2mholding.com login failed with 401 Unauthorized error. The super admin user either does not exist in the database or has incorrect credentials. Backend logs show 'Incorrect email or password' response. This prevents testing of super_admin role and view_all_companies permission functionality. RECOMMENDATION: Main agent needs to verify super admin user exists in database with correct credentials and proper role/permissions setup."
+        - working: false
+          agent: "testing"
+          comment: "❌ COMPREHENSIVE COMPANY MANAGEMENT API TESTING COMPLETE - SUPER ADMIN ISSUE CONFIRMED: Conducted extensive testing of Company Management API endpoint as requested in review. FINDINGS: 1) ✅ API ENDPOINT WORKING: GET /api/companies/management returns 200 OK with proper JSON response format 2) ✅ AUTHENTICATION WORKING: Properly rejects requests without tokens (403) and invalid tokens (401) 3) ✅ RESPONSE FORMAT VALID: Returns array of companies with all required fields (id, company_name, business_type, country_code, base_currency, is_main_company, parent_company_id) 4) ✅ TENANT ISOLATION WORKING: Users only see companies in their tenant database 5) ✅ SISTER COMPANIES WORKING: Properly returns main and sister companies with correct flags 6) ❌ SUPER ADMIN ACCESS FAILED: admin@2mholding.com login still fails with 401 - user does not exist or has wrong credentials 7) ✅ JWT TOKEN VALIDATION WORKING: Proper authentication flow verified. CONCLUSION: The Company Management API endpoint is working correctly. The 'failed to load' errors in frontend are NOT caused by backend API issues. The API properly handles authentication, returns correct data format, and maintains tenant isolation. The only issue is the missing super admin user."
 
   - task: "Company Creator Admin Permissions"
     implemented: true
