@@ -1733,9 +1733,9 @@ async def create_company(company: CompanyCreate, current_user: UserInDB = Depend
 # COMPANY MANAGEMENT API ENDPOINTS (Must be before generic company routes)
 # =================================================================================
 
-@api_router.get("/companies/management", response_model=List[CompanySetup])
+@api_router.get("/companies/management")
 async def get_all_companies(current_user: UserInDB = Depends(get_current_active_user)):
-    """Get all companies for management purposes"""
+    """Get all companies for management purposes including sister companies"""
     try:
         # Get tenant database for user
         tenant_service = await get_tenant_service(mongo_url)
@@ -1747,22 +1747,60 @@ async def get_all_companies(current_user: UserInDB = Depends(get_current_active_
             db_to_use = tenant_db
         
         print(f"DEBUG: Using database: {db_to_use.name}")
-        companies = await db_to_use.company_setups.find().to_list(length=None)
-        print(f"DEBUG: Found {len(companies)} companies")
         
-        if not companies:
-            return []
+        # Get main companies
+        main_companies_raw = await db_to_use.company_setups.find().to_list(length=None)
+        print(f"DEBUG: Found {len(main_companies_raw)} main companies")
         
         result = []
-        for company in companies:
+        
+        # Add main companies
+        for company_raw in main_companies_raw:
             try:
-                parsed_company = parse_from_mongo(company)
-                result.append(CompanySetup(**parsed_company))
+                company = parse_from_mongo(company_raw)
+                # Add a flag to indicate this is a main company
+                company['is_main_company'] = True
+                company['parent_company_id'] = None
+                result.append(company)
             except Exception as e:
-                print(f"DEBUG: Error parsing company {company.get('id', 'unknown')}: {e}")
+                print(f"DEBUG: Error parsing main company {company_raw.get('id', 'unknown')}: {e}")
                 continue
         
+        # Get sister companies and add them to the list
+        try:
+            sister_companies_raw = await db_to_use.sister_companies.find({"is_active": True}).to_list(length=None)
+            print(f"DEBUG: Found {len(sister_companies_raw)} sister companies")
+            
+            for sister_raw in sister_companies_raw:
+                try:
+                    sister = parse_from_mongo(sister_raw)
+                    # Transform sister company data to match CompanySetup structure
+                    sister_company = {
+                        'id': sister.get('id'),
+                        'company_name': sister.get('company_name'),
+                        'country_code': sister.get('country_code'),
+                        'business_type': sister.get('business_type'),
+                        'industry': sister.get('industry'),
+                        'base_currency': sister.get('base_currency'),
+                        'accounting_system': sister.get('accounting_system'),
+                        'fiscal_year_start': sister.get('fiscal_year_start'),
+                        'is_main_company': False,
+                        'parent_company_id': sister.get('group_company_id'),
+                        'setup_completed': True,
+                        'created_at': sister.get('created_at'),
+                        'updated_at': sister.get('updated_at')
+                    }
+                    result.append(sister_company)
+                except Exception as e:
+                    print(f"DEBUG: Error parsing sister company {sister_raw.get('id', 'unknown')}: {e}")
+                    continue
+        
+        except Exception as e:
+            print(f"DEBUG: Error fetching sister companies: {e}")
+        
+        print(f"DEBUG: Returning {len(result)} total companies (main + sister)")
         return result
+        
     except Exception as e:
         print(f"DEBUG: Error in get_all_companies: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
