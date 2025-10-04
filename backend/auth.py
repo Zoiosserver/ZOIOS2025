@@ -101,6 +101,7 @@ class CompanySetupCreate(BaseModel):
     website: Optional[str] = None
     tax_number: Optional[str] = None
     registration_number: Optional[str] = None
+    sister_companies: List[Dict[str, Any]] = []  # Added sister companies support
 
 class ChartOfAccount(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
