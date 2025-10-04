@@ -2450,6 +2450,21 @@ class BackendTester:
         # Test 10: Sister Company Data Structure Verification
         test_results['sister_company_data_structure'] = self.test_sister_company_data_structure_verification()
         
+        # Phase 3: Sister Company Debug Tests (HIGH PRIORITY - as requested in review)
+        self.log("\n" + "=" * 50)
+        self.log("PHASE 3: SISTER COMPANY DEBUG TESTS (HIGH PRIORITY)")
+        self.log("=" * 50)
+        
+        # Test 11: Sister Company Setup with Enhanced Debugging
+        test_results['sister_company_debug_setup'] = self.test_sister_company_setup_with_debugging()
+        
+        # Test 12: Database Verification for Sister Companies
+        test_results['database_verification'] = self.test_database_verification()
+        
+        # Test 13: Backend Logs Analysis
+        test_results['backend_logs_analysis'] = self.test_backend_logs_analysis()
+        test_results['sister_company_data_structure'] = self.test_sister_company_data_structure_verification()
+        
         # Phase 3: Company Setup API with Address Collection
         self.log("\n" + "=" * 50)
         self.log("PHASE 3: COMPANY SETUP API")
