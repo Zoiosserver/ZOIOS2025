@@ -510,8 +510,13 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
           </div>
 
           {/* Address */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-medium mb-4">Company Address</h3>
+          <div className="bg-gradient-to-r from-green-50 to-teal-50 p-6 rounded-2xl border border-green-200">
+            <div className="flex items-center mb-4">
+              <svg className="w-6 h-6 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
+              </svg>
+              <h3 className="text-xl font-semibold text-gray-900">Business Address</h3>
+            </div>
             
             <div className="space-y-4">
               <div>
