@@ -448,6 +448,7 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
   const [error, setError] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingAccount, setEditingAccount] = useState(null);
+  const [nextCodeLoading, setNextCodeLoading] = useState(false);
   const [accountForm, setAccountForm] = useState({
     account_name: '',
     account_code: '',
