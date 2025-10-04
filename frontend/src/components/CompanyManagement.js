@@ -1573,7 +1573,8 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
     let key;
     switch (groupBy) {
       case 'company':
-        key = account.company_name || 'Unknown Company';
+        // For consolidated accounts, we don't group by company since each row spans all companies
+        key = 'All Companies';
         break;
       case 'category':
         key = account.category || 'Other';
@@ -1590,7 +1591,7 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
   }, {});
 
   const getTotalBalance = (accounts) => {
-    return accounts.reduce((sum, account) => sum + (account.current_balance || 0), 0).toFixed(2);
+    return accounts.reduce((sum, account) => sum + (account.total_balance || 0), 0).toFixed(2);
   };
 
   return (
