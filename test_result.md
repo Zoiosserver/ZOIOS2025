@@ -297,6 +297,126 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 
+  - task: "Currency Symbol Display Frontend Fix"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/CurrencyManagement.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "User reports INR currency symbol displays $ instead of ₹ in currency management configuration and company accounts when selecting a company."
+        - working: false
+          agent: "main"
+          comment: "Need to investigate and fix currency symbol display in both CurrencyManagement and CompanyAccounts components. Issue might be in data fetching or icon rendering logic."
+
+  - task: "Account Code Auto-Generation Issue"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/CompanyAccounts.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Account code auto-generation shows '1000' for Asset type even when '1000' already exists, instead of generating next available code."
+        - working: false
+          agent: "main"
+          comment: "Need to investigate getNextAccountCode function timing and ensure companyAccounts data is loaded before generating codes."
+
+  - task: "Employee Check-In/Out Error Fix"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/ProfessionalDashboard.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Employee Check-In/Out module shows errors when accessed from the professional dashboard."
+        - working: false
+          agent: "main"
+          comment: "Need to implement or fix Employee Check-In/Out functionality in the professional dashboard."
+
+  - task: "Student Data Section Button Issues"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/ProfessionalDashboard.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Student Data section buttons are non-functional."
+        - working: false
+          agent: "main"
+          comment: "Need to implement Student Data functionality or fix existing button handlers."
+
+  - task: "User Management Add User Button Fix"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/UserManagement.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "User Management has an unresponsive 'Add user' button and lacks full permissions functionality."
+        - working: false
+          agent: "main"
+          comment: "Need to investigate and fix UserManagement component's Add user functionality and permissions handling."
+
+  - task: "PDF Generation Error Fix"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/CompanyManagement.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "Persistent PDF generation errors when trying to export data."
+        - working: false
+          agent: "main"
+          comment: "Need to debug and fix PDF generation functionality in export features."
+
+  - task: "ESC Key Popup Closing"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/CompanyManagement.js"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "ESC key does not close popup windows as expected."
+        - working: false
+          agent: "main"
+          comment: "Need to implement ESC key handlers for modal/popup components."
+
+  - task: "View Chart of Accounts Button Fix"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/CompanyManagement.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "View Chart of Accounts button from company management section is non-working."
+        - working: false
+          agent: "main"
+          comment: "Need to fix navigation or functionality for View Chart of Accounts button in company management."
+
   - task: "Tab Navigation in Company Setup"
     implemented: true
     working: true
