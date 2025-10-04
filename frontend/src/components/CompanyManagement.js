@@ -867,7 +867,7 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
 
     try {
       const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts/${accountId}/enhanced`, {
+      const response = await fetch(`${backendUrl}/api/company/${selectedCompany.id}/chart-of-accounts/${accountId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
