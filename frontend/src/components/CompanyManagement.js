@@ -461,16 +461,22 @@ const CompaniesTab = ({ companies, loading, error, onAdd, onEdit, onDelete, onSe
                 <p><span className="font-medium">Type:</span> <span className="break-words">{company.business_type}</span></p>
                 <p><span className="font-medium">Industry:</span> <span className="break-words">{company.industry}</span></p>
                 <p><span className="font-medium">Currency:</span> {company.base_currency}</p>
-                {company.is_main_company && company.sister_companies && company.sister_companies.length > 0 && (
+                {company.is_main_company === true && (
                   <div>
-                    <p><span className="font-medium">Sister Companies ({company.sister_companies.length}):</span></p>
-                    <div className="mt-1 ml-2 space-y-1">
-                      {company.sister_companies.map((sister, index) => (
-                        <p key={index} className="text-xs text-blue-600 font-medium">
-                          • {sister.company_name} ({sister.business_type})
-                        </p>
-                      ))}
-                    </div>
+                    {company.sister_companies && company.sister_companies.length > 0 ? (
+                      <div>
+                        <p><span className="font-medium">Sister Companies ({company.sister_companies.length}):</span></p>
+                        <div className="mt-1 ml-2 space-y-1">
+                          {company.sister_companies.map((sister, index) => (
+                            <p key={index} className="text-xs text-blue-600 font-medium">
+                              • {sister.company_name || 'Unknown Sister Company'} ({sister.business_type || 'Unknown Type'})
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <p><span className="font-medium">Sister Companies:</span> <span className="text-gray-500 text-sm">None</span></p>
+                    )}
                   </div>
                 )}
                 {!company.is_main_company && company.parent_company_id && (
