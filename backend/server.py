@@ -2660,6 +2660,33 @@ async def get_business_intelligence_data(current_user: UserInDB = Depends(get_cu
             }
         }
 
+# =================================================================================
+# ADMIN INITIALIZATION ENDPOINTS
+# =================================================================================
+
+@api_router.post("/admin/init-super-admin")
+async def init_super_admin():
+    """Initialize super admin user - for development/testing purposes"""
+    from auth import ensure_super_admin
+    try:
+        await ensure_super_admin(db)
+        return {"success": True, "message": "Super admin initialized successfully"}
+    except Exception as e:
+        print(f"DEBUG: Super admin initialization error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to initialize super admin: {str(e)}")
+
+@api_router.get("/admin/check-super-admin")
+async def check_super_admin():
+    """Check if super admin exists"""
+    try:
+        super_admin = await db.users.find_one({"email": "admin@2mholding.com"})
+        return {
+            "exists": super_admin is not None,
+            "email": "admin@2mholding.com" if super_admin else None
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include the router in the main app
 app.include_router(api_router)
 
