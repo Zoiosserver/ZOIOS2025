@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ZoiosLogo from './ZoiosLogo';
 
-const SimpleDashboard = ({ user, onLogout }) => {
+const SimpleDashboard = ({ user, onLogout, onNavigateToCompanyManagement }) => {
   const [companySetup, setCompanySetup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
