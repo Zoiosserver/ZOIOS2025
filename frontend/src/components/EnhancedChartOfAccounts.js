@@ -110,7 +110,7 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
 
     try {
       const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts/${accountId}`, {
+      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts/${accountId}/enhanced`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -120,7 +120,8 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
       if (response.ok) {
         await fetchAccounts();
       } else {
-        setError('Failed to delete account');
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.detail || 'Failed to delete account');
       }
     } catch (err) {
       setError('Connection failed: ' + err.message);
