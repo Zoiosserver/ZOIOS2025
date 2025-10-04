@@ -1430,66 +1430,67 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
     console.log('DEBUG: Export consolidated accounts called with format:', format);
     
     try {
-      // Use environment variable for backend URL
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-      const apiUrl = `${backendUrl}/api/companies/consolidated-accounts/export`;
-      
-      console.log('DEBUG: Calling export API URL:', apiUrl);
-      console.log('DEBUG: Export format:', format);
-      
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ format })
-      });
-
-      console.log('DEBUG: Export API response status:', response.status);
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('DEBUG: Export API response data:', data);
+      if (format === 'excel') {
+        // Create Excel file directly from frontend data
+        const { utils, writeFile } = await import('xlsx');
+        const workbook = utils.book_new();
         
-        if (format === 'excel') {
-          // Create Excel file from data
-          const { utils, writeFile } = await import('xlsx');
-          const workbook = utils.book_new();
+        // Prepare consolidated data for Excel - TRUE CONSOLIDATED FORMAT
+        const excelData = consolidatedAccounts.map(account => {
+          const row = {
+            'Account Code': account.account_code || 'N/A',
+            'Account Name': account.account_name || 'N/A',
+            'Account Type': account.account_type || 'N/A'
+          };
           
-          // Prepare consolidated data for Excel - TRUE CONSOLIDATED FORMAT
-          const excelData = consolidatedAccounts.map(account => {
-            const row = {
-              'Account Code': account.account_code || 'N/A',
-              'Account Name': account.account_name || 'N/A',
-              'Account Type': account.account_type || 'N/A'
-            };
-            
-            // Add column for each company
-            companyNames.forEach(companyName => {
-              row[companyName] = account.companies && account.companies[companyName] !== undefined 
-                ? Number(account.companies[companyName]).toFixed(2) 
-                : '0.00';
-            });
-            
-            // Add total column
-            row['Total'] = Number(account.total_balance || 0).toFixed(2);
-            
-            return row;
+          // Add column for each company
+          companyNames.forEach(companyName => {
+            row[companyName] = account.companies && account.companies[companyName] !== undefined 
+              ? Number(account.companies[companyName]).toFixed(2) 
+              : '0.00';
           });
           
-          const worksheet = utils.json_to_sheet(excelData);
-          utils.book_append_sheet(workbook, worksheet, 'Consolidated Accounts');
-          writeFile(workbook, data.filename || 'consolidated_accounts.xlsx');
-        } else if (format === 'pdf') {
-          // Create clean consolidated PDF
-          await generateConsolidatedPDF(data.data);
-        }
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        console.log('DEBUG: Export API error:', errorData);
-        setError('Failed to export consolidated accounts: ' + (errorData.detail || response.statusText));
-        alert('Export failed: ' + (errorData.detail || response.statusText));
+          // Add total column
+          row['Total'] = Number(account.total_balance || 0).toFixed(2);
+          
+          return row;
+        });
+        
+        const worksheet = utils.json_to_sheet(excelData);
+        
+        // Set column widths
+        const columnWidths = [
+          { width: 15 }, // Account Code
+          { width: 30 }, // Account Name  
+          { width: 15 }, // Account Type
+        ];
+        
+        // Add widths for company columns
+        companyNames.forEach(() => {
+          columnWidths.push({ width: 20 });
+        });
+        columnWidths.push({ width: 15 }); // Total column
+        
+        worksheet['!cols'] = columnWidths;
+        
+        // Add title and date
+        const title = [['Consolidated Chart of Accounts']];
+        const date = [[`Generated: ${new Date().toLocaleDateString('en-GB')}`]];
+        const emptyRow = [['']];
+        
+        utils.sheet_add_aoa(worksheet, title, { origin: 'A1' });
+        utils.sheet_add_aoa(worksheet, date, { origin: 'A2' });
+        utils.sheet_add_aoa(worksheet, emptyRow, { origin: 'A3' });
+        
+        utils.book_append_sheet(workbook, worksheet, 'Consolidated Accounts');
+        writeFile(workbook, `consolidated_accounts_${new Date().toISOString().split('T')[0]}.xlsx`);
+        
+        console.log('DEBUG: Excel file generated successfully');
+        
+      } else if (format === 'pdf') {
+        // Generate PDF directly
+        await generateConsolidatedPDF();
+        console.log('DEBUG: PDF file generated successfully');
       }
     } catch (err) {
       console.log('DEBUG: Export exception:', err);
