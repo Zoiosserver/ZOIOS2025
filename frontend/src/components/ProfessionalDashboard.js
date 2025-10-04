@@ -518,49 +518,6 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
 
   const renderCRMDashboardContent = () => {
     const sampleLeads = [];
-        company: 'ABC Corporation',
-        role: 'Operations Manager',
-        phone: '+1-555-0123',
-        email: 'john.smith@abc.com',
-        website: 'www.abc.com',
-        location: 'New York, NY',
-        section: 'Commercial',
-        status: 'Hot Lead',
-        actionType: 'Follow-up Call',
-        date: '2024-10-04',
-        response: 'Interested in elevator modernization project'
-      },
-      {
-        id: 2,
-        name: 'Sarah Johnson',
-        company: 'XYZ Building Group',
-        role: 'Project Director',
-        phone: '+1-555-0456',
-        email: 'sarah.j@xyz.com',
-        website: 'www.xyzbuilding.com',
-        location: 'Los Angeles, CA',
-        section: 'Construction',
-        status: 'Qualified',
-        actionType: 'Site Visit',
-        date: '2024-10-03',
-        response: 'Requesting quote for new installation'
-      },
-      {
-        id: 3,
-        name: 'Michael Chen',
-        company: 'Tech Plaza Mall',
-        role: 'Facility Manager',
-        phone: '+1-555-0789',
-        email: 'mchen@techplaza.com',
-        website: 'www.techplaza.com',
-        location: 'San Francisco, CA',
-        section: 'Retail',
-        status: 'Cold Lead',
-        actionType: 'Email Campaign',
-        date: '2024-10-02',
-        response: 'Maintenance contract renewal discussion'
-      }
-    ];
 
     return (
       <div className="space-y-6">
