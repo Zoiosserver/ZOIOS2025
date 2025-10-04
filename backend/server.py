@@ -1882,7 +1882,10 @@ async def get_enhanced_chart_of_accounts(company_id: str, current_user: UserInDB
         raise HTTPException(status_code=404, detail="Company not found")
     
     # Get chart of accounts
-    accounts = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
+    accounts_raw = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
+    
+    # Parse accounts to remove MongoDB ObjectIds
+    accounts = [parse_from_mongo(account) for account in accounts_raw]
     
     # Group accounts by type and category
     grouped_accounts = {}
@@ -1899,7 +1902,7 @@ async def get_enhanced_chart_of_accounts(company_id: str, current_user: UserInDB
         grouped_accounts[account_type][category].append(account)
     
     return {
-        "company_info": company,
+        "company_info": parse_from_mongo(company),
         "accounts": accounts,
         "grouped_accounts": grouped_accounts,
         "total_accounts": len(accounts),
