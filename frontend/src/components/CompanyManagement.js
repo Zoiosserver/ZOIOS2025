@@ -160,7 +160,7 @@ const CompanyManagement = ({ user, onBack }) => {
 
       if (response.ok) {
         await fetchCompanies();
-        setShowAddModal(false);
+        setShowAddCompanyModal(false);
         setEditingCompany(null);
         resetForm();
       } else {
