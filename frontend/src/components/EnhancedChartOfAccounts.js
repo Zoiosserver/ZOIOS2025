@@ -215,17 +215,27 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
   };
 
   const exportToExcel = () => {
-    const filteredAccounts = getFilteredAccounts();
-    
-    // Prepare data for Excel
-    const excelData = filteredAccounts.map(account => ({
-      'Account Code': account.account_code || account.code || '',
-      'Account Name': account.account_name || account.name || '',
-      'Account Type': account.account_type || '',
-      'Category': account.category || '',
-      'Current Balance': account.current_balance || account.opening_balance || 0,
-      'Description': account.description || ''
-    }));
+    try {
+      console.log('DEBUG: Excel export started');
+      const filteredAccounts = getFilteredAccounts();
+      console.log('DEBUG: Filtered accounts:', filteredAccounts.length, filteredAccounts);
+      
+      if (filteredAccounts.length === 0) {
+        alert('No accounts to export');
+        return;
+      }
+      
+      // Prepare data for Excel
+      const excelData = filteredAccounts.map(account => ({
+        'Account Code': account.account_code || account.code || '',
+        'Account Name': account.account_name || account.name || '',
+        'Account Type': account.account_type || '',
+        'Category': account.category || '',
+        'Current Balance': account.current_balance || account.opening_balance || 0,
+        'Description': account.description || ''
+      }));
+      
+      console.log('DEBUG: Excel data prepared:', excelData.length, excelData);
 
     // Create workbook and worksheet
     const wb = XLSX.utils.book_new();
