@@ -857,7 +857,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
             </div>
           )}
 
-          {renderOverviewContent()}
+          {renderModuleContent()}
         </div>
       </div>
     </div>
