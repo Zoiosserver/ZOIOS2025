@@ -382,13 +382,23 @@ const CompaniesTab = ({ companies, loading, error, onAdd, onEdit, onDelete, onSe
         <div key={company.id} className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-4 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 space-y-3 sm:space-y-0">
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 truncate">{company.company_name}</h3>
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 truncate">{company.company_name}</h3>
+                {company.is_main_company ? (
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">Main</span>
+                ) : (
+                  <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">Sister</span>
+                )}
+              </div>
               <div className="space-y-1 text-sm text-gray-600">
                 <p><span className="font-medium">Type:</span> <span className="break-words">{company.business_type}</span></p>
                 <p><span className="font-medium">Industry:</span> <span className="break-words">{company.industry}</span></p>
                 <p><span className="font-medium">Currency:</span> {company.base_currency}</p>
-                {company.sister_companies && company.sister_companies.length > 0 && (
+                {company.is_main_company && company.sister_companies && company.sister_companies.length > 0 && (
                   <p><span className="font-medium">Sister Companies:</span> {company.sister_companies.length}</p>
+                )}
+                {!company.is_main_company && company.parent_company_id && (
+                  <p><span className="font-medium">Parent Company ID:</span> <span className="text-xs font-mono">{company.parent_company_id.substring(0, 8)}...</span></p>
                 )}
               </div>
             </div>
