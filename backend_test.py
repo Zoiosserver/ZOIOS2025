@@ -1889,6 +1889,26 @@ class BackendTester:
             # Test 13: User Deletion
             test_results['user_deletion'] = self.test_user_deletion_fix()
         
+        # Phase 5: ERP Functionality Testing (New)
+        self.log("\n" + "=" * 50)
+        self.log("PHASE 5: ERP FUNCTIONALITY")
+        self.log("=" * 50)
+        
+        # Test 14: Company Management API Endpoints
+        test_results['company_management_endpoints'] = self.test_company_management_endpoints()
+        
+        # Test 15: Enhanced Chart of Accounts API Endpoints
+        test_results['enhanced_chart_of_accounts'] = self.test_enhanced_chart_of_accounts_endpoints()
+        
+        # Test 16: Export and Print API Endpoints
+        test_results['export_and_print_endpoints'] = self.test_export_and_print_endpoints()
+        
+        # Test 17: Authentication Requirements
+        test_results['authentication_requirements'] = self.test_authentication_requirements()
+        
+        # Test 18: Data Validation and Error Handling
+        test_results['data_validation'] = self.test_data_validation()
+        
         # Phase 5: Results Summary
         self.log("\n" + "=" * 80)
         self.log("COMPREHENSIVE BACKEND TEST RESULTS")
