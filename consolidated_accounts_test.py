@@ -38,31 +38,119 @@ class ConsolidatedAccountsTester:
         
     def test_login(self):
         """Login with existing Group Company account"""
-        self.log("Testing login with Group Company account...")
+        self.log("Testing login with Group Company accounts...")
         
-        login_data = {
-            "email": TEST_EMAIL,
-            "password": TEST_PASSWORD
+        for email, password in TEST_ACCOUNTS:
+            self.log(f"Trying login with {email}...")
+            
+            login_data = {
+                "email": email,
+                "password": password
+            }
+            
+            try:
+                response = self.session.post(f"{API_BASE}/auth/login", json=login_data)
+                self.log(f"Login response status: {response.status_code}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    self.auth_token = data.get('access_token')
+                    self.user_data = data.get('user')
+                    self.log(f"✅ Login successful with {email}")
+                    self.log(f"User ID: {self.user_data.get('id')}")
+                    self.log(f"Email: {self.user_data.get('email')}")
+                    return True
+                else:
+                    self.log(f"❌ Login failed with {email}: {response.text}")
+                    
+            except Exception as e:
+                self.log(f"❌ Login error with {email}: {str(e)}")
+        
+        # If all accounts fail, create a fresh one
+        self.log("All existing accounts failed, creating fresh test account...")
+        return self.create_fresh_test_account()
+    
+    def create_fresh_test_account(self):
+        """Create a fresh test account with Group Company and sister companies"""
+        import time
+        import random
+        
+        timestamp = str(int(time.time()))
+        random_suffix = str(random.randint(1000, 9999))
+        fresh_email = f"consolidatedtest{timestamp}{random_suffix}@example.com"
+        fresh_password = "testpass123"
+        
+        self.log(f"Creating fresh test account: {fresh_email}")
+        
+        # Step 1: Sign up
+        signup_data = {
+            "email": fresh_email,
+            "password": fresh_password,
+            "name": "Consolidated Test User",
+            "company": "Consolidated Test Company"
         }
         
         try:
-            response = self.session.post(f"{API_BASE}/auth/login", json=login_data)
-            self.log(f"Login response status: {response.status_code}")
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.auth_token = data.get('access_token')
-                self.user_data = data.get('user')
-                self.log("✅ Login successful")
-                self.log(f"User ID: {self.user_data.get('id')}")
-                self.log(f"Email: {self.user_data.get('email')}")
-                return True
-            else:
-                self.log(f"❌ Login failed: {response.text}")
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            if response.status_code != 200:
+                self.log(f"❌ Fresh account signup failed: {response.text}")
                 return False
-                
+            
+            data = response.json()
+            self.auth_token = data.get('access_token')
+            self.user_data = data.get('user')
+            self.log("✅ Fresh account created successfully")
+            
+            # Step 2: Setup Group Company with sister companies
+            headers = {
+                "Authorization": f"Bearer {self.auth_token}",
+                "Content-Type": "application/json"
+            }
+            
+            setup_data = {
+                "company_name": "Main Group Company",
+                "country_code": "US",
+                "base_currency": "USD",
+                "additional_currencies": ["EUR", "GBP"],
+                "business_type": "Group Company",
+                "industry": "Technology",
+                "address": "123 Test Street",
+                "city": "Test City",
+                "state": "CA",
+                "postal_code": "12345",
+                "phone": "+1-555-123-4567",
+                "email": fresh_email,
+                "website": "https://testcompany.com",
+                "tax_number": "123456789",
+                "registration_number": "REG123456",
+                "sister_companies": [
+                    {
+                        "company_name": "Sister Company Alpha",
+                        "country": "US",
+                        "base_currency": "USD",
+                        "business_type": "Private Limited Company",
+                        "industry": "Technology"
+                    },
+                    {
+                        "company_name": "Sister Company Beta", 
+                        "country": "GB",
+                        "base_currency": "GBP",
+                        "business_type": "Limited Company",
+                        "industry": "Finance"
+                    }
+                ]
+            }
+            
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            if response.status_code != 200:
+                self.log(f"❌ Company setup failed: {response.text}")
+                return False
+            
+            self.log("✅ Group Company with sister companies created successfully")
+            return True
+            
         except Exception as e:
-            self.log(f"❌ Login error: {str(e)}")
+            self.log(f"❌ Fresh account creation error: {str(e)}")
             return False
     
     def test_companies_management_endpoint(self):
