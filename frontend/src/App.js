@@ -101,6 +101,14 @@ function App() {
     );
   }
 
+  if (currentView === 'forgot-password') {
+    return (
+      <ForgotPassword 
+        onBackToLogin={() => setCurrentView('login')}
+      />
+    );
+  }
+
   if (currentView === 'company-setup') {
     return (
       <WorkingCompanySetup 
