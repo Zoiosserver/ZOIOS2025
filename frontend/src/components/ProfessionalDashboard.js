@@ -677,10 +677,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
       return () => clearInterval(timer);
     }, []);
 
-    const attendanceData = [
-      { id: 1, name: 'John Doe', department: 'Engineering', checkIn: '09:15 AM', checkOut: '--', status: 'Present', photo: '👨‍💼' },
-      { id: 2, name: 'Sarah Wilson', department: 'Installation', checkIn: '08:45 AM', checkOut: '05:30 PM', status: 'Complete', photo: '👩‍🔧' },
-      { id: 3, name: 'Mike Johnson', department: 'Maintenance', checkIn: '09:00 AM', checkOut: '--', status: 'Present', photo: '👨‍🔧' },
+    const attendanceData = [];
       { id: 4, name: 'Emily Davis', department: 'Quality Control', checkIn: '--', checkOut: '--', status: 'Absent', photo: '👩‍💼' },
     ];
 
