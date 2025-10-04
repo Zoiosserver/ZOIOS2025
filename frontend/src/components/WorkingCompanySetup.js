@@ -105,14 +105,39 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
     }));
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.reload();
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-2xl w-full space-y-8 p-6">
-        <div>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            Company Setup
-          </h2>
-          <p className="text-center text-gray-600">Complete your company information</p>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse delay-1000"></div>
+      </div>
+
+      <div className="relative max-w-4xl w-full">
+        {/* Logo/Brand Section with Logout */}
+        <div className="text-center mb-8 relative">
+          <div className="inline-block bg-gradient-to-r from-green-600 to-blue-600 p-4 rounded-2xl shadow-lg mb-6">
+            <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 6l3 1v13l-3-1V6zm6 0l3 1v13l-3-1V6zm6 0l3 1v13l-3-1V6zm3-3v2H6V3h12zM6 21h12v2H6v-2z"/>
+            </svg>
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent mb-2">
+            ZOIOS ERP
+          </h1>
+          <p className="text-gray-600 text-lg mb-4">Complete Your Company Setup</p>
+          
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="absolute top-0 right-0 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors text-sm"
+          >
+            Logout & Continue Later
+          </button>
         </div>
         
         <form className="space-y-6" onSubmit={handleSubmit}>
