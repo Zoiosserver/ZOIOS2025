@@ -634,7 +634,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
       return () => clearInterval(timer);
     }, []);
 
-    const attendanceData = [];
+    const attendanceData = [
       { id: 4, name: 'Emily Davis', department: 'Quality Control', checkIn: '--', checkOut: '--', status: 'Absent', photo: '👩‍💼' },
     ];
 
