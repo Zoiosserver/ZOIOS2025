@@ -237,30 +237,42 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
       
       console.log('DEBUG: Excel data prepared:', excelData.length, excelData);
 
-    // Create workbook and worksheet
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(excelData);
-    
-    // Set column widths
-    ws['!cols'] = [
-      { width: 15 }, // Account Code
-      { width: 30 }, // Account Name
-      { width: 15 }, // Account Type
-      { width: 20 }, // Category
-      { width: 15 }, // Opening Balance
-      { width: 40 }  // Description
-    ];
-    
-    // Add title row
-    XLSX.utils.sheet_add_aoa(ws, [[`Chart of Accounts - ${selectedCompany?.company_name || 'All Companies'}`]], { origin: 'A1' });
-    XLSX.utils.sheet_add_aoa(ws, [[`Generated: ${new Date().toLocaleDateString('en-GB')}`]], { origin: 'A2' });
-    XLSX.utils.sheet_add_aoa(ws, [['']], { origin: 'A3' }); // Empty row
-    
-    // Append worksheet to workbook
-    XLSX.utils.book_append_sheet(wb, ws, 'Chart of Accounts');
-    
-    // Save file
-    XLSX.writeFile(wb, `chart-of-accounts-${selectedCompany?.company_name || 'all'}-${new Date().toISOString().split('T')[0]}.xlsx`);
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      
+      console.log('DEBUG: Workbook created, worksheet generated');
+      
+      // Set column widths
+      ws['!cols'] = [
+        { width: 15 }, // Account Code
+        { width: 30 }, // Account Name
+        { width: 15 }, // Account Type
+        { width: 20 }, // Category
+        { width: 15 }, // Current Balance
+        { width: 40 }  // Description
+      ];
+      
+      // Add title row
+      XLSX.utils.sheet_add_aoa(ws, [[`Chart of Accounts - ${selectedCompany?.company_name || 'All Companies'}`]], { origin: 'A1' });
+      XLSX.utils.sheet_add_aoa(ws, [[`Generated: ${new Date().toLocaleDateString('en-GB')}`]], { origin: 'A2' });
+      XLSX.utils.sheet_add_aoa(ws, [['']], { origin: 'A3' }); // Empty row
+      
+      // Append worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Chart of Accounts');
+      
+      console.log('DEBUG: About to write Excel file');
+      
+      // Write file
+      const filename = `chart-of-accounts-${selectedCompany?.company_name || 'all'}-${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, filename);
+      
+      console.log('DEBUG: Excel file written successfully:', filename);
+      
+    } catch (error) {
+      console.error('DEBUG: Excel export error:', error);
+      alert('Excel export failed: ' + error.message);
+    }
   };
 
   const directPrint = () => {
