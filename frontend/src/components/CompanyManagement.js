@@ -63,8 +63,9 @@ const CompanyManagement = ({ user, onBack }) => {
           )
         }));
         
-        // Include all companies in the display (main + sister)
-        setCompanies(companiesData);
+        // Include all companies in the display (main + sister) with sister companies properly attached
+        const allCompanies = [...companiesWithSisters, ...sisterCompanies];
+        setCompanies(allCompanies);
       } else {
         const errorText = await response.text();
         console.error('DEBUG: API Error Response:', response.status, errorText);
