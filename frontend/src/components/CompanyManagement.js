@@ -1501,9 +1501,14 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
   const generateConsolidatedPDF = async (pdfData) => {
     try {
       const { jsPDF } = await import('jspdf');
-      await import('jspdf-autotable');
+      const autoTable = await import('jspdf-autotable');
       
       const doc = new jsPDF();
+      
+      // Ensure autoTable is available
+      if (!doc.autoTable && autoTable.default) {
+        doc.autoTable = autoTable.default.bind(doc);
+      }
       const pageWidth = doc.internal.pageSize.width;
       
       // Header
