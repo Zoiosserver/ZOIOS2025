@@ -212,15 +212,18 @@ backend:
 
   - task: "Export and Print API Endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Added data export API endpoints: POST /companies/{id}/accounts/export (individual company), POST /companies/consolidated-accounts/export (consolidated). Supports PDF and Excel formats with structured data for frontend processing. Includes company information, account summaries, and proper formatting data."
+        - working: true
+          agent: "testing"
+          comment: "Export and Print API endpoints working perfectly. All export formats tested successfully. PDF export working with proper filename generation. Excel export functional with structured data. Consolidated export working for multi-company views. Invalid format validation working correctly (400 error for unsupported formats). Fixed MongoDB ObjectId serialization issues. All export operations verified with tenant database isolation and proper authentication requirements."
 
 frontend:
   - task: "Company Setup Wizard UI"
