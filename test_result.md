@@ -288,11 +288,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Company Management API Endpoints"
-    - "Enhanced Chart of Accounts API Endpoints"
-    - "Export and Print API Endpoints"
+    - "Company Management Functionality Testing"
+    - "Authentication Flow Investigation"
+    - "Account Creation and Login Process"
   stuck_tasks:
     - "India Rupee Currency Display Issue"
+    - "Company Management Functionality Testing"
   test_all: false
   test_priority: "high_first"
 
