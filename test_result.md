@@ -694,6 +694,21 @@ agent_communication:
           agent: "testing"
           comment: "✅ USER DELETION SYSTEM FULLY VERIFIED: Cross-database user deletion working perfectly. Successfully tested deletion of test user with admin credentials. DELETE /api/users/{user_id} endpoint properly searches both tenant and main databases for user lookup. Returns proper success response. User deletion functionality is production-ready with proper security protections in place."
 
+  - task: "Consolidated Accounts Functionality Investigation"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "User reports that consolidated accounts is not showing other companies - it's not displaying accounts from all companies (main + sister companies) together. Expected behavior: Consolidated accounts should show accounts from ALL companies in one unified view."
+        - working: false
+          agent: "testing"
+          comment: "❌ CONSOLIDATED ACCOUNTS ISSUE CONFIRMED: Comprehensive investigation reveals a critical discrepancy between two consolidated accounts endpoints. **ISSUE DETAILS**: 1) **GET /api/companies/consolidated-accounts/enhanced** - ❌ NOT WORKING: Only shows 26 accounts from 1 company (main company only), missing accounts from sister companies, total_companies: 1 instead of expected 3 2) **GET /api/company/consolidated-accounts** - ✅ WORKING CORRECTLY: Shows 26 accounts with sister_companies_data including all 3 companies (Main Group Company, Sister Company Alpha, Sister Company Beta) 3) **Individual Company Verification**: ✅ All companies have proper chart of accounts (Main: 26 accounts, Sister Alpha: 26 accounts, Sister Beta: 26 accounts = 78 total accounts expected) 4) **Expected vs Actual**: Expected consolidated view should show ~78 accounts from 3 companies, but enhanced endpoint only shows 26 accounts from 1 company. **ROOT CAUSE**: The enhanced consolidated accounts endpoint is not properly including sister company accounts in the consolidated view, while the regular endpoint works correctly. **USER REPORT CONFIRMED**: The user's report is accurate - consolidated accounts functionality is not showing accounts from all companies together. The issue is specifically with the enhanced endpoint that's likely being used by the frontend."
+
   - task: "Granular Permission System Implementation"
     implemented: true
     working: true
