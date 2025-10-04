@@ -355,24 +355,75 @@ def parse_user_from_mongo(user):
     return user
 
 # Create default admin user
-async def create_default_admin():
-    """Create default admin user if none exists"""
-    admin_exists = await db.users.find_one({"role": "admin"})
-    if not admin_exists:
-        admin_user = {
-            "id": str(uuid.uuid4()),
-            "email": "admin@zoios.com",
-            "hashed_password": hash_password("admin123"),
-            "name": "Admin User",
-            "company": "ZOIOS",
-            "role": "admin",
-            "is_active": True,
-            "onboarding_completed": True,  # Admin doesn't need onboarding
-            "created_at": datetime.now(timezone.utc)
+async def create_default_admin(db):
+    """Create default admin user if it doesn't exist"""
+    admin_email = "admin@zoios.com"
+    existing_admin = await db.users.find_one({"email": admin_email})
+    
+    if not existing_admin:
+        admin_user = User(
+            id=str(uuid.uuid4()),
+            email=admin_email,
+            name="ZOIOS Admin",
+            company="ZOIOS Systems",
+            role="admin",
+            is_active=True,
+            created_at=datetime.now(timezone.utc),
+            permissions=get_default_permissions("admin")
+        )
+        
+        # Create admin password hash
+        admin_password_hash = hash_password("admin123")
+        
+        admin_data = {
+            **admin_user.dict(),
+            "password": admin_password_hash
         }
-        prepared_admin = prepare_user_for_mongo(admin_user)
+        
+        prepared_admin = prepare_user_for_mongo(admin_data)
         await db.users.insert_one(prepared_admin)
-        print("✅ Default admin user created: admin@zoios.com / admin123")
+        print("Default admin user created: admin@zoios.com / admin123")
+
+async def ensure_super_admin(db):
+    """Ensure super admin exists and has proper permissions"""
+    super_admin_email = "admin@2mholding.com"
+    existing_super_admin = await db.users.find_one({"email": super_admin_email})
+    
+    if existing_super_admin:
+        # Update existing super admin with proper permissions
+        update_data = {
+            "role": "super_admin",
+            "permissions": get_default_permissions("super_admin"),
+            "assigned_companies": [],  # Super admin can see all companies
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.users.update_one({"email": super_admin_email}, {"$set": update_data})
+        print(f"Super admin updated: {super_admin_email}")
+    else:
+        # Create super admin if it doesn't exist
+        super_admin_user = User(
+            id=str(uuid.uuid4()),
+            email=super_admin_email,
+            name="Super Admin",
+            company="2M Holdings",
+            role="super_admin",
+            is_active=True,
+            created_at=datetime.now(timezone.utc),
+            permissions=get_default_permissions("super_admin"),
+            assigned_companies=[]  # Super admin can see all companies
+        )
+        
+        # Create super admin password hash
+        super_admin_password_hash = hash_password("admin123")
+        
+        super_admin_data = {
+            **super_admin_user.dict(),
+            "password": super_admin_password_hash
+        }
+        
+        prepared_super_admin = prepare_user_for_mongo(super_admin_data)
+        await db.users.insert_one(prepared_super_admin)
+        print(f"Super admin created: {super_admin_email} / admin123")
 
 # Password reset token utilities
 def generate_reset_token():
