@@ -1775,7 +1775,7 @@ async def get_company_details(company_id: str, current_user: UserInDB = Depends(
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     
-    return CompanySetup(**company)
+    return CompanySetup(**parse_from_mongo(company))
 
 @api_router.put("/companies/management/{company_id}")
 async def update_company(
