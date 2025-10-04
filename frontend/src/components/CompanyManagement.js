@@ -200,16 +200,18 @@ const CompanyManagement = ({ user, onBack }) => {
     if (!window.confirm('Convert your company to Group Company? This will enable you to add sister companies.')) return;
 
     try {
-      const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies/convert-to-group`, {
-        method: 'POST',
+      // Use environment variable for backend URL to ensure correct API calls
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const response = await fetch(`${backendUrl}/api/setup/company/convert-to-group`, {
+        method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
       if (response.ok) {
-        await fetchCompanies();
+        const result = await response.json();
+        await fetchCompanies(); // Refresh the companies list
         alert('Company successfully converted to Group Company! You can now add sister companies.');
       } else {
         const errorData = await response.json().catch(() => ({}));
