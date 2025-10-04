@@ -530,12 +530,12 @@ agent_communication:
           comment: "Need to implement ESC key handlers for modal/popup components."
 
   - task: "View Chart of Accounts Button Fix"
-    implemented: false
-    working: false
+    implemented: true
+    working: true
     file: "/app/frontend/src/components/CompanyManagement.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "user"
@@ -543,6 +543,9 @@ agent_communication:
         - working: false
           agent: "main"
           comment: "Need to fix navigation or functionality for View Chart of Accounts button in company management."
+        - working: true
+          agent: "testing"
+          comment: "🎉 SISTER COMPANY CHART OF ACCOUNTS ISSUE COMPLETELY FIXED! **ROOT CAUSE IDENTIFIED**: The frontend CompanyManagement.js was using the wrong API endpoint `/api/companies/{id}/accounts/enhanced` (which returns 404 for sister companies) instead of the correct endpoint `/api/company/{id}/chart-of-accounts` (which works for all companies). **COMPREHENSIVE TESTING COMPLETED**: 1) ✅ **Backend API Working**: Direct API testing confirmed all companies (main and sister) return 23 accounts via `/api/company/{id}/chart-of-accounts` endpoint 2) ✅ **Frontend Issue Fixed**: Updated CompanyManagement.js to use correct API endpoint and data mapping 3) ✅ **Sister Company Alpha**: Successfully loads 23 accounts (1000-Cash and Bank, 1100-Sundry Debtors, etc.) 4) ✅ **Sister Company Beta**: Successfully loads 23 accounts with proper company header display 5) ✅ **Main Company**: Continues to work correctly (verified) 6) ✅ **API Responses**: All calls now return 200 OK instead of 404 NOT FOUND. **TECHNICAL CHANGES MADE**: Fixed API endpoints in fetchAccounts(), handleSubmitAccount(), and handleDeleteAccount() functions, updated data mapping to handle accounts_by_category response structure, corrected request body format for account operations. **VERIFICATION**: Tested with working account sisterapi@example.com / sisterapi123 - all sister companies now display their complete chart of accounts (23 accounts each) successfully. The user's reported issue is completely resolved."
 
   - task: "Tab Navigation in Company Setup"
     implemented: true
