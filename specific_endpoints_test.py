@@ -23,9 +23,12 @@ import random
 BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://zoios-erp-2.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
-# Test credentials - using existing working account from test_result.md
-TEST_EMAIL = "usertestsister@example.com"
-TEST_PASSWORD = "testsister123"
+# Test credentials - create fresh account for testing
+timestamp = str(int(time.time()))
+TEST_EMAIL = f"endpointtest{timestamp}@example.com"
+TEST_PASSWORD = "testpass123"
+TEST_NAME = "Endpoint Test User"
+TEST_COMPANY = "Endpoint Test Company"
 
 class SpecificEndpointsTester:
     def __init__(self):
