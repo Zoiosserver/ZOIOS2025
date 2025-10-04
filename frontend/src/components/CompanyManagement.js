@@ -1501,14 +1501,7 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
   const generateConsolidatedPDF = async (pdfData) => {
     try {
       const { jsPDF } = await import('jspdf');
-      const autoTable = await import('jspdf-autotable');
-      
       const doc = new jsPDF();
-      
-      // Ensure autoTable is available
-      if (!doc.autoTable && autoTable.default) {
-        doc.autoTable = autoTable.default.bind(doc);
-      }
       const pageWidth = doc.internal.pageSize.width;
       
       // Header
@@ -1516,47 +1509,78 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
       doc.setFont('helvetica', 'bold');
       doc.text('Consolidated Chart of Accounts', pageWidth / 2, 20, { align: 'center' });
       
-      // Export Date
-      doc.setFontSize(10);
+      doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Generated on: ${pdfData.export_date}`, pageWidth / 2, 30, { align: 'center' });
+      doc.text(`Generated on: ${new Date().toLocaleDateString('en-GB')}`, pageWidth / 2, 30, { align: 'center' });
       
-      // Prepare table data with company names
-      const tableRows = consolidatedAccounts.map(account => [
-        account.account_code || 'N/A',
-        account.account_name || 'N/A',
-        account.company_name || 'N/A',
-        (account.account_type || 'N/A').charAt(0).toUpperCase() + (account.account_type || '').slice(1),
-        (account.category || 'N/A').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        `${account.current_balance || 0}`
-      ]);
+      // Manual table creation for better compatibility
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
       
-      // Table
-      doc.autoTable({
-        head: [['Account Code', 'Account Name', 'Company', 'Type', 'Category', 'Balance']],
-        body: tableRows,
-        startY: 40,
-        theme: 'grid',
-        headStyles: {
-          fillColor: [59, 130, 246], // Blue color
-          textColor: 255,
-          fontStyle: 'bold'
-        },
-        styles: {
-          fontSize: 7,
-          cellPadding: 2
-        },
-        alternateRowStyles: {
-          fillColor: [248, 250, 252] // Light gray
-        },
-        columnStyles: {
-          0: { cellWidth: 25 }, // Account Code
-          1: { cellWidth: 40 }, // Account Name
-          2: { cellWidth: 35 }, // Company
-          3: { cellWidth: 25 }, // Type
-          4: { cellWidth: 30 }, // Category
-          5: { cellWidth: 25 }  // Balance
+      let yPos = 50;
+      const leftMargin = 10;
+      const colWidths = [25, 60, 25, 25, 25, 30]; // Column widths
+      let xPos = leftMargin;
+      
+      // Header row
+      const headers = ['Code', 'Account Name', 'Type'];
+      
+      // Add company columns dynamically
+      if (pdfData && pdfData.company_names) {
+        headers.push(...pdfData.company_names.map(name => name.substring(0, 8)));
+      }
+      headers.push('Total');
+      
+      // Draw header
+      headers.forEach((header, index) => {
+        doc.text(header, xPos, yPos);
+        xPos += colWidths[index] || 25;
+      });
+      
+      // Draw line under headers
+      doc.line(leftMargin, yPos + 2, pageWidth - 10, yPos + 2);
+      yPos += 8;
+      
+      // Data rows
+      doc.setFont('helvetica', 'normal');
+      
+      consolidatedAccounts.forEach((account) => {
+        if (yPos > 270) { // New page if needed
+          doc.addPage();
+          yPos = 30;
         }
+        
+        xPos = leftMargin;
+        
+        // Account code
+        doc.text(account.account_code || '', xPos, yPos);
+        xPos += colWidths[0];
+        
+        // Account name (truncated if too long)
+        const accountName = account.account_name || '';
+        const truncatedName = accountName.length > 25 ? accountName.substring(0, 25) + '...' : accountName;
+        doc.text(truncatedName, xPos, yPos);
+        xPos += colWidths[1];
+        
+        // Account type
+        doc.text(account.account_type || '', xPos, yPos);
+        xPos += colWidths[2];
+        
+        // Company balances
+        if (companyNames && account.companies) {
+          companyNames.forEach((companyName) => {
+            const balance = account.companies[companyName] || 0;
+            doc.text(Number(balance).toFixed(2), xPos, yPos);
+            xPos += colWidths[3] || 25;
+          });
+        }
+        
+        // Total balance
+        doc.setFont('helvetica', 'bold');
+        doc.text(Number(account.total_balance || 0).toFixed(2), xPos, yPos);
+        doc.setFont('helvetica', 'normal');
+        
+        yPos += 6;
       });
       
       // Summary at bottom
