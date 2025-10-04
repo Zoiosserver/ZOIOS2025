@@ -1530,6 +1530,7 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
     } catch (error) {
       console.error('Consolidated PDF generation failed:', error);
       setError('PDF generation failed: ' + error.message);
+      alert('PDF generation failed: ' + error.message);
     }
   };
 
