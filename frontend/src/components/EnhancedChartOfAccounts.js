@@ -65,10 +65,20 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
     try {
       const backendUrl = window.location.origin;
       const url = editingAccount 
-        ? `${backendUrl}/api/companies/${selectedCompany.id}/accounts/${editingAccount.id}` 
-        : `${backendUrl}/api/companies/${selectedCompany.id}/accounts`;
+        ? `${backendUrl}/api/companies/${selectedCompany.id}/accounts/${editingAccount.id}/enhanced` 
+        : `${backendUrl}/api/companies/${selectedCompany.id}/accounts/enhanced`;
       
       const method = editingAccount ? 'PUT' : 'POST';
+
+      // Map form fields to API expected format
+      const requestData = {
+        account_name: accountForm.name,
+        account_code: accountForm.code,
+        account_type: accountForm.account_type?.toLowerCase(),
+        category: accountForm.category?.toLowerCase().replace(/ /g, '_'),
+        description: accountForm.description,
+        opening_balance: accountForm.opening_balance
+      };
 
       const response = await fetch(url, {
         method,
@@ -76,7 +86,7 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(accountForm)
+        body: JSON.stringify(requestData)
       });
 
       if (response.ok) {
