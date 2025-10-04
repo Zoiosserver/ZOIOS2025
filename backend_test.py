@@ -4185,19 +4185,204 @@ class BackendTester:
         
         return test_results
 
+    def test_sister_company_api_response_structure(self):
+        """Test sister company API response structure as requested in review"""
+        self.log("Testing sister company API response structure...")
+        
+        # Create a fresh user for this test
+        timestamp = str(int(time.time()))
+        test_email = f"sistercompanytest{timestamp}@example.com"
+        
+        signup_data = {
+            "email": test_email,
+            "password": "testpass123",
+            "name": "Sister Company Test User",
+            "company": "Sister Company Test Group"
+        }
+        
+        try:
+            # Sign up fresh user
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            if response.status_code != 200:
+                self.log(f"❌ Fresh user signup failed: {response.text}")
+                return False
+            
+            fresh_token = response.json().get('access_token')
+            fresh_headers = {
+                "Authorization": f"Bearer {fresh_token}",
+                "Content-Type": "application/json"
+            }
+            
+            # Setup Group Company with sister companies
+            setup_data = {
+                "company_name": "Main Group Company Ltd",
+                "country_code": "US",
+                "base_currency": "USD",
+                "additional_currencies": ["EUR", "GBP"],
+                "business_type": "Group Company",  # This is key for sister companies
+                "industry": "Technology",
+                "address": "123 Main Street",
+                "city": "New York",
+                "state": "NY",
+                "postal_code": "10001",
+                "phone": "+1-555-123-4567",
+                "email": test_email,
+                "website": "https://maingroup.com",
+                "tax_number": "TAX123456789",
+                "registration_number": "REG123456789",
+                "sister_companies": [
+                    {
+                        "company_name": "Sister Company Alpha Ltd",
+                        "country": "GB",
+                        "business_type": "Private Limited Company",
+                        "industry": "Finance",
+                        "fiscal_year_start": "01/04"
+                    },
+                    {
+                        "company_name": "Sister Company Beta Corp",
+                        "country": "CA",
+                        "business_type": "Corporation",
+                        "industry": "Manufacturing",
+                        "fiscal_year_start": "01/01"
+                    },
+                    {
+                        "company_name": "Sister Company Gamma LLC",
+                        "country": "US",
+                        "business_type": "LLC",
+                        "industry": "Consulting",
+                        "fiscal_year_start": "01/01"
+                    }
+                ]
+            }
+            
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=fresh_headers)
+            if response.status_code != 200:
+                self.log(f"❌ Group company setup failed: {response.text}")
+                return False
+            
+            self.log("✅ Group Company with 3 sister companies created successfully")
+            
+            # Now test the GET /api/companies/management endpoint
+            self.log("Testing GET /api/companies/management endpoint...")
+            
+            response = self.session.get(f"{API_BASE}/companies/management", headers=fresh_headers)
+            self.log(f"Companies management response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                companies_data = response.json()
+                self.log(f"✅ GET /api/companies/management successful")
+                self.log(f"Total companies returned: {len(companies_data)}")
+                
+                # Log the complete JSON response structure for debugging
+                self.log("\n" + "="*60)
+                self.log("COMPLETE JSON RESPONSE STRUCTURE:")
+                self.log("="*60)
+                self.log(json.dumps(companies_data, indent=2, default=str))
+                self.log("="*60)
+                
+                # Analyze the response structure
+                main_companies = [c for c in companies_data if c.get('is_main_company') == True]
+                sister_companies = [c for c in companies_data if c.get('is_main_company') == False]
+                
+                self.log(f"\n📊 RESPONSE STRUCTURE ANALYSIS:")
+                self.log(f"Main companies: {len(main_companies)}")
+                self.log(f"Sister companies: {len(sister_companies)}")
+                
+                # Examine main company structure
+                if main_companies:
+                    main_company = main_companies[0]
+                    self.log(f"\n🏢 MAIN COMPANY OBJECT STRUCTURE:")
+                    self.log(f"ID: {main_company.get('id')}")
+                    self.log(f"Company Name: {main_company.get('company_name')}")
+                    self.log(f"Business Type: {main_company.get('business_type')}")
+                    self.log(f"is_main_company: {main_company.get('is_main_company')}")
+                    self.log(f"parent_company_id: {main_company.get('parent_company_id')}")
+                    self.log(f"Country Code: {main_company.get('country_code')}")
+                    self.log(f"Base Currency: {main_company.get('base_currency')}")
+                    self.log(f"Industry: {main_company.get('industry')}")
+                    self.log(f"Setup Completed: {main_company.get('setup_completed')}")
+                    
+                    # Show all available fields
+                    self.log(f"\n📋 ALL MAIN COMPANY FIELDS:")
+                    for key, value in main_company.items():
+                        self.log(f"  {key}: {value}")
+                
+                # Examine sister company structure
+                if sister_companies:
+                    self.log(f"\n👥 SISTER COMPANIES STRUCTURE:")
+                    for i, sister in enumerate(sister_companies, 1):
+                        self.log(f"\n--- Sister Company #{i} ---")
+                        self.log(f"ID: {sister.get('id')}")
+                        self.log(f"Company Name: {sister.get('company_name')}")
+                        self.log(f"Business Type: {sister.get('business_type')}")
+                        self.log(f"is_main_company: {sister.get('is_main_company')}")
+                        self.log(f"parent_company_id: {sister.get('parent_company_id')}")
+                        self.log(f"Country Code: {sister.get('country_code')}")
+                        self.log(f"Base Currency: {sister.get('base_currency')}")
+                        self.log(f"Industry: {sister.get('industry')}")
+                        self.log(f"Setup Completed: {sister.get('setup_completed')}")
+                        
+                        # Show all available fields for first sister company
+                        if i == 1:
+                            self.log(f"\n📋 ALL SISTER COMPANY FIELDS (Sample):")
+                            for key, value in sister.items():
+                                self.log(f"  {key}: {value}")
+                
+                # Field comparison analysis
+                self.log(f"\n🔍 FIELD COMPARISON ANALYSIS:")
+                if main_companies and sister_companies:
+                    main_fields = set(main_companies[0].keys())
+                    sister_fields = set(sister_companies[0].keys())
+                    
+                    common_fields = main_fields.intersection(sister_fields)
+                    main_only_fields = main_fields - sister_fields
+                    sister_only_fields = sister_fields - main_fields
+                    
+                    self.log(f"Common fields: {sorted(common_fields)}")
+                    self.log(f"Main company only fields: {sorted(main_only_fields)}")
+                    self.log(f"Sister company only fields: {sorted(sister_only_fields)}")
+                
+                # Key findings summary
+                self.log(f"\n🎯 KEY FINDINGS FOR FRONTEND DEBUG:")
+                self.log(f"1. Total companies in response: {len(companies_data)}")
+                self.log(f"2. Main companies (is_main_company=True): {len(main_companies)}")
+                self.log(f"3. Sister companies (is_main_company=False): {len(sister_companies)}")
+                self.log(f"4. parent_company_id field: {'Present' if any('parent_company_id' in c for c in companies_data) else 'Missing'}")
+                self.log(f"5. is_main_company field: {'Present' if any('is_main_company' in c for c in companies_data) else 'Missing'}")
+                
+                if sister_companies:
+                    parent_ids = [s.get('parent_company_id') for s in sister_companies]
+                    self.log(f"6. Sister company parent IDs: {parent_ids}")
+                    
+                    # Check if parent IDs match main company IDs
+                    main_ids = [m.get('id') for m in main_companies]
+                    matching_parents = [pid for pid in parent_ids if pid in main_ids]
+                    self.log(f"7. Parent-child relationships working: {'Yes' if matching_parents else 'No'}")
+                
+                return True
+            else:
+                self.log(f"❌ GET /api/companies/management failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Sister company API test error: {str(e)}")
+            return False
+
 def main():
-    """Main function to run the tests"""
+    """Main function to run the sister company API test as requested in review"""
     tester = BackendTester()
-    results = tester.run_all_tests()
     
-    # Exit with error code if critical tests failed
-    critical_tests = ['registration', 'login', 'auth_me_before', 'company_setup', 'auth_me_after']
-    new_feature_tests = ['chart_of_accounts', 'currency_rates_get', 'exchangerate_api']
-    critical_passed = all(results.get(test, False) for test in critical_tests if test in results)
-    new_features_passed = all(results.get(test, False) for test in new_feature_tests if test in results)
+    # Run the specific sister company API test as requested in review
+    print("🎯 RUNNING SISTER COMPANY API RESPONSE STRUCTURE TEST")
+    print("="*80)
+    result = tester.test_sister_company_api_response_structure()
     
-    # Exit successfully if critical tests pass (new features are not critical for exit code)
-    sys.exit(0 if critical_passed else 1)
+    if result:
+        print("\n✅ Sister Company API Response Structure Test PASSED")
+        sys.exit(0)
+    else:
+        print("\n❌ Sister Company API Response Structure Test FAILED")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
