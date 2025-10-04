@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import * as XLSX from 'xlsx';
+// XLSX will be dynamically imported when needed
 
 const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }) => {
   const [accounts, setAccounts] = useState([]);
