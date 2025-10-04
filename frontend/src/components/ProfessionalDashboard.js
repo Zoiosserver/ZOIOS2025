@@ -820,6 +820,306 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
     );
   };
 
+  const renderStudentsDataContent = () => {
+    const studentsData = [
+      { id: 1, name: 'Alex Johnson', course: 'Elevator Safety Training', level: 'Beginner', progress: '75%', enrollDate: '2024-09-15', status: 'Active', photo: '👨‍🎓' },
+      { id: 2, name: 'Maria Garcia', course: 'Advanced Maintenance', level: 'Advanced', progress: '90%', enrollDate: '2024-08-20', status: 'Active', photo: '👩‍🎓' },
+      { id: 3, name: 'David Kim', course: 'Installation Techniques', level: 'Intermediate', progress: '60%', enrollDate: '2024-09-10', status: 'Active', photo: '👨‍💼' },
+      { id: 4, name: 'Lisa Chen', course: 'Quality Assurance', level: 'Beginner', progress: '30%', enrollDate: '2024-09-25', status: 'Active', photo: '👩‍💼' },
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">Students Data Management</h2>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all duration-200">
+            Add Student
+          </button>
+        </div>
+
+        {/* Student Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[
+            { title: 'Total Students', value: '124', color: 'blue-600', icon: '🎓' },
+            { title: 'Active Courses', value: '8', color: 'green-600', icon: '📚' },
+            { title: 'Completed This Month', value: '23', color: 'purple-600', icon: '✅' },
+            { title: 'Average Progress', value: '68%', color: 'orange-500', icon: '📊' }
+          ].map((stat, index) => (
+            <div key={index} className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-${stat.color}`}>
+                  <span className="text-white">{stat.icon}</span>
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+              <div className="text-gray-600 text-sm">{stat.title}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Students Table */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">Students Overview</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enrolled Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {studentsData.map((student) => (
+                  <tr key={student.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="text-2xl mr-3">{student.photo}</div>
+                        <div className="font-medium text-gray-900">{student.name}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.course}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        student.level === 'Beginner' ? 'bg-yellow-100 text-yellow-800' :
+                        student.level === 'Intermediate' ? 'bg-blue-100 text-blue-800' :
+                        'bg-purple-100 text-purple-800'
+                      }`}>
+                        {student.level}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full" 
+                            style={{ width: student.progress }}
+                          ></div>
+                        </div>
+                        <span className="text-sm text-gray-900">{student.progress}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.enrollDate}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                        {student.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button className="text-blue-600 hover:text-blue-900">View</button>
+                        <button className="text-green-600 hover:text-green-900">Edit</button>
+                        <button className="text-purple-600 hover:text-purple-900">Certificate</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderProjectDashboardContent = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-900">Project Management Dashboard</h2>
+      
+      {/* Project Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[
+          { title: 'Active Projects', value: '12', color: 'blue-600', icon: '🏗️' },
+          { title: 'Installations', value: '8', color: 'green-600', icon: '🏢' },
+          { title: 'Maintenance Jobs', value: '15', color: 'orange-500', icon: '🔧' },
+          { title: 'Completed This Month', value: '23', color: 'purple-600', icon: '✅' }
+        ].map((stat, index) => (
+          <div key={index} className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-${stat.color}`}>
+                <span className="text-white">{stat.icon}</span>
+              </div>
+            </div>
+            <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+            <div className="text-gray-600 text-sm">{stat.title}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 text-center">
+        <div className="text-4xl mb-4">🏗️</div>
+        <h3 className="text-xl font-semibold mb-2">Project Management Hub</h3>
+        <p className="text-gray-600">Comprehensive project tracking for elevator installation and maintenance.</p>
+      </div>
+    </div>
+  );
+
+  const renderElevatorInstallationContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Elevator Installation Projects</h2>
+        <button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all duration-200">
+          New Installation Project
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { project: 'ABC Tower Installation', client: 'ABC Corporation', floors: 25, status: 'In Progress', completion: '65%', deadline: '2024-12-15' },
+          { project: 'XYZ Mall Elevators', client: 'XYZ Building Group', floors: 8, status: 'Planning', completion: '20%', deadline: '2024-11-30' },
+          { project: 'Tech Plaza Upgrade', client: 'Tech Plaza', floors: 15, status: 'Materials', completion: '40%', deadline: '2024-10-20' }
+        ].map((project, index) => (
+          <div key={index} className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-gray-900">{project.project}</h3>
+              <span className={`px-2 py-1 text-xs rounded-full ${
+                project.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                project.status === 'Planning' ? 'bg-yellow-100 text-yellow-800' :
+                'bg-orange-100 text-orange-800'
+              }`}>
+                {project.status}
+              </span>
+            </div>
+            <div className="space-y-2 text-sm text-gray-600">
+              <div><strong>Client:</strong> {project.client}</div>
+              <div><strong>Floors:</strong> {project.floors}</div>
+              <div><strong>Deadline:</strong> {project.deadline}</div>
+              <div className="flex items-center">
+                <strong className="mr-2">Progress:</strong>
+                <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full" 
+                    style={{ width: project.completion }}
+                  ></div>
+                </div>
+                <span>{project.completion}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderElevatorMaintenanceContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Elevator Maintenance</h2>
+        <button className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition-all duration-200">
+          Schedule Maintenance
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { building: 'Downtown Plaza', elevators: 4, lastService: '2024-09-15', nextService: '2024-10-15', priority: 'Medium', status: 'Scheduled' },
+          { building: 'Business Center', elevators: 6, lastService: '2024-09-20', nextService: '2024-10-05', priority: 'High', status: 'Overdue' },
+          { building: 'Residential Complex', elevators: 2, lastService: '2024-09-25', nextService: '2024-10-25', priority: 'Low', status: 'On Track' }
+        ].map((maintenance, index) => (
+          <div key={index} className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-gray-900">{maintenance.building}</h3>
+              <span className={`px-2 py-1 text-xs rounded-full ${
+                maintenance.status === 'Overdue' ? 'bg-red-100 text-red-800' :
+                maintenance.status === 'Scheduled' ? 'bg-yellow-100 text-yellow-800' :
+                'bg-green-100 text-green-800'
+              }`}>
+                {maintenance.status}
+              </span>
+            </div>
+            <div className="space-y-2 text-sm text-gray-600">
+              <div><strong>Elevators:</strong> {maintenance.elevators}</div>
+              <div><strong>Last Service:</strong> {maintenance.lastService}</div>
+              <div><strong>Next Service:</strong> {maintenance.nextService}</div>
+              <div><strong>Priority:</strong> 
+                <span className={`ml-1 ${
+                  maintenance.priority === 'High' ? 'text-red-600 font-medium' :
+                  maintenance.priority === 'Medium' ? 'text-yellow-600 font-medium' :
+                  'text-green-600 font-medium'
+                }`}>
+                  {maintenance.priority}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderProductionPlanningContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Production Planning</h2>
+        <button className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 transition-all duration-200">
+          Create Production Plan
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { title: 'Production Orders', value: '24', color: 'blue-600', icon: '📋' },
+          { title: 'In Production', value: '8', color: 'green-600', icon: '⚙️' },
+          { title: 'Completed Today', value: '5', color: 'purple-600', icon: '✅' }
+        ].map((stat, index) => (
+          <div key={index} className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-${stat.color}`}>
+                <span className="text-white">{stat.icon}</span>
+              </div>
+            </div>
+            <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+            <div className="text-gray-600 text-sm">{stat.title}</div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 text-center">
+        <div className="text-4xl mb-4">🏭</div>
+        <h3 className="text-xl font-semibold mb-2">Production Planning System</h3>
+        <p className="text-gray-600">Plan and optimize manufacturing processes for elevator components.</p>
+      </div>
+    </div>
+  );
+
+  const renderWorkOrdersContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Work Orders</h2>
+        <button className="bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition-all duration-200">
+          Create Work Order
+        </button>
+      </div>
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 text-center">
+        <div className="text-4xl mb-4">📝</div>
+        <h3 className="text-xl font-semibold mb-2">Work Order Management</h3>
+        <p className="text-gray-600">Create and track manufacturing work orders for elevator production.</p>
+      </div>
+    </div>
+  );
+
+  const renderQualityControlContent = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Quality Control</h2>
+        <button className="bg-red-600 text-white px-4 py-2 rounded-xl hover:bg-red-700 transition-all duration-200">
+          New QC Check
+        </button>
+      </div>
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 text-center">
+        <div className="text-4xl mb-4">🔍</div>
+        <h3 className="text-xl font-semibold mb-2">Quality Control System</h3>
+        <p className="text-gray-600">Monitor and ensure quality standards in elevator manufacturing.</p>
+      </div>
+    </div>
+  );
+
   const renderOverviewContent = () => (
     <div className="space-y-6">
       {/* Welcome Header */}
