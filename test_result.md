@@ -615,6 +615,54 @@ test_plan:
           agent: "testing"
           comment: "🎉 SISTER COMPANY FUNCTIONALITY COMPLETELY WORKING! Comprehensive testing confirms all sister company features are working perfectly. VERIFIED RESULTS: ✅ **COMPANY SETUP WITH SISTER COMPANIES**: Successfully created Group Company with 2 sister companies (Sister Company 1 - Private Limited Company, Sister Company 2 - Partnership) ✅ **DATABASE PERSISTENCE**: Sister companies properly saved to sister_companies collection with correct group_company_id linkage ✅ **API ENDPOINTS WORKING**: GET /api/company/sister-companies returns 2 sister companies with complete data structure ✅ **COMPANY MANAGEMENT INTEGRATION**: GET /api/companies/management shows 3 companies (1 main + 2 sister) with proper is_main_company flags ✅ **CHART OF ACCOUNTS**: Each sister company has 23 accounts with proper categorization ✅ **TENANT DATABASE ISOLATION**: Multi-tenant architecture working correctly ✅ **DEBUG LOGGING**: Backend logs show proper DEBUG messages for sister company processing ✅ **DATA STRUCTURE VERIFICATION**: All required fields present (id, group_company_id, company_name, country_code, business_type, industry, base_currency, is_active). The sister company functionality is production-ready and working as designed. Previous testing issues were resolved."
 
+  - task: "Super Admin Initialization and Permissions"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ SUPER ADMIN INITIALIZATION FAILED: Testing admin@2mholding.com login failed with 401 Unauthorized error. The super admin user either does not exist in the database or has incorrect credentials. Backend logs show 'Incorrect email or password' response. This prevents testing of super_admin role and view_all_companies permission functionality. RECOMMENDATION: Main agent needs to verify super admin user exists in database with correct credentials and proper role/permissions setup."
+
+  - task: "Company Creator Admin Permissions"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ COMPANY CREATOR PERMISSIONS ISSUE: Users who create companies are assigned admin role correctly, but are not being properly linked to their created company. Testing shows: ✅ User gets admin role ❌ company_id remains null ❌ assigned_companies array remains empty. The company is created successfully with correct ID, but the user-company linkage is not established. This means company creators don't get proper admin permissions for their specific company. RECOMMENDATION: Main agent needs to fix the company setup endpoint to properly set company_id and assigned_companies fields for the creating user."
+
+  - task: "Account Code Auto-Generation System"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "⚠️ ACCOUNT CODE AUTO-GENERATION ENDPOINT EXISTS BUT UNTESTABLE: The GET /api/companies/{company_id}/accounts/next-code/{account_type} endpoint exists in the backend, but testing was blocked because new users don't have companies available for testing. The endpoint structure appears correct for generating codes in ranges: Assets (1000-1999), Liabilities (2000-2999), Equity (3000-3999), Revenue (4000-4999), Expenses (5000-5999). RECOMMENDATION: Main agent should test this endpoint with an existing company setup to verify the auto-generation logic works correctly."
+
+  - task: "Enhanced PDF Export Structure"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "⚠️ ENHANCED PDF EXPORT ENDPOINTS EXIST BUT UNTESTABLE: The PDF export endpoints (POST /api/companies/{company_id}/accounts/export and POST /api/companies/consolidated-accounts/export) exist in the backend, but testing was blocked because new users don't have companies available for testing. The endpoints should return structured data with company_info, table_data (with headers and rows), and summary fields. RECOMMENDATION: Main agent should test these endpoints with an existing company setup to verify the enhanced structure returns proper data format for frontend processing."
+
 agent_communication:
     - agent: "main"
       message: "Starting fresh implementation cycle. All test data has been cleaned except protected super admin (admin@2mholding.com) and test user (admin@zoios.com). Ready to implement fixes for: 1) Currency Exchange Rate undefined issue, 2) Currency symbol display (INR showing $ instead of ₹), 3) Account code auto-generation fix, 4) User deletion for admin@zoios.com, 5) Granular permission system to hide menu items. Will start with backend fixes first."
