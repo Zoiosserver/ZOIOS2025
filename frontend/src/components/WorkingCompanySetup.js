@@ -443,12 +443,12 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
 
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700">Fiscal Year Start</label>
-                        <input
-                          type="date"
+                        <DateInput
                           name="fiscal_year_start"
                           value={sisterCompanyData.fiscal_year_start}
                           onChange={handleSisterCompanyChange}
-                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
+                          placeholder="dd/mm/yyyy"
+                          className="mt-1 w-full px-3 py-10 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                       </div>
                     </div>
