@@ -3,6 +3,7 @@ import SimpleLogin from './components/SimpleLogin';
 import SimpleSignup from './components/SimpleSignup';
 import WorkingCompanySetup from './components/WorkingCompanySetup';
 import SimpleDashboard from './components/SimpleDashboard';
+import DemoCompanySetup from './components/DemoCompanySetup';
 import './App.css';
 
 function App() {
