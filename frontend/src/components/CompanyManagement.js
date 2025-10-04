@@ -1541,7 +1541,7 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
       // Draw header
       headers.forEach((header, index) => {
         doc.text(header, xPos, yPos);
-        xPos += colWidths[index] || 25;
+        xPos += dynamicColWidth;
       });
       
       // Draw line under headers
@@ -1561,24 +1561,25 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
         
         // Account code
         doc.text(account.account_code || '', xPos, yPos);
-        xPos += colWidths[0];
+        xPos += dynamicColWidth;
         
         // Account name (truncated if too long)
         const accountName = account.account_name || '';
-        const truncatedName = accountName.length > 25 ? accountName.substring(0, 25) + '...' : accountName;
+        const maxNameLength = Math.floor(dynamicColWidth / 2.5); // Estimate characters that fit
+        const truncatedName = accountName.length > maxNameLength ? accountName.substring(0, maxNameLength) + '...' : accountName;
         doc.text(truncatedName, xPos, yPos);
-        xPos += colWidths[1];
+        xPos += dynamicColWidth;
         
         // Account type
         doc.text(account.account_type || '', xPos, yPos);
-        xPos += colWidths[2];
+        xPos += dynamicColWidth;
         
         // Company balances
         if (companyNames && account.companies) {
           companyNames.forEach((companyName) => {
             const balance = account.companies[companyName] || 0;
             doc.text(Number(balance).toFixed(2), xPos, yPos);
-            xPos += colWidths[3] || 25;
+            xPos += dynamicColWidth;
           });
         }
         
