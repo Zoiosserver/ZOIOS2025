@@ -2183,6 +2183,7 @@ class BackendTester:
         currency_tests = ['chart_of_accounts', 'currency_rates_undefined_fix', 'currency_conversion', 'manual_currency_rate']
         user_mgmt_tests = ['admin_login', 'granular_permissions', 'user_deletion']
         erp_tests = ['company_management_endpoints', 'enhanced_chart_of_accounts', 'export_and_print_endpoints', 'authentication_requirements', 'data_validation']
+        filtering_tests = ['company_filtering_issue', 'user_permission_filtering', 'database_direct_investigation']
         
         self.log("\n🔐 AUTHENTICATION SYSTEM:")
         for test_name in auth_tests:
