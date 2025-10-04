@@ -549,24 +549,145 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
     </div>
   );
 
-  const renderCRMDashboardContent = () => (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900">CRM Dashboard</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[
-          { title: 'Total Leads', value: 156, color: 'blue' },
-          { title: 'Qualified Leads', value: 42, color: 'green' },
-          { title: 'Active Customers', value: 78, color: 'purple' },
-          { title: 'Conversion Rate', value: '27%', color: 'orange' }
-        ].map((metric, index) => (
-          <div key={index} className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-6">
-            <div className="text-2xl font-bold text-gray-900">{metric.value}</div>
-            <div className="text-gray-600 text-sm">{metric.title}</div>
+  const renderCRMDashboardContent = () => {
+    const sampleLeads = [
+      {
+        id: 1,
+        name: 'John Smith',
+        company: 'ABC Corporation',
+        role: 'Operations Manager',
+        phone: '+1-555-0123',
+        email: 'john.smith@abc.com',
+        website: 'www.abc.com',
+        location: 'New York, NY',
+        section: 'Commercial',
+        status: 'Hot Lead',
+        actionType: 'Follow-up Call',
+        date: '2024-10-04',
+        response: 'Interested in elevator modernization project'
+      },
+      {
+        id: 2,
+        name: 'Sarah Johnson',
+        company: 'XYZ Building Group',
+        role: 'Project Director',
+        phone: '+1-555-0456',
+        email: 'sarah.j@xyz.com',
+        website: 'www.xyzbuilding.com',
+        location: 'Los Angeles, CA',
+        section: 'Construction',
+        status: 'Qualified',
+        actionType: 'Site Visit',
+        date: '2024-10-03',
+        response: 'Requesting quote for new installation'
+      },
+      {
+        id: 3,
+        name: 'Michael Chen',
+        company: 'Tech Plaza Mall',
+        role: 'Facility Manager',
+        phone: '+1-555-0789',
+        email: 'mchen@techplaza.com',
+        website: 'www.techplaza.com',
+        location: 'San Francisco, CA',
+        section: 'Retail',
+        status: 'Cold Lead',
+        actionType: 'Email Campaign',
+        date: '2024-10-02',
+        response: 'Maintenance contract renewal discussion'
+      }
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">CRM Dashboard</h2>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition-all duration-200">
+            Add New Lead
+          </button>
+        </div>
+
+        {/* CRM KPIs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            { title: 'Total Leads', value: 156, color: 'blue-600', icon: '👥' },
+            { title: 'Hot Leads', value: 42, color: 'red-500', icon: '🔥' },
+            { title: 'Qualified Leads', value: 78, color: 'green-600', icon: '✅' },
+            { title: 'Conversion Rate', value: '27%', color: 'purple-600', icon: '📊' }
+          ].map((metric, index) => (
+            <div key={index} className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-${metric.color}`}>
+                  <span className="text-white text-xl">{metric.icon}</span>
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-gray-900">{metric.value}</div>
+              <div className="text-gray-600 text-sm">{metric.title}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Leads Table */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">Recent Leads</h3>
           </div>
-        ))}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action Type</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {sampleLeads.map((lead) => (
+                  <tr key={lead.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="font-medium text-gray-900">{lead.name}</div>
+                      <div className="text-sm text-gray-500">{lead.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{lead.company}</div>
+                      <div className="text-sm text-blue-600">{lead.website}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{lead.role}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{lead.phone}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{lead.location}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        lead.status === 'Hot Lead' ? 'bg-red-100 text-red-800' :
+                        lead.status === 'Qualified' ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {lead.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{lead.actionType}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{lead.date}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button className="text-blue-600 hover:text-blue-900">Edit</button>
+                        <button className="text-green-600 hover:text-green-900">Convert</button>
+                        <button className="text-red-600 hover:text-red-900">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderLeadsContent = () => (
     <div className="space-y-6">
