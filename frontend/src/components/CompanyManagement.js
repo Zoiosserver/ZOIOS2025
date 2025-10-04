@@ -57,12 +57,19 @@ const CompanyManagement = ({ user, onBack }) => {
         console.log('DEBUG: Sister companies:', sisterCompanies.length, sisterCompanies);
         
         // Add sister companies info to main companies
-        const companiesWithSisters = mainCompanies.map(company => ({
-          ...company,
-          sister_companies: sisterCompanies.filter(sister => 
+        const companiesWithSisters = mainCompanies.map(company => {
+          const attachedSisters = sisterCompanies.filter(sister => 
             sister.parent_company_id === company.id
-          )
-        }));
+          );
+          console.log(`DEBUG: Main company ${company.company_name} (ID: ${company.id}) has ${attachedSisters.length} sister companies:`, attachedSisters);
+          
+          return {
+            ...company,
+            sister_companies: attachedSisters
+          };
+        });
+        
+        console.log('DEBUG: Companies with sisters attached:', companiesWithSisters);
         
         // Set companies with proper sister company attachment for main companies
         // Include both main companies (with sister company data) and individual sister companies
