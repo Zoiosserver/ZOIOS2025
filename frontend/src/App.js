@@ -124,6 +124,16 @@ function App() {
       <SimpleDashboard 
         user={user}
         onLogout={handleLogout}
+        onNavigateToCompanyManagement={() => setCurrentView('company-management')}
+      />
+    );
+  }
+
+  if (currentView === 'company-management') {
+    return (
+      <CompanyManagement 
+        user={user}
+        onBack={() => setCurrentView('dashboard')}
       />
     );
   }
