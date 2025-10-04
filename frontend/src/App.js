@@ -87,6 +87,7 @@ function App() {
       <SimpleLogin 
         onLogin={handleLogin} 
         onSwitchToSignup={() => setCurrentView('signup')}
+        onSwitchToForgotPassword={() => setCurrentView('forgot-password')}
       />
     );
   }
