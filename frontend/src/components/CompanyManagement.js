@@ -984,8 +984,6 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
   const generateCleanPDF = async (pdfData) => {
     try {
       const { jsPDF } = await import('jspdf');
-      await import('jspdf-autotable');
-      
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.width;
       
@@ -1011,28 +1009,47 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
       doc.setFont('helvetica', 'normal');
       doc.text(`Generated on: ${pdfData.company_info.export_date}`, pageWidth / 2, 47, { align: 'center' });
       
-      // Table
-      doc.autoTable({
-        head: [pdfData.table_data.headers],
-        body: pdfData.table_data.rows,
-        startY: 55,
-        theme: 'grid',
-        headStyles: {
-          fillColor: [59, 130, 246], // Blue color
-          textColor: 255,
-          fontStyle: 'bold'
-        },
-        styles: {
-          fontSize: 8,
-          cellPadding: 3
-        },
-        alternateRowStyles: {
-          fillColor: [248, 250, 252] // Light gray
-        }
+      // Manual table creation
+      let yPos = 60;
+      const leftMargin = 10;
+      
+      // Table headers
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      const headers = pdfData.table_data.headers;
+      const colWidth = (pageWidth - 20) / headers.length;
+      
+      let xPos = leftMargin;
+      headers.forEach(header => {
+        doc.text(header, xPos, yPos);
+        xPos += colWidth;
       });
       
+      // Draw header line
+      doc.line(leftMargin, yPos + 2, pageWidth - 10, yPos + 2);
+      yPos += 8;
+      
+      // Table rows
+      doc.setFont('helvetica', 'normal');
+      pdfData.table_data.rows.forEach(row => {
+        if (yPos > 270) { // New page if needed
+          doc.addPage();
+          yPos = 30;
+        }
+        
+        xPos = leftMargin;
+        row.forEach(cell => {
+          const cellText = String(cell || '');
+          const maxWidth = colWidth - 2;
+          const truncatedText = cellText.length > 15 ? cellText.substring(0, 15) + '...' : cellText;
+          doc.text(truncatedText, xPos, yPos);
+          xPos += colWidth;
+        });
+        yPos += 6;
+      });
+
       // Summary at bottom
-      const finalY = doc.lastAutoTable.finalY + 10;
+      const finalY = yPos + 20;
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
       doc.text('Summary', 14, finalY);
