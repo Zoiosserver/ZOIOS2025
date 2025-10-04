@@ -843,7 +843,14 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(accountForm)
+        body: JSON.stringify({
+          account_name: accountForm.account_name,
+          account_code: accountForm.account_code,
+          account_type: accountForm.account_type?.toLowerCase(),
+          category: accountForm.category?.toLowerCase().replace(/ /g, '_'),
+          description: accountForm.description,
+          opening_balance: accountForm.opening_balance
+        })
       });
 
       if (response.ok) {
