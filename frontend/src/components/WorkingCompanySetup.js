@@ -76,6 +76,35 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
     }
   };
 
+  const handleSisterCompanyChange = (e) => {
+    const { name, value } = e.target;
+    setSisterCompanyData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const addSisterCompany = () => {
+    if (sisterCompanyData.company_name.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        sister_companies: [...prev.sister_companies, { ...sisterCompanyData, id: Date.now() }]
+      }));
+      setSisterCompanyData({
+        company_name: '',
+        country: 'IN',
+        business_type: 'Private Limited Company',
+        industry: 'Technology',
+        fiscal_year_start: '2024-04-01'
+      });
+      setShowSisterCompanyForm(false);
+    }
+  };
+
+  const removeSisterCompany = (id) => {
+    setFormData(prev => ({
+      ...prev,
+      sister_companies: prev.sister_companies.filter(comp => comp.id !== id)
+    }));
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-2xl w-full space-y-8 p-6">
