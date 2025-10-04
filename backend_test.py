@@ -4384,7 +4384,7 @@ def main():
         print("\n❌ Sister Company API Response Structure Test FAILED")
         sys.exit(1)
 
-    def test_existing_accounts(self):
+def test_existing_accounts(self):
         """Test existing common test accounts as requested in review"""
         self.log("Testing existing common test accounts...")
         
