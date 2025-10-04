@@ -2400,6 +2400,249 @@ class BackendTester:
             self.log(f"❌ Data structure verification error: {str(e)}")
             return False
 
+    def test_sister_company_setup_with_debugging(self):
+        """Test company setup process with sister companies and enhanced debugging"""
+        self.log("Testing company setup process with sister companies and enhanced debugging...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Company setup data with sister companies as specified in review request
+        setup_data = {
+            "company_name": "Debug Test Group Company",
+            "country_code": "US", 
+            "business_type": "Group Company",
+            "industry": "Technology",
+            "base_currency": "USD",
+            "additional_currencies": ["EUR", "GBP"],
+            "address": "123 Debug Street",
+            "city": "Debug City",
+            "state": "CA",
+            "postal_code": "12345",
+            "phone": "+1-555-123-4567",
+            "email": TEST_EMAIL,
+            "website": "https://debugtest.com",
+            "tax_number": "123456789",
+            "registration_number": "REG123456",
+            "sister_companies": [
+                {
+                    "company_name": "Debug Sister Company 1",
+                    "country": "US",
+                    "business_type": "Private Limited Company", 
+                    "industry": "Technology",
+                    "fiscal_year_start": "01-01"
+                }
+            ]
+        }
+        
+        try:
+            self.log("Submitting company setup with sister companies...")
+            self.log(f"Sister companies in payload: {len(setup_data['sister_companies'])}")
+            self.log(f"Sister company data: {setup_data['sister_companies'][0]}")
+            
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            self.log(f"Company setup response status: {response.status_code}")
+            self.log(f"Company setup response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log("✅ Company setup with sister companies successful")
+                self.log(f"Main Company ID: {data.get('id')}")
+                self.log(f"Setup completed: {data.get('setup_completed')}")
+                
+                # Now test GET /api/companies/management to see if sister companies are saved
+                self.log("Testing GET /api/companies/management to verify sister companies...")
+                companies_response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+                self.log(f"Companies management response status: {companies_response.status_code}")
+                self.log(f"Companies management response: {companies_response.text}")
+                
+                if companies_response.status_code == 200:
+                    companies = companies_response.json()
+                    self.log(f"Found {len(companies)} companies")
+                    
+                    # Look for sister companies
+                    sister_companies = [c for c in companies if not c.get('is_main_company', True)]
+                    self.log(f"Found {len(sister_companies)} sister companies")
+                    
+                    if len(sister_companies) > 0:
+                        self.log("✅ Sister companies found in database!")
+                        for i, sister in enumerate(sister_companies):
+                            self.log(f"Sister Company {i+1}: {sister.get('name')} (ID: {sister.get('id')})")
+                        return True
+                    else:
+                        self.log("❌ CRITICAL ISSUE: Sister companies NOT found in database!")
+                        self.log("This confirms the bug - sister companies are not being saved")
+                        return False
+                else:
+                    self.log(f"❌ Failed to retrieve companies: {companies_response.text}")
+                    return False
+                    
+            elif response.status_code == 400 and "already completed" in response.text:
+                self.log("⚠️ Company setup already completed - testing existing data")
+                return self.test_existing_sister_companies(headers)
+            else:
+                self.log(f"❌ Company setup failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Sister company setup error: {str(e)}")
+            return False
+
+    def test_existing_sister_companies(self, headers):
+        """Test existing sister companies if setup already completed"""
+        self.log("Testing existing sister companies...")
+        
+        try:
+            # Check companies management endpoint
+            response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            self.log(f"Existing companies response status: {response.status_code}")
+            self.log(f"Existing companies response: {response.text}")
+            
+            if response.status_code == 200:
+                companies = response.json()
+                self.log(f"Found {len(companies)} existing companies")
+                
+                # Check for sister companies
+                sister_companies = [c for c in companies if not c.get('is_main_company', True)]
+                self.log(f"Found {len(sister_companies)} existing sister companies")
+                
+                if len(sister_companies) > 0:
+                    self.log("✅ Sister companies exist in database")
+                    return True
+                else:
+                    self.log("❌ No sister companies found - confirming the bug exists")
+                    return False
+            else:
+                self.log(f"❌ Failed to check existing companies: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Existing sister companies test error: {str(e)}")
+            return False
+
+    def test_database_verification(self):
+        """Test database verification for sister companies"""
+        self.log("Testing database verification for sister companies...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # Test tenant info to see database details
+            tenant_response = self.session.get(f"{API_BASE}/tenant/info", headers=headers)
+            self.log(f"Tenant info response status: {tenant_response.status_code}")
+            self.log(f"Tenant info response: {tenant_response.text}")
+            
+            if tenant_response.status_code == 200:
+                tenant_data = tenant_response.json()
+                if tenant_data.get('tenant_assigned'):
+                    self.log(f"✅ Tenant database: {tenant_data.get('database_name')}")
+                    self.log(f"User email: {tenant_data.get('user_email')}")
+                    
+                    # Check company setup
+                    setup_response = self.session.get(f"{API_BASE}/setup/company", headers=headers)
+                    if setup_response.status_code == 200:
+                        setup_data = setup_response.json()
+                        self.log(f"Main company in database: {setup_data.get('company_name')}")
+                        self.log(f"Business type: {setup_data.get('business_type')}")
+                        
+                        # Check sister companies endpoint
+                        sister_response = self.session.get(f"{API_BASE}/company/sister-companies", headers=headers)
+                        self.log(f"Sister companies endpoint response status: {sister_response.status_code}")
+                        self.log(f"Sister companies endpoint response: {sister_response.text}")
+                        
+                        if sister_response.status_code == 200:
+                            sister_companies = sister_response.json()
+                            self.log(f"Sister companies from dedicated endpoint: {len(sister_companies)}")
+                            
+                            if len(sister_companies) > 0:
+                                self.log("✅ Sister companies found via dedicated endpoint")
+                                for i, sister in enumerate(sister_companies):
+                                    self.log(f"Sister Company {i+1}: {sister.get('company_name')}")
+                                return True
+                            else:
+                                self.log("❌ No sister companies found via dedicated endpoint")
+                                return False
+                        else:
+                            self.log(f"Sister companies endpoint failed: {sister_response.text}")
+                            return False
+                    else:
+                        self.log("❌ Could not retrieve company setup")
+                        return False
+                else:
+                    self.log("⚠️ No tenant database assigned")
+                    return False
+            else:
+                self.log(f"❌ Tenant info failed: {tenant_response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Database verification error: {str(e)}")
+            return False
+
+    def test_backend_logs_analysis(self):
+        """Test backend logs analysis for sister company processing"""
+        self.log("Testing backend logs analysis for sister company processing...")
+        
+        try:
+            # Check backend logs for DEBUG messages
+            self.log("Looking for DEBUG messages in backend logs...")
+            
+            # Try to read supervisor backend logs
+            import subprocess
+            try:
+                result = subprocess.run(['tail', '-n', '100', '/var/log/supervisor/backend.out.log'], 
+                                      capture_output=True, text=True, timeout=10)
+                if result.returncode == 0:
+                    logs = result.stdout
+                    self.log("✅ Backend logs retrieved")
+                    
+                    # Look for sister company related DEBUG messages
+                    debug_messages = [
+                        "DEBUG: Processing",
+                        "DEBUG: Created sister company",
+                        "DEBUG: Saving",
+                        "DEBUG: Sister companies saved"
+                    ]
+                    
+                    found_messages = []
+                    for message in debug_messages:
+                        if message in logs:
+                            found_messages.append(message)
+                            self.log(f"✅ Found DEBUG message: {message}")
+                    
+                    if found_messages:
+                        self.log(f"✅ Found {len(found_messages)} DEBUG messages related to sister companies")
+                        return True
+                    else:
+                        self.log("❌ No sister company DEBUG messages found in logs")
+                        return False
+                else:
+                    self.log("⚠️ Could not read backend logs")
+                    return False
+            except subprocess.TimeoutExpired:
+                self.log("⚠️ Timeout reading backend logs")
+                return False
+            except Exception as e:
+                self.log(f"⚠️ Error reading backend logs: {str(e)}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Backend logs analysis error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run comprehensive backend testing as requested in review"""
         self.log("=" * 80)
