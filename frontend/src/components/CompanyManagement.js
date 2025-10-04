@@ -1094,19 +1094,112 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
         
         if (format === 'excel') {
           // Create Excel file from data
-          const workbook = XLSX.utils.book_new();
-          const worksheet = XLSX.utils.json_to_sheet(data.data.accounts);
-          XLSX.utils.book_append_sheet(workbook, worksheet, 'Consolidated Accounts');
-          XLSX.writeFile(workbook, data.filename);
+          const { utils, writeFile } = await import('xlsx');
+          const workbook = utils.book_new();
+          
+          // Prepare consolidated data for Excel
+          const excelData = consolidatedAccounts.map(account => ({
+            'Account Code': account.account_code || 'N/A',
+            'Account Name': account.account_name || 'N/A',
+            'Company': account.company_name || 'N/A',
+            'Account Type': account.account_type || 'N/A',
+            'Category': (account.category || 'N/A').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            'Current Balance': account.current_balance || 0
+          }));
+          
+          const worksheet = utils.json_to_sheet(excelData);
+          utils.book_append_sheet(workbook, worksheet, 'Consolidated Accounts');
+          writeFile(workbook, data.filename || 'consolidated_accounts.xlsx');
         } else if (format === 'pdf') {
-          // Create PDF from data (simplified version)
-          window.print(); // This will print the current view
+          // Create clean consolidated PDF
+          await generateConsolidatedPDF(data.data);
         }
       } else {
         setError('Failed to export consolidated accounts');
       }
     } catch (err) {
       setError('Export failed: ' + err.message);
+    }
+  };
+
+  const generateConsolidatedPDF = async (pdfData) => {
+    try {
+      const { jsPDF } = await import('jspdf');
+      await import('jspdf-autotable');
+      
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.width;
+      
+      // Header
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Consolidated Chart of Accounts', pageWidth / 2, 20, { align: 'center' });
+      
+      // Export Date
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generated on: ${pdfData.export_date}`, pageWidth / 2, 30, { align: 'center' });
+      
+      // Prepare table data with company names
+      const tableRows = consolidatedAccounts.map(account => [
+        account.account_code || 'N/A',
+        account.account_name || 'N/A',
+        account.company_name || 'N/A',
+        (account.account_type || 'N/A').charAt(0).toUpperCase() + (account.account_type || '').slice(1),
+        (account.category || 'N/A').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        `${account.current_balance || 0}`
+      ]);
+      
+      // Table
+      doc.autoTable({
+        head: [['Account Code', 'Account Name', 'Company', 'Type', 'Category', 'Balance']],
+        body: tableRows,
+        startY: 40,
+        theme: 'grid',
+        headStyles: {
+          fillColor: [59, 130, 246], // Blue color
+          textColor: 255,
+          fontStyle: 'bold'
+        },
+        styles: {
+          fontSize: 7,
+          cellPadding: 2
+        },
+        alternateRowStyles: {
+          fillColor: [248, 250, 252] // Light gray
+        },
+        columnStyles: {
+          0: { cellWidth: 25 }, // Account Code
+          1: { cellWidth: 40 }, // Account Name
+          2: { cellWidth: 35 }, // Company
+          3: { cellWidth: 25 }, // Type
+          4: { cellWidth: 30 }, // Category
+          5: { cellWidth: 25 }  // Balance
+        }
+      });
+      
+      // Summary at bottom
+      const finalY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Summary', 14, finalY);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      let summaryY = finalY + 8;
+      doc.text(`Total Companies: ${pdfData.total_companies}`, 14, summaryY);
+      doc.text(`Total Accounts: ${pdfData.total_accounts}`, 14, summaryY + 6);
+      doc.text(`Assets: ${pdfData.summary.assets}`, 14, summaryY + 12);
+      doc.text(`Liabilities: ${pdfData.summary.liabilities}`, 14, summaryY + 18);
+      doc.text(`Equity: ${pdfData.summary.equity}`, 90, summaryY + 6);
+      doc.text(`Revenue: ${pdfData.summary.revenue}`, 90, summaryY + 12);
+      doc.text(`Expenses: ${pdfData.summary.expense}`, 90, summaryY + 18);
+      
+      // Save PDF
+      doc.save('consolidated_chart_of_accounts.pdf');
+    } catch (error) {
+      console.error('Consolidated PDF generation failed:', error);
+      setError('PDF generation failed: ' + error.message);
     }
   };
 
