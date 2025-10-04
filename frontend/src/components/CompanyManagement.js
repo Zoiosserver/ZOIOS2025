@@ -61,8 +61,8 @@ const CompanyManagement = ({ user, onBack }) => {
     try {
       const backendUrl = window.location.origin;
       const url = editingCompany 
-        ? `${backendUrl}/api/companies/${editingCompany.id}` 
-        : `${backendUrl}/api/companies`;
+        ? `${backendUrl}/api/companies/management/${editingCompany.id}` 
+        : `${backendUrl}/api/setup/company`;  // Use existing company setup endpoint for creating
       
       const method = editingCompany ? 'PUT' : 'POST';
 
