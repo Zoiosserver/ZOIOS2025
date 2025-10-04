@@ -1457,15 +1457,26 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
           const { utils, writeFile } = await import('xlsx');
           const workbook = utils.book_new();
           
-          // Prepare consolidated data for Excel
-          const excelData = consolidatedAccounts.map(account => ({
-            'Account Code': account.account_code || 'N/A',
-            'Account Name': account.account_name || 'N/A',
-            'Company': account.company_name || 'N/A',
-            'Account Type': account.account_type || 'N/A',
-            'Category': (account.category || 'N/A').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-            'Current Balance': account.current_balance || 0
-          }));
+          // Prepare consolidated data for Excel - TRUE CONSOLIDATED FORMAT
+          const excelData = consolidatedAccounts.map(account => {
+            const row = {
+              'Account Code': account.account_code || 'N/A',
+              'Account Name': account.account_name || 'N/A',
+              'Account Type': account.account_type || 'N/A'
+            };
+            
+            // Add column for each company
+            companyNames.forEach(companyName => {
+              row[companyName] = account.companies && account.companies[companyName] !== undefined 
+                ? Number(account.companies[companyName]).toFixed(2) 
+                : '0.00';
+            });
+            
+            // Add total column
+            row['Total'] = Number(account.total_balance || 0).toFixed(2);
+            
+            return row;
+          });
           
           const worksheet = utils.json_to_sheet(excelData);
           utils.book_append_sheet(workbook, worksheet, 'Consolidated Accounts');
