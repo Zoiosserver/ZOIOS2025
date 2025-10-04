@@ -1682,6 +1682,124 @@ async def create_company(company: CompanyCreate, current_user: UserInDB = Depend
     await db.companies.insert_one(prepared_data)
     return company_obj
 
+# =================================================================================
+# COMPANY MANAGEMENT API ENDPOINTS (Must be before generic company routes)
+# =================================================================================
+
+@api_router.get("/companies/management", response_model=List[CompanySetup])
+async def get_all_companies(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get all companies for management purposes"""
+    try:
+        # Get tenant database for user
+        tenant_service = await get_tenant_service(mongo_url)
+        tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+        
+        if tenant_db is None:
+            db_to_use = db
+        else:
+            db_to_use = tenant_db
+        
+        print(f"DEBUG: Using database: {db_to_use.name}")
+        companies = await db_to_use.company_setups.find().to_list(length=None)
+        print(f"DEBUG: Found {len(companies)} companies")
+        
+        if not companies:
+            return []
+        
+        result = []
+        for company in companies:
+            try:
+                parsed_company = parse_from_mongo(company)
+                result.append(CompanySetup(**parsed_company))
+            except Exception as e:
+                print(f"DEBUG: Error parsing company {company.get('id', 'unknown')}: {e}")
+                continue
+        
+        return result
+    except Exception as e:
+        print(f"DEBUG: Error in get_all_companies: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@api_router.get("/companies/management/{company_id}", response_model=CompanySetup)
+async def get_company_details(company_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Get detailed company information by ID"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    company = await db_to_use.company_setups.find_one({"id": company_id})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    return CompanySetup(**parse_from_mongo(company))
+
+@api_router.put("/companies/management/{company_id}")
+async def update_company(
+    company_id: str, 
+    company_data: CompanyUpdate, 
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Update company information"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Only update fields that are provided
+    update_data = {k: v for k, v in company_data.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db_to_use.company_setups.update_one(
+        {"id": company_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    return {"success": True, "message": "Company updated successfully"}
+
+@api_router.delete("/companies/management/{company_id}")
+async def delete_company(company_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Delete a company"""
+    # Only admin users can delete companies
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
+    
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Check if company exists
+    company = await db_to_use.company_setups.find_one({"id": company_id})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    # Delete company and related data
+    await db_to_use.company_setups.delete_one({"id": company_id})
+    await db_to_use.chart_of_accounts.delete_many({"company_id": company_id})
+    await db_to_use.sister_companies.delete_many({"parent_company_id": company_id})
+    
+    return {"success": True, "message": "Company deleted successfully"}
+
+# =================================================================================
+# GENERIC COMPANY ROUTES (CRM functionality)
+# =================================================================================
+
 @api_router.get("/companies", response_model=List[Company])
 async def get_companies(current_user: UserInDB = Depends(get_current_active_user), skip: int = 0, limit: int = 100):
     user_filter = get_user_filter(current_user)
