@@ -513,6 +513,110 @@ const CompanyManagement = ({ user, onBack }) => {
           </div>
         </div>
       )}
+      {/* Add Sister Company Modal */}
+      {showAddSisterModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gray-900">Add Sister Company</h3>
+                <button
+                  onClick={() => {
+                    setShowAddSisterModal(false);
+                    resetSisterForm();
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={handleAddSisterCompany} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                    <input
+                      type="text"
+                      value={sisterCompanyForm.company_name}
+                      onChange={(e) => setSisterCompanyForm({ ...sisterCompanyForm, company_name: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Business Type</label>
+                    <select
+                      value={sisterCompanyForm.business_type}
+                      onChange={(e) => setSisterCompanyForm({ ...sisterCompanyForm, business_type: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="Private Limited Company">Private Limited Company</option>
+                      <option value="Public Limited Company">Public Limited Company</option>
+                      <option value="Partnership">Partnership</option>
+                      <option value="Sole Proprietorship">Sole Proprietorship</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Parent Company</label>
+                    <select
+                      value={sisterCompanyForm.parent_company_id}
+                      onChange={(e) => setSisterCompanyForm({ ...sisterCompanyForm, parent_company_id: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      <option value="">Select Parent Company</option>
+                      {companies.filter(c => c.is_main_company).map(company => (
+                        <option key={company.id} value={company.id}>{company.company_name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                    <select
+                      value={sisterCompanyForm.industry}
+                      onChange={(e) => setSisterCompanyForm({ ...sisterCompanyForm, industry: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="Technology">Technology</option>
+                      <option value="Manufacturing">Manufacturing</option>
+                      <option value="Services">Services</option>
+                      <option value="Retail">Retail</option>
+                      <option value="Healthcare">Healthcare</option>
+                      <option value="Finance">Finance</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddSisterModal(false);
+                      resetSisterForm();
+                    }}
+                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 disabled:opacity-50"
+                  >
+                    {loading ? 'Adding...' : 'Add Sister Company'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
