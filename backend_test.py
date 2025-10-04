@@ -2091,9 +2091,32 @@ class BackendTester:
         # Test 4: /auth/me endpoint
         test_results['auth_me_endpoint'] = self.test_auth_me_endpoint()
         
-        # Phase 2: Company Setup API with Address Collection
+        # Phase 2: Sister Company Functionality Tests (as requested in review)
         self.log("\n" + "=" * 50)
-        self.log("PHASE 2: COMPANY SETUP API")
+        self.log("PHASE 2: SISTER COMPANY FUNCTIONALITY TESTS")
+        self.log("=" * 50)
+        
+        # Test 5: Company Setup with Sister Companies
+        test_results['sister_company_setup'] = self.test_sister_company_setup_with_group_company()
+        
+        # Test 6: Sister Companies API GET endpoint
+        test_results['sister_companies_api'] = self.test_sister_companies_api_get()
+        
+        # Test 7: Company Management API Integration
+        test_results['company_management_integration'] = self.test_company_management_api_integration()
+        
+        # Test 8: Sister Company Chart of Accounts
+        test_results['sister_company_chart_accounts'] = self.test_sister_company_chart_of_accounts()
+        
+        # Test 9: Tenant Database Isolation
+        test_results['tenant_database_isolation'] = self.test_tenant_database_isolation()
+        
+        # Test 10: Sister Company Data Structure Verification
+        test_results['sister_company_data_structure'] = self.test_sister_company_data_structure_verification()
+        
+        # Phase 3: Company Setup API with Address Collection
+        self.log("\n" + "=" * 50)
+        self.log("PHASE 3: COMPANY SETUP API")
         self.log("=" * 50)
         
         # Test 5: Company Setup with Address Collection
