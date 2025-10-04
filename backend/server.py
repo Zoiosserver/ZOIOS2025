@@ -373,11 +373,11 @@ async def login(user_credentials: UserLogin):
     return Token(access_token=access_token, token_type="bearer", user=user_response)
 
 @api_router.post("/auth/forgot-password")
-async def forgot_password(email: str):
+async def forgot_password(request: ForgotPasswordRequest):
     """Forgot password endpoint - sends reset instructions via email"""
     try:
         # Check if user exists
-        user = await db.users.find_one({"email": email})
+        user = await db.users.find_one({"email": request.email})
         if user:
             # Generate reset token
             reset_token = await create_password_reset_token(user["id"])
@@ -387,16 +387,16 @@ async def forgot_password(email: str):
             
             # Send reset email
             email_sent = await send_password_reset_email(
-                email=email,
+                email=request.email,
                 user_name=user["name"],
                 reset_token=reset_token,
                 base_url=base_url
             )
             
             if email_sent:
-                print(f"✅ Password reset email sent to {email}")
+                print(f"✅ Password reset email sent to {request.email}")
             else:
-                print(f"❌ Failed to send password reset email to {email}")
+                print(f"❌ Failed to send password reset email to {request.email}")
         
         # Always return success message for security (don't reveal if email exists)
         return {"message": "If the email exists, password reset instructions have been sent"}
