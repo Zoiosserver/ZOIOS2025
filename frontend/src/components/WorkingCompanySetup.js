@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ZoiosLogo from './ZoiosLogo';
+import DateInput from './DateInput';
 
 const WorkingCompanySetup = ({ user, onComplete }) => {
   const [loading, setLoading] = useState(false);
