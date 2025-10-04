@@ -183,6 +183,42 @@ backend:
           agent: "testing"
           comment: "✅ CURRENCY MANAGEMENT SYSTEM FULLY VERIFIED: All currency endpoints working perfectly with tenant database support. Currency update rates endpoint returns proper response format (updated_rates: 2, no undefined issues). Currency conversion working (USD $100 → EUR €92). Manual rate setting functional (USD→EUR at 0.85). Fixed tenant database lookup issues in currency endpoints. Currency undefined fix confirmed working. Complete currency management system is production-ready."
 
+  - task: "Company Management API Endpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Added comprehensive company management API endpoints: GET /companies/management (list all), GET /companies/management/{id} (get details), PUT /companies/management/{id} (update), DELETE /companies/management/{id} (delete with cascading). Includes proper tenant database support and admin-only delete permissions."
+
+  - task: "Enhanced Chart of Accounts API Endpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Added enhanced chart of accounts API endpoints: GET /companies/{id}/accounts/enhanced (detailed view with grouping), GET /companies/consolidated-accounts/enhanced (consolidated view), POST /companies/{id}/accounts/enhanced (create), PUT /companies/{id}/accounts/{id}/enhanced (update), DELETE /companies/{id}/accounts/{id}/enhanced (delete). Includes account validation, conflict checking, and cascading deletes."
+
+  - task: "Export and Print API Endpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Added data export API endpoints: POST /companies/{id}/accounts/export (individual company), POST /companies/consolidated-accounts/export (consolidated). Supports PDF and Excel formats with structured data for frontend processing. Includes company information, account summaries, and proper formatting data."
+
 frontend:
   - task: "Company Setup Wizard UI"
     implemented: true
