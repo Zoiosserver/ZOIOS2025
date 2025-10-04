@@ -2348,21 +2348,39 @@ async def export_chart_of_accounts(
         }
     
     elif export_request.format.lower() == "pdf":
-        # Create PDF export data
+        # Create PDF export data with proper structure for table-only PDF
         pdf_data = {
-            "company_name": company.get('company_name', 'Unknown Company'),
-            "company_address": f"{company.get('address', '')}, {company.get('city', '')}, {company.get('state', '')} {company.get('postal_code', '')}",
-            "export_date": datetime.now(timezone.utc).strftime("%B %d, %Y"),
-            "accounts": accounts,
-            "total_accounts": len(accounts),
+            "company_info": {
+                "name": company.get('company_name', 'Unknown Company'),
+                "address": f"{company.get('address', '')}, {company.get('city', '')}, {company.get('state', '')} {company.get('postal_code', '')}".strip(', '),
+                "country": company.get('country_code', ''),
+                "currency": company.get('base_currency', ''),
+                "export_date": datetime.now(timezone.utc).strftime("%B %d, %Y")
+            },
+            "table_data": {
+                "headers": ["Account Code", "Account Name", "Account Type", "Category", "Current Balance"],
+                "rows": []
+            },
             "summary": {
-                "assets": len([a for a in accounts if a.get('account_type') == 'asset']),
-                "liabilities": len([a for a in accounts if a.get('account_type') == 'liability']),
-                "equity": len([a for a in accounts if a.get('account_type') == 'equity']),
-                "revenue": len([a for a in accounts if a.get('account_type') == 'revenue']),
-                "expense": len([a for a in accounts if a.get('account_type') == 'expense'])
+                "total_accounts": len(accounts),
+                "assets_count": len([a for a in accounts if a.get('account_type') == 'asset']),
+                "liabilities_count": len([a for a in accounts if a.get('account_type') == 'liability']),
+                "equity_count": len([a for a in accounts if a.get('account_type') == 'equity']),
+                "revenue_count": len([a for a in accounts if a.get('account_type') == 'revenue']),
+                "expense_count": len([a for a in accounts if a.get('account_type') == 'expense'])
             }
         }
+        
+        # Prepare table rows
+        for account in accounts:
+            row = [
+                account.get('code', 'N/A'),
+                account.get('name', 'N/A'),
+                account.get('account_type', 'N/A').capitalize(),
+                account.get('category', 'N/A').replace('_', ' ').title(),
+                f"{account.get('current_balance', 0):.2f}"
+            ]
+            pdf_data["table_data"]["rows"].append(row)
         
         return {
             "success": True,
