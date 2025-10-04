@@ -645,9 +645,11 @@ async def setup_company(
     
     # Process sister companies if this is a Group Company
     if company_data.business_type == "Group Company" and company_data.sister_companies:
+        print(f"DEBUG: Processing {len(company_data.sister_companies)} sister companies for Group Company")
         sister_companies_to_create = []
         
-        for sister_data in company_data.sister_companies:
+        for i, sister_data in enumerate(company_data.sister_companies):
+            print(f"DEBUG: Processing sister company {i+1}: {sister_data.get('company_name')}")
             # Create sister company record
             sister_company = SisterCompany(
                 group_company_id=company_setup.id,
@@ -661,6 +663,7 @@ async def setup_company(
                 is_active=True
             )
             
+            print(f"DEBUG: Created sister company object with ID: {sister_company.id}")
             prepared_sister = prepare_for_mongo(sister_company.dict())
             sister_companies_to_create.append(prepared_sister)
             
@@ -679,11 +682,16 @@ async def setup_company(
             
             # Save sister company chart of accounts
             if sister_accounts_to_create:
+                print(f"DEBUG: Saving {len(sister_accounts_to_create)} accounts for sister company {sister_company.company_name}")
                 await tenant_db.chart_of_accounts.insert_many(sister_accounts_to_create)
         
         # Save all sister companies
         if sister_companies_to_create:
-            await tenant_db.sister_companies.insert_many(sister_companies_to_create)
+            print(f"DEBUG: Saving {len(sister_companies_to_create)} sister companies to database")
+            result = await tenant_db.sister_companies.insert_many(sister_companies_to_create)
+            print(f"DEBUG: Sister companies saved with IDs: {result.inserted_ids}")
+    else:
+        print(f"DEBUG: No sister companies to process. Business type: {company_data.business_type}, Sister companies count: {len(company_data.sister_companies) if company_data.sister_companies else 0}")
     
     # Update user onboarding status in both main database and tenant database
     update_data = {
