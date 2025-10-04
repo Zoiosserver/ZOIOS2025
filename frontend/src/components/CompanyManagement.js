@@ -832,8 +832,8 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
     try {
       const backendUrl = window.location.origin;
       const url = editingAccount 
-        ? `${backendUrl}/api/companies/${selectedCompany.id}/accounts/${editingAccount.id}/enhanced`
-        : `${backendUrl}/api/companies/${selectedCompany.id}/accounts/enhanced`;
+        ? `${backendUrl}/api/company/${selectedCompany.id}/chart-of-accounts/${editingAccount.id}`
+        : `${backendUrl}/api/company/${selectedCompany.id}/chart-of-accounts`;
       
       const method = editingAccount ? 'PUT' : 'POST';
 
