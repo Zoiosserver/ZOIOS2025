@@ -2643,6 +2643,430 @@ class BackendTester:
             self.log(f"❌ Backend logs analysis error: {str(e)}")
             return False
 
+    def test_super_admin_initialization(self):
+        """Test super admin initialization and permissions"""
+        self.log("Testing super admin initialization...")
+        
+        # Test with super admin credentials
+        super_admin_login = {
+            "email": "admin@2mholding.com",
+            "password": "admin123"  # Assuming this is the password
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/auth/login", json=super_admin_login)
+            self.log(f"Super admin login response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                super_admin_token = data.get('access_token')
+                super_admin_user = data.get('user')
+                
+                self.log("✅ Super admin login successful")
+                self.log(f"Super admin role: {super_admin_user.get('role')}")
+                
+                # Check if user has super_admin role and view_all_companies permission
+                headers = {
+                    "Authorization": f"Bearer {super_admin_token}",
+                    "Content-Type": "application/json"
+                }
+                
+                # Test /auth/me to check permissions
+                auth_response = self.session.get(f"{API_BASE}/auth/me", headers=headers)
+                if auth_response.status_code == 200:
+                    auth_data = auth_response.json()
+                    permissions = auth_data.get('permissions', {})
+                    role = auth_data.get('role')
+                    
+                    self.log(f"Super admin role: {role}")
+                    self.log(f"Super admin permissions: {permissions}")
+                    
+                    # Check for super_admin role and view_all_companies permission
+                    if role == "super_admin" or permissions.get('view_all_companies'):
+                        self.log("✅ Super admin has proper role/permissions")
+                        return True
+                    else:
+                        self.log("❌ Super admin missing proper role/permissions")
+                        return False
+                else:
+                    self.log("❌ Could not verify super admin permissions")
+                    return False
+            else:
+                self.log(f"❌ Super admin login failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Super admin test error: {str(e)}")
+            return False
+
+    def test_company_creator_permissions(self):
+        """Test that company creators become admin for their company"""
+        self.log("Testing company creator permissions...")
+        
+        # Create a new user and company
+        creator_email = f"creator{int(time.time())}@example.com"
+        signup_data = {
+            "email": creator_email,
+            "password": "testpass123",
+            "name": "Company Creator",
+            "company": "Creator Test Company"
+        }
+        
+        try:
+            # Sign up new user
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            if response.status_code != 200:
+                self.log(f"❌ Creator signup failed: {response.text}")
+                return False
+            
+            creator_token = response.json().get('access_token')
+            headers = {
+                "Authorization": f"Bearer {creator_token}",
+                "Content-Type": "application/json"
+            }
+            
+            # Create company setup
+            setup_data = {
+                "company_name": "Creator Test Company",
+                "country_code": "US",
+                "base_currency": "USD",
+                "additional_currencies": ["EUR"],
+                "business_type": "Corporation",
+                "industry": "Technology",
+                "address": "123 Creator Street",
+                "city": "Creator City",
+                "state": "CA",
+                "postal_code": "12345",
+                "phone": "+1-555-123-4567",
+                "email": creator_email,
+                "website": "https://creatortest.com",
+                "tax_number": "123456789",
+                "registration_number": "REG123456"
+            }
+            
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            if response.status_code != 200:
+                self.log(f"❌ Company creation failed: {response.text}")
+                return False
+            
+            company_data = response.json()
+            company_id = company_data.get('id')
+            self.log(f"✅ Company created with ID: {company_id}")
+            
+            # Check if user became admin for their company
+            auth_response = self.session.get(f"{API_BASE}/auth/me", headers=headers)
+            if auth_response.status_code == 200:
+                auth_data = auth_response.json()
+                role = auth_data.get('role')
+                company_id_assigned = auth_data.get('company_id')
+                assigned_companies = auth_data.get('assigned_companies', [])
+                
+                self.log(f"Creator role: {role}")
+                self.log(f"Creator company_id: {company_id_assigned}")
+                self.log(f"Creator assigned_companies: {assigned_companies}")
+                
+                if role == "admin" and (company_id_assigned == company_id or company_id in assigned_companies):
+                    self.log("✅ Company creator became admin for their company")
+                    return True
+                else:
+                    self.log("❌ Company creator did not get proper admin permissions")
+                    return False
+            else:
+                self.log("❌ Could not verify creator permissions")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Company creator test error: {str(e)}")
+            return False
+
+    def test_sister_company_management_comprehensive(self):
+        """Test comprehensive sister company management"""
+        self.log("Testing comprehensive sister company management...")
+        
+        # Create a Group Company with sister companies
+        group_email = f"group{int(time.time())}@example.com"
+        signup_data = {
+            "email": group_email,
+            "password": "testpass123",
+            "name": "Group Company Owner",
+            "company": "Main Group Company"
+        }
+        
+        try:
+            # Sign up new user
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            if response.status_code != 200:
+                self.log(f"❌ Group company signup failed: {response.text}")
+                return False
+            
+            group_token = response.json().get('access_token')
+            headers = {
+                "Authorization": f"Bearer {group_token}",
+                "Content-Type": "application/json"
+            }
+            
+            # Create Group Company with sister companies
+            setup_data = {
+                "company_name": "Main Group Company",
+                "country_code": "US",
+                "base_currency": "USD",
+                "additional_currencies": ["EUR", "GBP"],
+                "business_type": "Group Company",
+                "industry": "Technology",
+                "address": "123 Group Street",
+                "city": "Group City",
+                "state": "CA",
+                "postal_code": "12345",
+                "phone": "+1-555-123-4567",
+                "email": group_email,
+                "website": "https://grouptest.com",
+                "tax_number": "123456789",
+                "registration_number": "REG123456",
+                "sister_companies": [
+                    {
+                        "company_name": "Sister Company Alpha",
+                        "country": "US",
+                        "business_type": "Private Limited Company",
+                        "industry": "Technology",
+                        "fiscal_year_start": "01-01"
+                    },
+                    {
+                        "company_name": "Sister Company Beta",
+                        "country": "GB",
+                        "business_type": "Partnership",
+                        "industry": "Finance",
+                        "fiscal_year_start": "04-01"
+                    }
+                ]
+            }
+            
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            self.log(f"Group company setup response status: {response.status_code}")
+            self.log(f"Group company setup response: {response.text}")
+            
+            if response.status_code != 200:
+                self.log(f"❌ Group company creation failed: {response.text}")
+                return False
+            
+            main_company_data = response.json()
+            main_company_id = main_company_data.get('id')
+            self.log(f"✅ Group company created with ID: {main_company_id}")
+            
+            # Test GET /api/companies/management to see both main and sister companies
+            companies_response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            self.log(f"Companies management response status: {companies_response.status_code}")
+            
+            if companies_response.status_code == 200:
+                companies = companies_response.json()
+                self.log(f"✅ Found {len(companies)} companies in management view")
+                
+                # Check for main company and sister companies
+                main_companies = [c for c in companies if c.get('is_main_company') == True]
+                sister_companies = [c for c in companies if c.get('is_main_company') == False]
+                
+                self.log(f"Main companies: {len(main_companies)}")
+                self.log(f"Sister companies: {len(sister_companies)}")
+                
+                if len(main_companies) >= 1 and len(sister_companies) >= 2:
+                    self.log("✅ Both main and sister companies appear in management list")
+                    
+                    # Verify sister companies have proper flags
+                    for sister in sister_companies:
+                        if sister.get('is_main_company') == False:
+                            self.log(f"✅ Sister company '{sister.get('company_name')}' has is_main_company: false")
+                        else:
+                            self.log(f"❌ Sister company '{sister.get('company_name')}' missing proper flag")
+                            return False
+                    
+                    return True
+                else:
+                    self.log("❌ Expected companies not found in management list")
+                    return False
+            else:
+                self.log(f"❌ Companies management failed: {companies_response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Sister company management test error: {str(e)}")
+            return False
+
+    def test_account_code_auto_generation(self):
+        """Test account code auto-generation for different account types"""
+        self.log("Testing account code auto-generation...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # First get a company ID to test with
+            companies_response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            if companies_response.status_code != 200:
+                self.log("❌ Could not get companies for testing")
+                return False
+                
+            companies = companies_response.json()
+            if not companies:
+                self.log("❌ No companies available for testing")
+                return False
+                
+            company_id = companies[0].get('id')
+            self.log(f"Testing account code generation with company ID: {company_id}")
+            
+            # Test account code generation for different account types
+            account_types = [
+                ("Assets", "1000-1999"),
+                ("Liabilities", "2000-2999"),
+                ("Equity", "3000-3999"),
+                ("Revenue", "4000-4999"),
+                ("Expenses", "5000-5999")
+            ]
+            
+            all_passed = True
+            for account_type, expected_range in account_types:
+                response = self.session.get(
+                    f"{API_BASE}/companies/{company_id}/accounts/next-code/{account_type}", 
+                    headers=headers
+                )
+                
+                self.log(f"Next code for {account_type} - Status: {response.status_code}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    next_code = data.get('next_code')
+                    
+                    if next_code:
+                        # Verify the code is in the expected range
+                        code_num = int(next_code)
+                        range_start, range_end = map(int, expected_range.split('-'))
+                        
+                        if range_start <= code_num <= range_end:
+                            self.log(f"✅ {account_type}: Next code {next_code} is in range {expected_range}")
+                        else:
+                            self.log(f"❌ {account_type}: Next code {next_code} is NOT in range {expected_range}")
+                            all_passed = False
+                    else:
+                        self.log(f"❌ {account_type}: No next_code returned")
+                        all_passed = False
+                else:
+                    self.log(f"❌ {account_type}: Request failed - {response.text}")
+                    all_passed = False
+            
+            return all_passed
+                
+        except Exception as e:
+            self.log(f"❌ Account code generation test error: {str(e)}")
+            return False
+
+    def test_enhanced_pdf_export_structure(self):
+        """Test enhanced PDF export structure"""
+        self.log("Testing enhanced PDF export structure...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # First get a company ID to test with
+            companies_response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            if companies_response.status_code != 200:
+                self.log("❌ Could not get companies for testing")
+                return False
+                
+            companies = companies_response.json()
+            if not companies:
+                self.log("❌ No companies available for testing")
+                return False
+                
+            company_id = companies[0].get('id')
+            self.log(f"Testing PDF export with company ID: {company_id}")
+            
+            # Test individual company PDF export
+            export_data = {
+                "format": "pdf"
+            }
+            
+            response = self.session.post(
+                f"{API_BASE}/companies/{company_id}/accounts/export", 
+                json=export_data, 
+                headers=headers
+            )
+            
+            self.log(f"Individual PDF export response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log("✅ Individual PDF export successful")
+                
+                # Check for structured data format
+                required_fields = ['company_info', 'table_data', 'summary']
+                all_fields_present = True
+                
+                for field in required_fields:
+                    if field in data:
+                        self.log(f"✅ {field} present in export data")
+                        
+                        # Check table_data structure
+                        if field == 'table_data':
+                            table_data = data[field]
+                            if 'headers' in table_data and 'rows' in table_data:
+                                self.log("✅ table_data has proper headers and rows format")
+                            else:
+                                self.log("❌ table_data missing headers or rows")
+                                all_fields_present = False
+                    else:
+                        self.log(f"❌ {field} missing from export data")
+                        all_fields_present = False
+                
+                if all_fields_present:
+                    # Test consolidated PDF export
+                    consolidated_export_data = {
+                        "format": "pdf",
+                        "company_ids": [company_id]
+                    }
+                    
+                    consolidated_response = self.session.post(
+                        f"{API_BASE}/companies/consolidated-accounts/export", 
+                        json=consolidated_export_data, 
+                        headers=headers
+                    )
+                    
+                    self.log(f"Consolidated PDF export response status: {consolidated_response.status_code}")
+                    
+                    if consolidated_response.status_code == 200:
+                        consolidated_data = consolidated_response.json()
+                        self.log("✅ Consolidated PDF export successful")
+                        
+                        # Check consolidated export structure
+                        if all(field in consolidated_data for field in required_fields):
+                            self.log("✅ Enhanced PDF export structure working correctly")
+                            return True
+                        else:
+                            self.log("❌ Consolidated export missing required fields")
+                            return False
+                    else:
+                        self.log(f"❌ Consolidated PDF export failed: {consolidated_response.text}")
+                        return False
+                else:
+                    return False
+            else:
+                self.log(f"❌ Individual PDF export failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ PDF export test error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run comprehensive backend testing as requested in review"""
         self.log("=" * 80)
