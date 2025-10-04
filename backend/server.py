@@ -643,6 +643,48 @@ async def setup_company(
             # Log error but don't fail the setup process
             logger.warning(f"Failed to fetch initial currency rates: {e}")
     
+    # Process sister companies if this is a Group Company
+    if company_data.business_type == "Group Company" and company_data.sister_companies:
+        sister_companies_to_create = []
+        
+        for sister_data in company_data.sister_companies:
+            # Create sister company record
+            sister_company = SisterCompany(
+                group_company_id=company_setup.id,
+                company_name=sister_data.get("company_name"),
+                country_code=sister_data.get("country", "IN"),  # Frontend sends 'country', backend expects 'country_code'
+                base_currency=sister_data.get("base_currency", company_data.base_currency),
+                business_type=sister_data.get("business_type", "Private Limited Company"),
+                industry=sister_data.get("industry", company_data.industry),
+                fiscal_year_start=sister_data.get("fiscal_year_start"),
+                accounting_system=accounting_system["name"],
+                is_active=True
+            )
+            
+            prepared_sister = prepare_for_mongo(sister_company.dict())
+            sister_companies_to_create.append(prepared_sister)
+            
+            # Create chart of accounts for sister company
+            sister_accounts_to_create = []
+            for category, accounts in chart_template.items():
+                for account in accounts:
+                    sister_chart_account = ChartOfAccount(
+                        company_id=sister_company.id,
+                        code=account["code"],
+                        name=account["name"],
+                        account_type=account["type"],
+                        category=account["category"]
+                    )
+                    sister_accounts_to_create.append(prepare_for_mongo(sister_chart_account.dict()))
+            
+            # Save sister company chart of accounts
+            if sister_accounts_to_create:
+                await tenant_db.chart_of_accounts.insert_many(sister_accounts_to_create)
+        
+        # Save all sister companies
+        if sister_companies_to_create:
+            await tenant_db.sister_companies.insert_many(sister_companies_to_create)
+    
     # Update user onboarding status in both main database and tenant database
     update_data = {
         "onboarding_completed": True,
