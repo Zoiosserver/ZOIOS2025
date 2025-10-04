@@ -41,9 +41,44 @@ class SpecificEndpointsTester:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"[{timestamp}] {level}: {message}")
         
+    def test_signup_and_login(self):
+        """Create fresh test account and login"""
+        self.log("Creating fresh test account...")
+        
+        # First try to signup
+        signup_data = {
+            "email": TEST_EMAIL,
+            "password": TEST_PASSWORD,
+            "name": TEST_NAME,
+            "company": TEST_COMPANY
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            self.log(f"Signup response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.auth_token = data.get('access_token')
+                self.user_data = data.get('user')
+                self.log("✅ Signup and login successful")
+                self.log(f"User ID: {self.user_data.get('id')}")
+                self.log(f"Email: {self.user_data.get('email')}")
+                return True
+            elif response.status_code == 400 and "already registered" in response.text:
+                self.log("⚠️ User already exists, trying login...")
+                return self.test_login()
+            else:
+                self.log(f"❌ Signup failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Signup error: {str(e)}")
+            return False
+    
     def test_login(self):
-        """Login with existing test account"""
-        self.log("Testing login with existing account...")
+        """Login with test account"""
+        self.log("Testing login...")
         
         login_data = {
             "email": TEST_EMAIL,
