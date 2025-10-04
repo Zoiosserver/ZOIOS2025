@@ -56,9 +56,19 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
         // Extract accounts from the response structure
         const allAccounts = [];
         if (data.accounts_by_category) {
-          // Flatten accounts from all categories
+          // Flatten accounts from all categories and map field names
           Object.values(data.accounts_by_category).forEach(categoryAccounts => {
-            allAccounts.push(...categoryAccounts);
+            const mappedAccounts = categoryAccounts.map(account => ({
+              id: account.id,
+              account_code: account.code,
+              account_name: account.name,
+              account_type: account.account_type,
+              category: account.category,
+              current_balance: account.current_balance || account.opening_balance || 0,
+              opening_balance: account.opening_balance || 0,
+              description: account.description || ''
+            }));
+            allAccounts.push(...mappedAccounts);
           });
         }
         
