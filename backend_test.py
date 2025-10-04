@@ -2538,6 +2538,7 @@ class BackendTester:
         
         # Group results by category
         auth_tests = ['user_registration', 'user_login', 'jwt_token_validity', 'auth_me_endpoint']
+        sister_company_tests = ['sister_company_setup', 'sister_companies_api', 'company_management_integration', 'sister_company_chart_accounts', 'tenant_database_isolation', 'sister_company_data_structure']
         company_tests = ['company_setup_address', 'auth_me_after_setup', 'multi_tenancy']
         currency_tests = ['chart_of_accounts', 'currency_rates_undefined_fix', 'currency_conversion', 'manual_currency_rate']
         user_mgmt_tests = ['admin_login', 'granular_permissions', 'user_deletion']
