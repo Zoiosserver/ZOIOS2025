@@ -789,7 +789,7 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
     setLoading(true);
     try {
       const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts/enhanced`, {
+      const response = await fetch(`${backendUrl}/api/company/${selectedCompany.id}/chart-of-accounts`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -797,7 +797,24 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
 
       if (response.ok) {
         const data = await response.json();
-        setAccounts(data.accounts || []);
+        // Extract accounts from the response structure (accounts_by_category)
+        const allAccounts = [];
+        if (data.accounts_by_category) {
+          Object.values(data.accounts_by_category).forEach(categoryAccounts => {
+            const mappedAccounts = categoryAccounts.map(account => ({
+              id: account.id,
+              account_code: account.code,
+              account_name: account.name,
+              account_type: account.account_type,
+              category: account.category,
+              current_balance: account.current_balance || account.opening_balance || 0,
+              opening_balance: account.opening_balance || 0,
+              description: account.description || ''
+            }));
+            allAccounts.push(...mappedAccounts);
+          });
+        }
+        setAccounts(allAccounts);
       } else {
         setError('Failed to load accounts');
       }
