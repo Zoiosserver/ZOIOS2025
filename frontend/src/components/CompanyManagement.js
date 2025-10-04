@@ -1075,7 +1075,8 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
                   </div>
                 </div>
                 
-                <div className="overflow-x-auto">
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
@@ -1090,16 +1091,53 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
                     <tbody className="divide-y divide-gray-200">
                       {accounts.map((account) => (
                         <tr key={`${account.company_id}-${account.id}`} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{account.account_code}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{account.account_name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{account.company_name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{account.account_type}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{account.category?.replace('_', ' ')}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{account.account_code || 'N/A'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{account.account_name || 'N/A'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{account.company_name || 'N/A'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{account.account_type || 'N/A'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{account.category?.replace('_', ' ') || 'N/A'}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{account.current_balance || 0}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden divide-y divide-gray-200">
+                  {accounts.map((account) => (
+                    <div key={`${account.company_id}-${account.id}`} className="p-4 hover:bg-gray-50">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-col space-y-1">
+                            <div className="text-sm font-medium text-gray-900 break-words">
+                              {account.account_name || 'N/A'}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              Code: {account.account_code || 'N/A'}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-sm font-medium text-gray-900 ml-4">
+                          {account.current_balance || 0}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-gray-500">Company:</span> 
+                          <span className="ml-1 break-words">{account.company_name || 'N/A'}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Type:</span> 
+                          <span className="ml-1 capitalize">{account.account_type || 'N/A'}</span>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-gray-500">Category:</span> 
+                          <span className="ml-1 capitalize">{account.category?.replace('_', ' ') || 'N/A'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))
