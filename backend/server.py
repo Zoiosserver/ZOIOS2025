@@ -502,15 +502,20 @@ async def reset_password(password_reset: PasswordReset):
 @api_router.get("/auth/me", response_model=User)
 async def get_current_user_info(current_user: UserInDB = Depends(get_current_active_user)):
     """Get current user information"""
-    # Get permissions from database (they might not be in the token)
-    tenant_service = await get_tenant_service(mongo_url)
-    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
-    
-    db_to_use = tenant_db if tenant_db is not None else db
-    
-    # Fetch fresh user data to get permissions
-    user_data = await db_to_use.users.find_one({"id": current_user.id})
-    permissions = user_data.get("permissions", {}) if user_data else {}
+    # Super admin is always in main database
+    if current_user.role == "super_admin":
+        user_data = await db.users.find_one({"id": current_user.id})
+        permissions = user_data.get("permissions", {}) if user_data else {}
+    else:
+        # Get permissions from database (they might not be in the token)
+        tenant_service = await get_tenant_service(mongo_url)
+        tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+        
+        db_to_use = tenant_db if tenant_db is not None else db
+        
+        # Fetch fresh user data to get permissions
+        user_data = await db_to_use.users.find_one({"id": current_user.id})
+        permissions = user_data.get("permissions", {}) if user_data else {}
     
     return User(
         id=current_user.id,
