@@ -70,21 +70,43 @@ const SimpleDashboard = ({ user, onLogout }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse delay-1000"></div>
+      </div>
+
       {/* Header */}
-      <header className="bg-white shadow">
+      <header className="relative bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-100/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">ZOIOS ERP Dashboard</h1>
-              <p className="text-gray-600">Welcome back, {user?.name}</p>
+          <div className="flex justify-between items-center py-4 sm:py-6">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white p-2 sm:p-3 rounded-xl shadow-md border border-gray-100">
+                <ZoiosLogo size="medium" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">ERP Dashboard</h1>
+                <p className="text-sm sm:text-base text-gray-600">Welcome back, {user?.name} 👋</p>
+              </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-            >
-              Logout
-            </button>
+            <div className="flex items-center space-x-3">
+              <div className="hidden sm:flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                Online
+              </div>
+              <button
+                onClick={handleLogout}
+                className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+              >
+                <div className="flex items-center space-x-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                  </svg>
+                  <span className="hidden sm:inline">Logout</span>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </header>
