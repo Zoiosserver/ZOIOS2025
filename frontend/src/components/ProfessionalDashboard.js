@@ -248,11 +248,11 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
   const renderKPICard = (kpi, index) => (
     <div key={index} className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-6 hover:shadow-2xl transition-all duration-300">
       <div className="flex items-center justify-between mb-4">
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-r ${
-          kpi.color === 'green' ? 'from-green-500 to-emerald-500' :
-          kpi.color === 'blue' ? 'from-blue-500 to-indigo-500' :
-          kpi.color === 'purple' ? 'from-purple-500 to-violet-500' :
-          'from-orange-500 to-red-500'
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+          kpi.color === 'green' ? 'bg-green-500' :
+          kpi.color === 'blue' ? 'bg-blue-500' :
+          kpi.color === 'purple' ? 'bg-purple-500' :
+          'bg-orange-500'
         }`}>
           <span className="text-white text-xl">
             {kpi.color === 'green' ? '💰' : kpi.color === 'blue' ? '📊' : kpi.color === 'purple' ? '🏦' : '💸'}
