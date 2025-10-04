@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 const WorkingCompanySetup = ({ user, onComplete }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showSisterCompanyForm, setShowSisterCompanyForm] = useState(false);
   
   const [formData, setFormData] = useState({
     company_name: user?.company || '',
@@ -13,6 +14,7 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
     accounting_system: 'indian_gaap',
     base_currency: 'INR',
     additional_currencies: [],
+    sister_companies: [],
     address: {
       street_address: '',
       city: '',
@@ -20,6 +22,14 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
       postal_code: '',
       country: 'IN'
     }
+  });
+
+  const [sisterCompanyData, setSisterCompanyData] = useState({
+    company_name: '',
+    country: 'IN',
+    business_type: 'Private Limited Company',
+    industry: 'Technology',
+    fiscal_year_start: '2024-04-01'
   });
 
   const handleSubmit = async (e) => {
