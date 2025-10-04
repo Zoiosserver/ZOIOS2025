@@ -38,11 +38,13 @@ class User(BaseModel):
     email: str
     name: str
     company: str
-    role: str  # "admin" or "user"
+    role: str  # "super_admin", "admin", "manager", "user", "viewer"
     is_active: bool = True
     onboarding_completed: bool = False
     created_at: datetime
     permissions: Optional[Dict[str, bool]] = Field(default_factory=dict)
+    company_id: Optional[str] = None
+    assigned_companies: Optional[List[str]] = Field(default_factory=list)  # For multi-company access
 
 class UserInDB(User):
     hashed_password: str
