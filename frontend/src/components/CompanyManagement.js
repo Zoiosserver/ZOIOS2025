@@ -34,8 +34,14 @@ const CompanyManagement = ({ user, onBack }) => {
 
   const fetchCompanies = async () => {
     try {
-      const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies/management`, {
+      // Use environment variable for backend URL to ensure correct API calls
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const apiUrl = `${backendUrl}/api/companies/management`;
+      
+      console.log('DEBUG: Fetching companies from URL:', apiUrl);
+      console.log('DEBUG: Using token:', localStorage.getItem('token') ? 'Token present' : 'No token found');
+      
+      const response = await fetch(apiUrl, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
