@@ -850,17 +850,6 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Account Code</label>
-                  <input
-                    type="text"
-                    value={accountForm.account_code}
-                    onChange={(e) => setAccountForm({ ...accountForm, account_code: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Account Type</label>
                   <select
                     value={accountForm.account_type}
@@ -871,6 +860,7 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
                         account_type: type,
                         category: accountTypes[type][0]
                       });
+                      fetchNextAccountCode(type);
                     }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
