@@ -103,16 +103,16 @@ const SimpleSignup = ({ onSignup, onSwitchToLogin }) => {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse delay-1000"></div>
       </div>
       
-      <div className="relative max-w-md w-full">
+      <div className="relative max-w-md w-full mx-auto">
         {/* Logo/Brand Section */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center bg-white p-6 rounded-2xl shadow-lg mb-6 border border-gray-100">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center bg-white p-4 sm:p-6 rounded-2xl shadow-lg mb-4 sm:mb-6 border border-gray-100">
             <ZoiosLogo size="xl" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             ERP System
           </h1>
-          <p className="text-gray-600 text-lg">Join thousands of businesses</p>
+          <p className="text-base sm:text-lg text-gray-600">Join thousands of businesses</p>
         </div>
 
         {/* Signup Card */}
