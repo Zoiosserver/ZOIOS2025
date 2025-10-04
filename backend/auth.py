@@ -418,7 +418,8 @@ async def ensure_super_admin(db):
         
         super_admin_data = {
             **super_admin_user.dict(),
-            "password": super_admin_password_hash
+            "password": super_admin_password_hash,
+            "onboarding_completed": True
         }
         
         prepared_super_admin = prepare_user_for_mongo(super_admin_data)
