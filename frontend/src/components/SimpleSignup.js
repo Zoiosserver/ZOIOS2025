@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ZoiosLogo from './ZoiosLogo';
 
 const SimpleSignup = ({ onSignup, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
