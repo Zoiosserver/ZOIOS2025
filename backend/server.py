@@ -2110,16 +2110,42 @@ async def get_enhanced_consolidated_accounts(current_user: UserInDB = Depends(ge
     else:
         db_to_use = tenant_db
     
-    # Get all companies
-    companies_raw = await db_to_use.company_setups.find().to_list(length=None)
-    companies = [parse_from_mongo(company) for company in companies_raw]
+    # Get main company
+    company_setup = await db_to_use.company_setups.find_one({"user_id": current_user.id})
+    if not company_setup:
+        raise HTTPException(status_code=404, detail="Company setup not found")
+    
+    all_companies = []
+    
+    # Add main company
+    main_company = parse_from_mongo(company_setup)
+    main_company['is_main_company'] = True
+    all_companies.append(main_company)
+    
+    # Get sister companies if this is a group company
+    if company_setup.get("business_type") == "Group Company":
+        sister_companies_raw = await db_to_use.sister_companies.find({
+            "group_company_id": company_setup["id"],
+            "is_active": True
+        }).to_list(length=None)
+        
+        for sister_raw in sister_companies_raw:
+            sister = parse_from_mongo(sister_raw)
+            sister['is_main_company'] = False
+            all_companies.append(sister)
+    
+    print(f"DEBUG: Found {len(all_companies)} total companies for consolidated accounts")
     
     consolidated_data = []
     total_accounts = 0
     
-    for company in companies:
+    for company in all_companies:
         company_id = company.get('id')
+        company_name = company.get('company_name', 'Unknown')
+        print(f"DEBUG: Processing accounts for company {company_name} (ID: {company_id})")
+        
         accounts_raw = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("code", 1).to_list(length=None)
+        print(f"DEBUG: Found {len(accounts_raw)} accounts for {company_name}")
         
         # Parse accounts and map field names for frontend compatibility
         for account_raw in accounts_raw:
@@ -2129,12 +2155,15 @@ async def get_enhanced_consolidated_accounts(current_user: UserInDB = Depends(ge
                 **account,
                 'account_code': account.get('code', ''),  # Map 'code' to 'account_code'
                 'account_name': account.get('name', ''),  # Map 'name' to 'account_name'
-                'company_name': company.get('company_name', 'Unknown'),
-                'company_id': company_id
+                'company_name': company_name,
+                'company_id': company_id,
+                'is_main_company': company.get('is_main_company', False)
             }
             consolidated_data.append(mapped_account)
         
         total_accounts += len(accounts_raw)
+    
+    print(f"DEBUG: Total consolidated accounts: {total_accounts}")
     
     # Group by account type
     grouped_accounts = {}
