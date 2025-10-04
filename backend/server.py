@@ -698,10 +698,15 @@ async def setup_company(
     else:
         print(f"DEBUG: No sister companies to process. Business type: {company_data.business_type}, Sister companies count: {len(company_data.sister_companies) if company_data.sister_companies else 0}")
     
-    # Update user onboarding status in both main database and tenant database
+    # Update user onboarding status and make them super admin for their company
+    from auth import get_default_permissions
+    
     update_data = {
         "onboarding_completed": True,
         "company_id": company_setup.id,  # Link user to company
+        "role": "admin",  # Company creators become admins by default
+        "permissions": get_default_permissions("admin"),
+        "assigned_companies": [company_setup.id],  # Add company to their assigned companies list
         "updated_at": datetime.now(timezone.utc).isoformat()
     }
     
