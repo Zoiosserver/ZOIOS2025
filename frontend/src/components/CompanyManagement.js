@@ -246,7 +246,7 @@ const CompanyManagement = ({ user, onBack }) => {
   const startEdit = (company) => {
     setEditingCompany(company);
     setCompanyForm({ ...company });
-    setShowAddModal(true);
+    setShowAddCompanyModal(true);
   };
 
   return (
