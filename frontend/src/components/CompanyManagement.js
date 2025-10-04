@@ -223,6 +223,34 @@ const CompanyManagement = ({ user, onBack }) => {
     }
   };
 
+  const handleAddSisterCompany = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const response = await fetch(`${backendUrl}/api/company/sister-companies`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(sisterCompanyForm)
+      });
+
+      if (response.ok) {
+        await fetchCompanies(); // Refresh the companies list
+        setShowAddSisterModal(false);
+        resetSisterForm();
+        alert('Sister company added successfully!');
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.detail || 'Failed to add sister company');
+      }
+    } catch (err) {
+      setError('Connection failed: ' + err.message);
+    }
+  };
+
   const resetForm = () => {
     setCompanyForm({
       company_name: '',
