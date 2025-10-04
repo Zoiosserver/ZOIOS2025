@@ -117,9 +117,9 @@ const SimpleSignup = ({ onSignup, onSwitchToLogin }) => {
 
         {/* Signup Card */}
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-100/50 p-6 sm:p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-            <p className="text-gray-600">Start your ERP journey today</p>
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+            <p className="text-sm sm:text-base text-gray-600">Start your ERP journey today</p>
           </div>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
