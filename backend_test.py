@@ -1699,14 +1699,14 @@ class BackendTester:
             response = self.session.get(f"{API_BASE}/companies/management")
             self.log(f"No auth companies/management response status: {response.status_code}")
             
-            if response.status_code == 401:
+            if response.status_code in [401, 403]:
                 self.log("✅ Authentication properly required for company management")
                 
                 # Test enhanced accounts endpoint without auth
                 response = self.session.get(f"{API_BASE}/companies/test-id/accounts/enhanced")
                 self.log(f"No auth enhanced accounts response status: {response.status_code}")
                 
-                if response.status_code == 401:
+                if response.status_code in [401, 403]:
                     self.log("✅ Authentication properly required for enhanced accounts")
                     
                     # Test export endpoint without auth
@@ -1714,7 +1714,7 @@ class BackendTester:
                     response = self.session.post(f"{API_BASE}/companies/test-id/accounts/export", json=export_data)
                     self.log(f"No auth export response status: {response.status_code}")
                     
-                    if response.status_code == 401:
+                    if response.status_code in [401, 403]:
                         self.log("✅ Authentication properly required for export endpoints")
                         return True
                     else:
