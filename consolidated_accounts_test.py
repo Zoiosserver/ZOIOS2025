@@ -18,8 +18,13 @@ BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://zoios-erp-2.preview.em
 API_BASE = f"{BACKEND_URL}/api"
 
 # Test with existing Group Company account that has sister companies
-TEST_EMAIL = "usertestsister@example.com"
-TEST_PASSWORD = "testsister123"
+# Will try multiple known accounts
+TEST_ACCOUNTS = [
+    ("usertestsister@example.com", "testsister123"),
+    ("admin@2mholding.com", "admin123"),
+    ("testuser1759583819@example.com", "password123"),
+    ("userfix1759589474@example.com", "userfix123")
+]
 
 class ConsolidatedAccountsTester:
     def __init__(self):
