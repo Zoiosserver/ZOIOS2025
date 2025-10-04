@@ -129,8 +129,9 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
   };
 
   const exportToPDF = async () => {
-    // Dynamic import of jsPDF
+    // Dynamic import of jsPDF and autoTable
     const { jsPDF } = await import('jspdf');
+    await import('jspdf-autotable');
     const doc = new jsPDF();
     
     // Header
