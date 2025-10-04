@@ -1668,28 +1668,38 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
                   </div>
                 </div>
                 
-                {/* Desktop Table View */}
+                {/* True Consolidated Table View - One row per account with company columns */}
                 <div className="hidden md:block overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account Name</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account Name</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        {companyNames.map((companyName) => (
+                          <th key={companyName} className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {companyName.length > 12 ? companyName.substring(0, 12) + '...' : companyName}
+                          </th>
+                        ))}
+                        <th className="px-4 py-3 text-right text-xs font-medium text-blue-600 uppercase tracking-wider font-bold">Total</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {accounts.map((account) => (
-                        <tr key={`${account.company_id}-${account.id}`} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{account.account_code || 'N/A'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{account.account_name || 'N/A'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{account.company_name || 'N/A'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{account.account_type || 'N/A'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{account.category?.replace('_', ' ') || 'N/A'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{account.current_balance || 0}</td>
+                      {accounts.map((account, index) => (
+                        <tr key={`${account.account_code}-${index}`} className="hover:bg-gray-50">
+                          <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{account.account_code || 'N/A'}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{account.account_name || 'N/A'}</td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{account.account_type || 'N/A'}</td>
+                          {companyNames.map((companyName) => (
+                            <td key={companyName} className="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
+                              {account.companies && account.companies[companyName] !== undefined 
+                                ? Number(account.companies[companyName]).toFixed(2) 
+                                : '0.00'}
+                            </td>
+                          ))}
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-blue-600 text-right font-bold">
+                            {Number(account.total_balance || 0).toFixed(2)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
