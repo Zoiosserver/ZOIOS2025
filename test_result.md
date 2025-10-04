@@ -303,12 +303,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Company Management Functionality Testing"
-    - "Authentication Flow Investigation"
-    - "Account Creation and Login Process"
+    - "Currency Symbol Display Frontend Fix"
+    - "Account Code Auto-Generation Issue"
+    - "Dashboard Dummy Data Removal"
   stuck_tasks:
     - "India Rupee Currency Display Issue"
-    - "Company Management Functionality Testing"
+    - "Currency Symbol Display Frontend Fix"
   test_all: false
   test_priority: "high_first"
 
