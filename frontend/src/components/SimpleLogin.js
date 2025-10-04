@@ -161,7 +161,11 @@ const SimpleLogin = ({ onLogin, onSwitchToSignup, onSwitchToForgotPassword }) =>
                 <input type="checkbox" className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
                 <span className="ml-2 block text-sm text-gray-700">Remember me</span>
               </label>
-              <button type="button" className="text-sm text-blue-600 hover:text-blue-500 font-medium">
+              <button 
+                type="button" 
+                onClick={onSwitchToForgotPassword}
+                className="text-sm text-blue-600 hover:text-blue-500 font-medium"
+              >
                 Forgot password?
               </button>
             </div>
