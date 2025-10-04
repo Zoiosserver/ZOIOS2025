@@ -279,9 +279,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Beautiful Professional Dashboard Testing"
-    - "Currency Symbol Display Fix"
-    - "Account Code Auto-Generation Fix"
+    - "Company Management API Endpoints"
+    - "Enhanced Chart of Accounts API Endpoints"
+    - "Export and Print API Endpoints"
   stuck_tasks:
     - "India Rupee Currency Display Issue"
   test_all: false
