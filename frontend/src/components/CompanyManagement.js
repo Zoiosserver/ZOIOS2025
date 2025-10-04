@@ -342,6 +342,7 @@ const CompanyManagement = ({ user, onBack }) => {
               onEdit={startEdit}
               onDelete={handleDelete}
               onSelectCompany={setSelectedCompany}
+              onConvertToGroup={handleConvertToGroupCompany}
             />
           )}
           
