@@ -418,7 +418,7 @@ async def ensure_super_admin(db):
         
         super_admin_data = {
             **super_admin_user.dict(),
-            "password": super_admin_password_hash,
+            "hashed_password": super_admin_password_hash,
             "onboarding_completed": True
         }
         
