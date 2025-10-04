@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ZoiosLogo from './ZoiosLogo';
 
 const WorkingCompanySetup = ({ user, onComplete }) => {
   const [loading, setLoading] = useState(false);
