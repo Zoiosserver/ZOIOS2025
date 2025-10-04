@@ -1760,6 +1760,47 @@ async def create_company(company: CompanyCreate, current_user: UserInDB = Depend
     return company_obj
 
 # =================================================================================
+# COMPANY SETUP MODIFICATION ENDPOINTS
+# =================================================================================
+
+@api_router.put("/setup/company/convert-to-group")
+async def convert_to_group_company(current_user: UserInDB = Depends(get_current_active_user)):
+    """Convert existing company to Group Company to allow sister companies"""
+    try:
+        # Get tenant database for user
+        tenant_service = await get_tenant_service(mongo_url)
+        tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+        
+        if tenant_db is None:
+            db_to_use = db
+        else:
+            db_to_use = tenant_db
+            
+        # Find user's company setup
+        company_setup_raw = await db_to_use.company_setups.find_one({"user_id": current_user.id})
+        
+        if not company_setup_raw:
+            raise HTTPException(status_code=404, detail="No company setup found")
+        
+        # Update business type to Group Company
+        await db_to_use.company_setups.update_one(
+            {"user_id": current_user.id},
+            {"$set": {"business_type": "Group Company", "updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        print(f"DEBUG: Converted company {company_setup_raw.get('company_name')} to Group Company")
+        
+        return {
+            "success": True,
+            "message": "Company converted to Group Company. You can now add sister companies.",
+            "business_type": "Group Company"
+        }
+        
+    except Exception as e:
+        print(f"DEBUG: Error converting to Group Company: {e}")
+        raise HTTPException(status_code=500, detail=f"Error converting company: {str(e)}")
+
+# =================================================================================
 # COMPANY MANAGEMENT API ENDPOINTS (Must be before generic company routes)
 # =================================================================================
 
