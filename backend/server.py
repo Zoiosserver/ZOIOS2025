@@ -1747,17 +1747,36 @@ async def get_contact_email_responses(contact_id: str, current_user: UserInDB = 
 @api_router.get("/companies/management", response_model=List[CompanySetup])
 async def get_all_companies(current_user: UserInDB = Depends(get_current_active_user)):
     """Get all companies for management purposes"""
-    # Get tenant database for user
-    tenant_service = await get_tenant_service(mongo_url)
-    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
-    
-    if tenant_db is None:
-        db_to_use = db
-    else:
-        db_to_use = tenant_db
-    
-    companies = await db_to_use.company_setups.find().to_list(length=None)
-    return [CompanySetup(**parse_from_mongo(company)) for company in companies]
+    try:
+        # Get tenant database for user
+        tenant_service = await get_tenant_service(mongo_url)
+        tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+        
+        if tenant_db is None:
+            db_to_use = db
+        else:
+            db_to_use = tenant_db
+        
+        print(f"DEBUG: Using database: {db_to_use.name}")
+        companies = await db_to_use.company_setups.find().to_list(length=None)
+        print(f"DEBUG: Found {len(companies)} companies")
+        
+        if not companies:
+            return []
+        
+        result = []
+        for company in companies:
+            try:
+                parsed_company = parse_from_mongo(company)
+                result.append(CompanySetup(**parsed_company))
+            except Exception as e:
+                print(f"DEBUG: Error parsing company {company.get('id', 'unknown')}: {e}")
+                continue
+        
+        return result
+    except Exception as e:
+        print(f"DEBUG: Error in get_all_companies: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @api_router.get("/companies/management/{company_id}", response_model=CompanySetup)
 async def get_company_details(company_id: str, current_user: UserInDB = Depends(get_current_active_user)):
