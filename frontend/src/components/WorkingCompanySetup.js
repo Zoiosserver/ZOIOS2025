@@ -300,18 +300,23 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
 
             {/* Sister Companies Section - Only show when Group Company is selected */}
             {formData.business_type === 'Group Company' && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h4 className="text-lg font-medium text-blue-900">Sister Companies</h4>
-                    <p className="text-sm text-blue-700">Add sister companies that are part of your group</p>
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border border-indigo-200">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center">
+                    <svg className="w-6 h-6 text-indigo-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/>
+                    </svg>
+                    <div>
+                      <h4 className="text-xl font-semibold text-gray-900">Sister Companies</h4>
+                      <p className="text-sm text-indigo-700">Add sister companies that are part of your group</p>
+                    </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setShowSisterCompanyForm(!showSisterCompanyForm)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                    className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 font-medium shadow-lg"
                   >
-                    Add Sister Company
+                    {showSisterCompanyForm ? 'Hide Form' : 'Add Sister Company'}
                   </button>
                 </div>
 
