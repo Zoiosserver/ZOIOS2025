@@ -443,43 +443,63 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
           </div>
 
           {/* Currency & Accounting */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-medium mb-4">Currency & Accounting</h3>
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border border-purple-200">
+            <div className="flex items-center mb-4">
+              <svg className="w-6 h-6 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.51-1.31c-.562-.649-1.413-1.076-2.353-1.253V5z" clipRule="evenodd"/>
+              </svg>
+              <h3 className="text-xl font-semibold text-gray-900">Financial Configuration</h3>
+            </div>
             
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Base Currency</label>
-                <select
-                  name="base_currency"
-                  value={formData.base_currency}
-                  onChange={handleChange}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
-                  required
-                >
-                  <option value="INR">INR - ₹ - Indian Rupee</option>
-                  <option value="USD">USD - $ - US Dollar</option>
-                  <option value="EUR">EUR - € - Euro</option>
-                  <option value="GBP">GBP - £ - British Pound</option>
-                  <option value="JPY">JPY - ¥ - Japanese Yen</option>
-                  <option value="CAD">CAD - C$ - Canadian Dollar</option>
-                </select>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Base Currency</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
+                    </svg>
+                  </div>
+                  <select
+                    name="base_currency"
+                    value={formData.base_currency}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white hover:bg-gray-50 appearance-none"
+                    required
+                  >
+                    <option value="INR">INR - ₹ - Indian Rupee</option>
+                    <option value="USD">USD - $ - US Dollar</option>
+                    <option value="EUR">EUR - € - Euro</option>
+                    <option value="GBP">GBP - £ - British Pound</option>
+                    <option value="JPY">JPY - ¥ - Japanese Yen</option>
+                    <option value="CAD">CAD - C$ - Canadian Dollar</option>
+                  </select>
+                </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Accounting System</label>
-                <select
-                  name="accounting_system"
-                  value={formData.accounting_system}
-                  onChange={handleChange}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md"
-                  required
-                >
-                  <option value="indian_gaap">Indian GAAP / Ind AS</option>
-                  <option value="us_gaap">US GAAP</option>
-                  <option value="ifrs">IFRS</option>
-                  <option value="uk_gaap">UK GAAP</option>
-                  <option value="canadian_gaap">Canadian GAAP</option>
-                </select>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Accounting System</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"/>
+                    </svg>
+                  </div>
+                  <select
+                    name="accounting_system"
+                    value={formData.accounting_system}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 bg-white hover:bg-gray-50 appearance-none"
+                    required
+                  >
+                    <option value="indian_gaap">Indian GAAP / Ind AS</option>
+                    <option value="us_gaap">US GAAP</option>
+                    <option value="ifrs">IFRS</option>
+                    <option value="uk_gaap">UK GAAP</option>
+                    <option value="canadian_gaap">Canadian GAAP</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
