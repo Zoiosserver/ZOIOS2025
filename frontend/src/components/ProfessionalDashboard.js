@@ -9,9 +9,9 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
   const [companySetup, setCompanySetup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeModule, setActiveModule] = useState('overview');
+  const [activeModule, setActiveModule] = useState('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [expandedSections, setExpandedSections] = useState({});
+  const [expandedSections, setExpandedSections] = useState({ overview: true }); // Start with overview expanded
   const [dashboardData, setDashboardData] = useState({});
 
   // Mock business intelligence data
