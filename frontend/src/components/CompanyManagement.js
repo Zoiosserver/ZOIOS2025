@@ -741,7 +741,7 @@ const CompaniesTab = ({ companies, loading, error, onAdd, onAddSister, onEdit, o
             onClick={() => {
               console.log('DEBUG: View Chart of Accounts clicked for company:', company.company_name);
               onSelectCompany(company);
-              setActiveTab('accounts');  // Also switch to accounts tab
+              onSwitchToAccountsTab();  // Switch to accounts tab
             }}
             className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-2 px-4 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 font-medium text-sm sm:text-base"
           >
