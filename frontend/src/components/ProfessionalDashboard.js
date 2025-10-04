@@ -69,7 +69,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
         accountsData.splice(0, accountsData.length, ...businessData.account_distribution.map(item => ({
           category: item.category,
           current: item.current,
-          previous: Math.round(item.current * 0.9) // Mock previous value
+          previous: item.previous || 0 // Real previous value from backend
         })));
         
         setCompanySetup({
