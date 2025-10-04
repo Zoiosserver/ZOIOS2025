@@ -454,9 +454,14 @@ class SpecificEndpointsTester:
             self.log("❌ Signup/Login failed - cannot proceed with tests")
             return False
         
-        # Step 2: Get company setup
-        if not self.get_company_setup():
+        # Step 2: Setup company with sister companies
+        if not self.setup_company_with_sisters():
             self.log("❌ Company setup failed - cannot proceed with tests")
+            return False
+        
+        # Step 3: Get company setup
+        if not self.get_company_setup():
+            self.log("❌ Company setup retrieval failed - cannot proceed with tests")
             return False
         
         # Step 3: Test specific endpoints
