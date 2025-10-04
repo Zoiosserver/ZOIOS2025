@@ -1440,10 +1440,15 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
           await generateConsolidatedPDF(data.data);
         }
       } else {
-        setError('Failed to export consolidated accounts');
+        const errorData = await response.json().catch(() => ({}));
+        console.log('DEBUG: Export API error:', errorData);
+        setError('Failed to export consolidated accounts: ' + (errorData.detail || response.statusText));
+        alert('Export failed: ' + (errorData.detail || response.statusText));
       }
     } catch (err) {
+      console.log('DEBUG: Export exception:', err);
       setError('Export failed: ' + err.message);
+      alert('Export failed: ' + err.message);
     }
   };
 
