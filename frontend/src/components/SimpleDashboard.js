@@ -338,7 +338,10 @@ const SimpleDashboard = ({ user, onLogout }) => {
                   </div>
                 </button>
                 
-                <button className="w-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 text-left hover:from-green-100 hover:to-emerald-100 transition-all duration-200 transform hover:scale-[1.02] group">
+                <button 
+                  onClick={onNavigateToCompanyManagement}
+                  className="w-full bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 text-left hover:from-green-100 hover:to-emerald-100 transition-all duration-200 transform hover:scale-[1.02] group"
+                >
                   <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
                       <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -346,8 +349,8 @@ const SimpleDashboard = ({ user, onLogout }) => {
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <div className="text-green-700 font-semibold">Chart of Accounts</div>
-                      <div className="text-green-600 text-sm">Manage account structure</div>
+                      <div className="text-green-700 font-semibold">Company Management</div>
+                      <div className="text-green-600 text-sm">Manage companies & chart of accounts</div>
                     </div>
                   </div>
                 </button>
