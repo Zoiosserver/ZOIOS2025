@@ -188,11 +188,23 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
       ]
     },
     {
+      key: 'projects',
+      title: 'Project Management',
+      icon: '🏗️',
+      items: [
+        { key: 'project-dashboard', label: 'Project Dashboard' },
+        { key: 'elevator-installation', label: 'Elevator Installation', badge: 'New' },
+        { key: 'elevator-maintenance', label: 'Elevator Maintenance' },
+        { key: 'project-planning', label: 'Project Planning' },
+        { key: 'resource-allocation', label: 'Resource Allocation' }
+      ]
+    },
+    {
       key: 'sales',
       title: 'Sales & CRM',
       icon: '📈',
       items: [
-        { key: 'crm-dashboard', label: 'CRM Dashboard', badge: 'New' },
+        { key: 'crm-dashboard', label: 'CRM Dashboard', badge: 'Enhanced' },
         { key: 'leads', label: 'Lead Management' },
         { key: 'opportunities', label: 'Opportunities' },
         { key: 'sales-orders', label: 'Sales Orders' },
@@ -208,6 +220,18 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
         { key: 'purchase-orders', label: 'Purchase Orders' },
         { key: 'rfq', label: 'RFQ Management' },
         { key: 'vendor-bills', label: 'Vendor Bills' }
+      ]
+    },
+    {
+      key: 'manufacturing',
+      title: 'Manufacturing',
+      icon: '🏭',
+      items: [
+        { key: 'production-planning', label: 'Production Planning' },
+        { key: 'work-orders', label: 'Work Orders' },
+        { key: 'quality-control', label: 'Quality Control' },
+        { key: 'equipment-management', label: 'Equipment Management' },
+        { key: 'production-reports', label: 'Production Reports' }
       ]
     },
     {
@@ -227,6 +251,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
       icon: '👥',
       items: [
         { key: 'employees', label: 'Employee Management' },
+        { key: 'employee-checkin', label: 'Employee Check-In/Out', badge: 'New' },
         { key: 'payroll', label: 'Payroll Processing' },
         { key: 'attendance', label: 'Time & Attendance' },
         { key: 'performance', label: 'Performance Management' }
@@ -238,6 +263,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
       icon: '🎓',
       items: [
         { key: 'courses', label: 'Course Library' },
+        { key: 'students-data', label: 'Students Data', badge: 'New' },
         { key: 'training', label: 'Training Programs' },
         { key: 'certifications', label: 'Certifications' },
         { key: 'knowledge-base', label: 'Knowledge Base' }
