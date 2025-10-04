@@ -345,6 +345,22 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
         return renderCRMDashboardContent();
       case 'leads':
         return renderLeadsContent();
+      case 'employee-checkin':
+        return renderEmployeeCheckinContent();
+      case 'students-data':
+        return renderStudentsDataContent();
+      case 'project-dashboard':
+        return renderProjectDashboardContent();
+      case 'elevator-installation':
+        return renderElevatorInstallationContent();
+      case 'elevator-maintenance':
+        return renderElevatorMaintenanceContent();
+      case 'production-planning':
+        return renderProductionPlanningContent();
+      case 'work-orders':
+        return renderWorkOrdersContent();
+      case 'quality-control':
+        return renderQualityControlContent();
       default:
         return renderComingSoonContent(activeModule);
     }
