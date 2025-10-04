@@ -220,11 +220,11 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
     
     // Prepare data for Excel
     const excelData = filteredAccounts.map(account => ({
-      'Account Code': account.code || '',
-      'Account Name': account.name || '',
+      'Account Code': account.account_code || account.code || '',
+      'Account Name': account.account_name || account.name || '',
       'Account Type': account.account_type || '',
       'Category': account.category || '',
-      'Opening Balance': account.opening_balance || 0,
+      'Current Balance': account.current_balance || account.opening_balance || 0,
       'Description': account.description || ''
     }));
 
