@@ -3644,6 +3644,286 @@ class BackendTester:
         
         return all_passed
 
+    def test_sister_company_functionality_comprehensive(self):
+        """Test comprehensive sister company functionality as requested in review"""
+        self.log("Testing comprehensive sister company functionality as requested in review...")
+        
+        # Step 1: Create a new account for Group Company testing
+        self.log("Step 1: Creating new account for Group Company testing...")
+        
+        timestamp = str(int(time.time()))
+        group_email = f"groupcompany{timestamp}@example.com"
+        group_signup_data = {
+            "email": group_email,
+            "password": "testpass123",
+            "name": "Group Company Admin",
+            "company": "Parent Holdings Ltd"
+        }
+        
+        try:
+            signup_response = self.session.post(f"{API_BASE}/auth/signup", json=group_signup_data)
+            if signup_response.status_code != 200:
+                self.log(f"❌ Group company account creation failed: {signup_response.text}")
+                return False
+            
+            group_token = signup_response.json().get('access_token')
+            group_headers = {
+                "Authorization": f"Bearer {group_token}",
+                "Content-Type": "application/json"
+            }
+            
+            self.log("✅ Group company account created successfully")
+            
+            # Step 2: Complete company setup as Group Company with sister companies
+            self.log("Step 2: Setting up Group Company with sister companies...")
+            
+            group_setup_data = {
+                "company_name": "Parent Holdings Ltd",
+                "country_code": "US",
+                "base_currency": "USD",
+                "additional_currencies": ["EUR", "GBP"],
+                "business_type": "Group Company",  # This is key for sister company functionality
+                "industry": "Financial Services",
+                "address": "123 Corporate Plaza",
+                "city": "New York",
+                "state": "NY",
+                "postal_code": "10001",
+                "phone": "+1-212-555-0100",
+                "email": group_email,
+                "website": "https://parentholdings.com",
+                "tax_number": "TAX987654321",
+                "registration_number": "REG123456789",
+                "sister_companies": [
+                    {
+                        "company_name": "Tech Subsidiary Inc",
+                        "country": "US",
+                        "business_type": "Private Limited Company",
+                        "industry": "Technology",
+                        "fiscal_year_start": "01/01"
+                    },
+                    {
+                        "company_name": "Finance Solutions LLC",
+                        "country": "US", 
+                        "business_type": "Limited Liability Company",
+                        "industry": "Financial Services",
+                        "fiscal_year_start": "01/01"
+                    },
+                    {
+                        "company_name": "Global Trading Corp",
+                        "country": "GB",
+                        "business_type": "Public Limited Company",
+                        "industry": "Trading",
+                        "fiscal_year_start": "04/01"
+                    }
+                ]
+            }
+            
+            setup_response = self.session.post(f"{API_BASE}/setup/company", json=group_setup_data, headers=group_headers)
+            self.log(f"Group company setup response status: {setup_response.status_code}")
+            self.log(f"Group company setup response: {setup_response.text}")
+            
+            if setup_response.status_code != 200:
+                self.log(f"❌ Group company setup failed: {setup_response.text}")
+                return False
+            
+            setup_data = setup_response.json()
+            main_company_id = setup_data.get('id')
+            self.log(f"✅ Group company setup successful - Company ID: {main_company_id}")
+            
+            # Step 3: Test the /api/companies/management endpoint
+            self.log("Step 3: Testing /api/companies/management endpoint...")
+            
+            management_response = self.session.get(f"{API_BASE}/companies/management", headers=group_headers)
+            self.log(f"Companies management response status: {management_response.status_code}")
+            self.log(f"Companies management response: {management_response.text}")
+            
+            if management_response.status_code != 200:
+                self.log(f"❌ Companies management endpoint failed: {management_response.text}")
+                return False
+            
+            companies_data = management_response.json()
+            self.log(f"✅ Companies management endpoint working - found {len(companies_data)} companies")
+            
+            # Step 4: Verify sister company data structure
+            self.log("Step 4: Verifying sister company data structure...")
+            
+            main_company = None
+            sister_companies = []
+            
+            for company in companies_data:
+                if company.get('is_main_company'):
+                    main_company = company
+                else:
+                    sister_companies.append(company)
+            
+            if not main_company:
+                self.log("❌ Main company not found in response")
+                return False
+            
+            self.log(f"✅ Main company found: {main_company.get('company_name')}")
+            self.log(f"✅ Sister companies found: {len(sister_companies)}")
+            
+            # Verify main company structure
+            required_main_fields = ['id', 'company_name', 'business_type', 'is_main_company', 'country_code', 'base_currency']
+            for field in required_main_fields:
+                if field not in main_company:
+                    self.log(f"❌ Missing required field in main company: {field}")
+                    return False
+                else:
+                    self.log(f"✅ Main company {field}: {main_company[field]}")
+            
+            # Verify sister company structure
+            expected_sister_names = ["Tech Subsidiary Inc", "Finance Solutions LLC", "Global Trading Corp"]
+            found_sister_names = [sc.get('company_name') for sc in sister_companies]
+            
+            for expected_name in expected_sister_names:
+                if expected_name in found_sister_names:
+                    self.log(f"✅ Sister company found: {expected_name}")
+                else:
+                    self.log(f"❌ Sister company missing: {expected_name}")
+                    return False
+            
+            # Verify sister company fields
+            for sister in sister_companies:
+                required_sister_fields = ['id', 'company_name', 'business_type', 'is_main_company']
+                for field in required_sister_fields:
+                    if field not in sister:
+                        self.log(f"❌ Missing required field in sister company {sister.get('company_name')}: {field}")
+                        return False
+                
+                # Verify is_main_company is False for sister companies
+                if sister.get('is_main_company') != False:
+                    self.log(f"❌ Sister company {sister.get('company_name')} has incorrect is_main_company flag: {sister.get('is_main_company')}")
+                    return False
+                
+                # Check for parent_company_id if available
+                if 'parent_company_id' in sister:
+                    if sister.get('parent_company_id') != main_company_id:
+                        self.log(f"❌ Sister company {sister.get('company_name')} has incorrect parent_company_id: {sister.get('parent_company_id')}")
+                        return False
+                
+                self.log(f"✅ Sister company structure verified: {sister.get('company_name')}")
+            
+            # Step 5: Test sister company API endpoints
+            self.log("Step 5: Testing sister company API endpoints...")
+            
+            # Test GET /api/company/sister-companies
+            sister_api_response = self.session.get(f"{API_BASE}/company/sister-companies", headers=group_headers)
+            self.log(f"Sister companies API response status: {sister_api_response.status_code}")
+            
+            if sister_api_response.status_code == 200:
+                sister_api_data = sister_api_response.json()
+                self.log(f"✅ Sister companies API working - found {len(sister_api_data)} sister companies")
+                
+                # Verify API data matches management endpoint data
+                api_sister_names = [sc.get('company_name') for sc in sister_api_data]
+                for expected_name in expected_sister_names:
+                    if expected_name in api_sister_names:
+                        self.log(f"✅ Sister company API data verified: {expected_name}")
+                    else:
+                        self.log(f"❌ Sister company missing from API: {expected_name}")
+                        return False
+            else:
+                self.log(f"❌ Sister companies API failed: {sister_api_response.text}")
+                return False
+            
+            # Step 6: Test consolidated accounts functionality
+            self.log("Step 6: Testing consolidated accounts functionality...")
+            
+            consolidated_response = self.session.get(f"{API_BASE}/company/consolidated-accounts", headers=group_headers)
+            self.log(f"Consolidated accounts response status: {consolidated_response.status_code}")
+            
+            if consolidated_response.status_code == 200:
+                consolidated_data = consolidated_response.json()
+                self.log(f"✅ Consolidated accounts working - found {len(consolidated_data)} consolidated accounts")
+                
+                # Verify consolidated accounts include data from all companies
+                if len(consolidated_data) > 0:
+                    sample_account = consolidated_data[0]
+                    if 'sister_companies_data' in sample_account:
+                        companies_in_consolidation = len(sample_account['sister_companies_data'])
+                        expected_companies = 1 + len(sister_companies)  # Main + sister companies
+                        
+                        if companies_in_consolidation == expected_companies:
+                            self.log(f"✅ Consolidated accounts include all companies: {companies_in_consolidation}")
+                        else:
+                            self.log(f"⚠️ Consolidated accounts company count mismatch: expected {expected_companies}, got {companies_in_consolidation}")
+                    else:
+                        self.log("⚠️ Consolidated accounts missing sister_companies_data field")
+                else:
+                    self.log("⚠️ No consolidated accounts found")
+            else:
+                self.log(f"❌ Consolidated accounts failed: {consolidated_response.text}")
+                return False
+            
+            # Step 7: Test individual company chart of accounts
+            self.log("Step 7: Testing individual company chart of accounts...")
+            
+            # Test main company chart of accounts
+            main_chart_response = self.session.get(f"{API_BASE}/company/{main_company_id}/chart-of-accounts", headers=group_headers)
+            if main_chart_response.status_code == 200:
+                main_chart_data = main_chart_response.json()
+                self.log(f"✅ Main company chart of accounts working - {main_chart_data.get('total_accounts', 0)} accounts")
+                
+                # Verify main company info
+                company_info = main_chart_data.get('company', {})
+                if company_info.get('is_main_company') == True:
+                    self.log("✅ Main company correctly identified in chart of accounts")
+                else:
+                    self.log("❌ Main company not correctly identified in chart of accounts")
+                    return False
+            else:
+                self.log(f"❌ Main company chart of accounts failed: {main_chart_response.text}")
+                return False
+            
+            # Test sister company chart of accounts
+            if sister_companies:
+                sister_id = sister_companies[0].get('id')
+                sister_chart_response = self.session.get(f"{API_BASE}/company/{sister_id}/chart-of-accounts", headers=group_headers)
+                if sister_chart_response.status_code == 200:
+                    sister_chart_data = sister_chart_response.json()
+                    self.log(f"✅ Sister company chart of accounts working - {sister_chart_data.get('total_accounts', 0)} accounts")
+                    
+                    # Verify sister company info
+                    sister_company_info = sister_chart_data.get('company', {})
+                    if sister_company_info.get('is_main_company') == False:
+                        self.log("✅ Sister company correctly identified in chart of accounts")
+                    else:
+                        self.log("❌ Sister company not correctly identified in chart of accounts")
+                        return False
+                else:
+                    self.log(f"❌ Sister company chart of accounts failed: {sister_chart_response.text}")
+                    return False
+            
+            # Step 8: Test company list endpoint
+            self.log("Step 8: Testing company list endpoint...")
+            
+            list_response = self.session.get(f"{API_BASE}/company/list", headers=group_headers)
+            if list_response.status_code == 200:
+                list_data = list_response.json()
+                self.log(f"✅ Company list endpoint working - found {len(list_data)} companies")
+                
+                # Verify all companies are in the list
+                list_company_names = [c.get('name') for c in list_data]
+                all_expected_names = [main_company.get('company_name')] + expected_sister_names
+                
+                for expected_name in all_expected_names:
+                    if expected_name in list_company_names:
+                        self.log(f"✅ Company in list: {expected_name}")
+                    else:
+                        self.log(f"❌ Company missing from list: {expected_name}")
+                        return False
+            else:
+                self.log(f"❌ Company list endpoint failed: {list_response.text}")
+                return False
+            
+            self.log("✅ Sister company functionality comprehensive testing completed successfully!")
+            return True
+            
+        except Exception as e:
+            self.log(f"❌ Sister company functionality test error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run comprehensive backend testing as requested in review"""
         self.log("=" * 80)
