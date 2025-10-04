@@ -4,6 +4,7 @@ import SimpleSignup from './components/SimpleSignup';
 import WorkingCompanySetup from './components/WorkingCompanySetup';
 import SimpleDashboard from './components/SimpleDashboard';
 import ForgotPassword from './components/ForgotPassword';
+import CompanyManagement from './components/CompanyManagement';
 import './App.css';
 
 function App() {
