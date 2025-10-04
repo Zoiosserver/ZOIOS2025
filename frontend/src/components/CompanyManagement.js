@@ -828,12 +828,202 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
   );
 };
 
-const ConsolidatedAccountsTab = ({ companies, user }) => (
-  <div>
-    <h2 className="text-2xl font-bold text-gray-900 mb-6">Consolidated Accounts</h2>
-    {/* Consolidated accounts content will be implemented */}
-    <p className="text-gray-600">Consolidated accounts functionality will be implemented here</p>
-  </div>
-);
+const ConsolidatedAccountsTab = ({ companies, user }) => {
+  const [consolidatedAccounts, setConsolidatedAccounts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [groupBy, setGroupBy] = useState('account_type'); // account_type, company, category
+
+  useEffect(() => {
+    fetchConsolidatedAccounts();
+  }, []);
+
+  const fetchConsolidatedAccounts = async () => {
+    setLoading(true);
+    try {
+      const backendUrl = window.location.origin;
+      const response = await fetch(`${backendUrl}/api/companies/consolidated-accounts/enhanced`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setConsolidatedAccounts(data.consolidated_accounts || []);
+      } else {
+        setError('Failed to load consolidated accounts');
+      }
+    } catch (err) {
+      setError('Connection failed: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const exportConsolidatedAccounts = async (format) => {
+    try {
+      const backendUrl = window.location.origin;
+      const response = await fetch(`${backendUrl}/api/companies/consolidated-accounts/export`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ format })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (format === 'excel') {
+          // Create Excel file from data
+          const workbook = XLSX.utils.book_new();
+          const worksheet = XLSX.utils.json_to_sheet(data.data.accounts);
+          XLSX.utils.book_append_sheet(workbook, worksheet, 'Consolidated Accounts');
+          XLSX.writeFile(workbook, data.filename);
+        } else if (format === 'pdf') {
+          // Create PDF from data (simplified version)
+          window.print(); // This will print the current view
+        }
+      } else {
+        setError('Failed to export consolidated accounts');
+      }
+    } catch (err) {
+      setError('Export failed: ' + err.message);
+    }
+  };
+
+  const groupedAccounts = consolidatedAccounts.reduce((groups, account) => {
+    let key;
+    switch (groupBy) {
+      case 'company':
+        key = account.company_name || 'Unknown Company';
+        break;
+      case 'category':
+        key = account.category || 'Other';
+        break;
+      default:
+        key = account.account_type || 'Other';
+    }
+    
+    if (!groups[key]) {
+      groups[key] = [];
+    }
+    groups[key].push(account);
+    return groups;
+  }, {});
+
+  const getTotalBalance = (accounts) => {
+    return accounts.reduce((sum, account) => sum + (account.current_balance || 0), 0).toFixed(2);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Consolidated Accounts</h2>
+          <p className="text-gray-600">View accounts from all companies in one consolidated view</p>
+        </div>
+        
+        <div className="flex space-x-3">
+          <select
+            value={groupBy}
+            onChange={(e) => setGroupBy(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          >
+            <option value="account_type">Group by Type</option>
+            <option value="company">Group by Company</option>
+            <option value="category">Group by Category</option>
+          </select>
+          
+          <button
+            onClick={() => exportConsolidatedAccounts('excel')}
+            className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 font-medium text-sm"
+          >
+            Export Excel
+          </button>
+          <button
+            onClick={() => exportConsolidatedAccounts('pdf')}
+            className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-200 font-medium text-sm"
+          >
+            Export PDF
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+          <span className="text-red-700 text-sm">{error}</span>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="text-gray-600 mt-4">Loading consolidated accounts...</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {consolidatedAccounts.length === 0 ? (
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-8 text-center">
+              <div className="text-gray-400 mb-4">
+                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Consolidated Accounts</h3>
+              <p className="text-gray-500">No accounts found across companies. Create companies and accounts first.</p>
+            </div>
+          ) : (
+            Object.entries(groupedAccounts).map(([groupName, accounts]) => (
+              <div key={groupName} className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-100">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold text-gray-900 capitalize">
+                      {groupName.replace('_', ' ')}
+                    </h3>
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium">{accounts.length} accounts</span>
+                      <span className="mx-2">•</span>
+                      <span className="font-medium">Total: {getTotalBalance(accounts)}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account Name</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {accounts.map((account) => (
+                        <tr key={`${account.company_id}-${account.id}`} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{account.account_code}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{account.account_name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{account.company_name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{account.account_type}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{account.category?.replace('_', ' ')}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{account.current_balance || 0}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default CompanyManagement;
