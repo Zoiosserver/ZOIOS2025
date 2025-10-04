@@ -619,19 +619,104 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
         
         if (format === 'excel') {
           // Create Excel file from data
-          const workbook = XLSX.utils.book_new();
-          const worksheet = XLSX.utils.json_to_sheet(data.data.accounts);
-          XLSX.utils.book_append_sheet(workbook, worksheet, 'Chart of Accounts');
-          XLSX.writeFile(workbook, data.filename);
+          const { utils, writeFile } = await import('xlsx');
+          const workbook = utils.book_new();
+          
+          // Prepare data for Excel
+          const excelData = accounts.map(account => ({
+            'Account Code': account.account_code || 'N/A',
+            'Account Name': account.account_name || 'N/A',
+            'Account Type': account.account_type || 'N/A',
+            'Category': (account.category || 'N/A').replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+            'Current Balance': account.current_balance || 0
+          }));
+          
+          const worksheet = utils.json_to_sheet(excelData);
+          utils.book_append_sheet(workbook, worksheet, 'Chart of Accounts');
+          writeFile(workbook, data.filename || 'chart_of_accounts.xlsx');
         } else if (format === 'pdf') {
-          // Create PDF from data (simplified version)
-          window.print(); // This will print the current view
+          // Create clean PDF with company header and table
+          await generateCleanPDF(data.data);
         }
       } else {
         setError('Failed to export accounts');
       }
     } catch (err) {
       setError('Export failed: ' + err.message);
+    }
+  };
+
+  const generateCleanPDF = async (pdfData) => {
+    try {
+      const { jsPDF } = await import('jspdf');
+      await import('jspdf-autotable');
+      
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.width;
+      
+      // Company Header
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.text(pdfData.company_info.name, pageWidth / 2, 20, { align: 'center' });
+      
+      // Company Address
+      if (pdfData.company_info.address) {
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(pdfData.company_info.address, pageWidth / 2, 28, { align: 'center' });
+      }
+      
+      // Title
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Chart of Accounts', pageWidth / 2, 40, { align: 'center' });
+      
+      // Export Date
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generated on: ${pdfData.company_info.export_date}`, pageWidth / 2, 47, { align: 'center' });
+      
+      // Table
+      doc.autoTable({
+        head: [pdfData.table_data.headers],
+        body: pdfData.table_data.rows,
+        startY: 55,
+        theme: 'grid',
+        headStyles: {
+          fillColor: [59, 130, 246], // Blue color
+          textColor: 255,
+          fontStyle: 'bold'
+        },
+        styles: {
+          fontSize: 8,
+          cellPadding: 3
+        },
+        alternateRowStyles: {
+          fillColor: [248, 250, 252] // Light gray
+        }
+      });
+      
+      // Summary at bottom
+      const finalY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Summary', 14, finalY);
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      let summaryY = finalY + 8;
+      doc.text(`Total Accounts: ${pdfData.summary.total_accounts}`, 14, summaryY);
+      doc.text(`Assets: ${pdfData.summary.assets_count}`, 14, summaryY + 6);
+      doc.text(`Liabilities: ${pdfData.summary.liabilities_count}`, 14, summaryY + 12);
+      doc.text(`Equity: ${pdfData.summary.equity_count}`, 14, summaryY + 18);
+      doc.text(`Revenue: ${pdfData.summary.revenue_count}`, 90, summaryY + 6);
+      doc.text(`Expenses: ${pdfData.summary.expense_count}`, 90, summaryY + 12);
+      
+      // Save PDF
+      doc.save(`${pdfData.company_info.name.replace(/\s+/g, '_')}_chart_of_accounts.pdf`);
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+      setError('PDF generation failed: ' + error.message);
     }
   };
 
