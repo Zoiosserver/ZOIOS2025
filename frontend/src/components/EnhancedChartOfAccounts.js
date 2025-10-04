@@ -286,9 +286,9 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
 
   const getFilteredAccounts = () => {
     return accounts.filter(account => {
-      const matchesCategory = filterCategory === 'all' || account.account_type === filterCategory;
-      const matchesSearch = account.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           account.code?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = filterCategory === 'all' || account.account_type === filterCategory.toLowerCase();
+      const matchesSearch = account.account_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           account.account_code?.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesCategory && matchesSearch;
     });
   };
