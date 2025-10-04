@@ -656,6 +656,7 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );
