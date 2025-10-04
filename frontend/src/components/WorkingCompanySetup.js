@@ -55,7 +55,12 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
         onComplete();
       } else {
         const errorData = await response.json().catch(() => ({}));
-        setError(errorData.detail || 'Setup failed');
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          const errorMessages = errorData.errors.map(err => `${err.field}: ${err.message}`).join(', ');
+          setError(`Validation error: ${errorMessages}`);
+        } else {
+          setError(errorData.detail || 'Setup failed');
+        }
       }
     } catch (err) {
       setError('Connection failed. Please try again.');
