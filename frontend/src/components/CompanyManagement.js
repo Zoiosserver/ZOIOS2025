@@ -643,7 +643,7 @@ const CompanyManagement = ({ user, onBack }) => {
 };
 
 // Separate components for each tab
-const CompaniesTab = ({ companies, loading, error, onAdd, onAddSister, onEdit, onDelete, onSelectCompany, onConvertToGroup }) => (
+const CompaniesTab = ({ companies, loading, error, onAdd, onAddSister, onEdit, onDelete, onSelectCompany, onConvertToGroup, onSwitchToAccountsTab }) => (
   <div className="space-y-6">
     <div className="flex justify-between items-center">
       <h2 className="text-2xl font-bold text-gray-900">Companies</h2>
