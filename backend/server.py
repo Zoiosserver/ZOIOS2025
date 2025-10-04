@@ -698,7 +698,7 @@ async def setup_company(
     else:
         print(f"DEBUG: No sister companies to process. Business type: {company_data.business_type}, Sister companies count: {len(company_data.sister_companies) if company_data.sister_companies else 0}")
     
-    # Update user onboarding status and make them super admin for their company
+    # Update user onboarding status and make them admin for their company
     from auth import get_default_permissions
     
     update_data = {
@@ -709,6 +709,8 @@ async def setup_company(
         "assigned_companies": [company_setup.id],  # Add company to their assigned companies list
         "updated_at": datetime.now(timezone.utc).isoformat()
     }
+    
+    print(f"DEBUG: Updating user {current_user.email} with company_id: {company_setup.id}")
     
     # Update in main database for authentication
     await db.users.update_one({"id": current_user.id}, {"$set": update_data})
