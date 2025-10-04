@@ -2158,7 +2158,21 @@ class BackendTester:
         # Test 18: Data Validation and Error Handling
         test_results['data_validation'] = self.test_data_validation()
         
-        # Phase 5: Results Summary
+        # Phase 6: Company Filtering Issue Investigation (NEW)
+        self.log("\n" + "=" * 50)
+        self.log("PHASE 6: COMPANY FILTERING ISSUE INVESTIGATION")
+        self.log("=" * 50)
+        
+        # Test 19: Company Filtering Issue Debug
+        test_results['company_filtering_issue'] = self.test_company_filtering_issue()
+        
+        # Test 20: User Permission Filtering
+        test_results['user_permission_filtering'] = self.test_user_permission_filtering()
+        
+        # Test 21: Database Direct Investigation
+        test_results['database_direct_investigation'] = self.test_database_direct_investigation()
+        
+        # Phase 6: Results Summary
         self.log("\n" + "=" * 80)
         self.log("COMPREHENSIVE BACKEND TEST RESULTS")
         self.log("=" * 80)
