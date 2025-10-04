@@ -314,7 +314,14 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
 
   const startEditAccount = (account) => {
     setEditingAccount(account);
-    setAccountForm({ ...account });
+    setAccountForm({ 
+      code: account.account_code,
+      name: account.account_name,
+      account_type: account.account_type?.charAt(0).toUpperCase() + account.account_type?.slice(1),
+      category: account.category?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      opening_balance: account.opening_balance || account.current_balance || 0,
+      description: account.description || ''
+    });
     setShowAddModal(true);
   };
 
