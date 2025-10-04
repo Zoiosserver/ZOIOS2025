@@ -1392,9 +1392,17 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
   };
 
   const exportConsolidatedAccounts = async (format) => {
+    console.log('DEBUG: Export consolidated accounts called with format:', format);
+    
     try {
-      const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies/consolidated-accounts/export`, {
+      // Use environment variable for backend URL
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const apiUrl = `${backendUrl}/api/companies/consolidated-accounts/export`;
+      
+      console.log('DEBUG: Calling export API URL:', apiUrl);
+      console.log('DEBUG: Export format:', format);
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1403,8 +1411,11 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
         body: JSON.stringify({ format })
       });
 
+      console.log('DEBUG: Export API response status:', response.status);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('DEBUG: Export API response data:', data);
         
         if (format === 'excel') {
           // Create Excel file from data
