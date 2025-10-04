@@ -45,7 +45,7 @@ const CompanyManagement = ({ user, onBack }) => {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
-        })
+        }).catch(() => ({ ok: false }))  // Don't fail if sister companies endpoint fails
       ]);
 
       if (companiesResponse.ok) {
@@ -54,14 +54,18 @@ const CompanyManagement = ({ user, onBack }) => {
         // Fetch sister companies if available
         let sisterCompaniesData = [];
         if (sisterCompaniesResponse.ok) {
-          sisterCompaniesData = await sisterCompaniesResponse.json();
+          try {
+            sisterCompaniesData = await sisterCompaniesResponse.json();
+          } catch (e) {
+            console.log('Sister companies data not available:', e);
+          }
         }
         
         // Add sister companies info to main companies
         const companiesWithSisters = companiesData.map(company => ({
           ...company,
           sister_companies: sisterCompaniesData.filter(sister => 
-            sister.parent_company_id === company.id
+            sister.group_company_id === company.id  // Changed from parent_company_id to group_company_id
           )
         }));
         
