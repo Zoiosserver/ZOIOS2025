@@ -517,10 +517,7 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
   );
 
   const renderCRMDashboardContent = () => {
-    const sampleLeads = [
-      {
-        id: 1,
-        name: 'John Smith',
+    const sampleLeads = [];
         company: 'ABC Corporation',
         role: 'Operations Manager',
         phone: '+1-555-0123',
