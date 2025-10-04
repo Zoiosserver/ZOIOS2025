@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ZoiosLogo from './ZoiosLogo';
 
-const SimpleLogin = ({ onLogin, onSwitchToSignup }) => {
+const SimpleLogin = ({ onLogin, onSwitchToSignup, onSwitchToForgotPassword }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
