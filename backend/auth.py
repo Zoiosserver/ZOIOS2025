@@ -377,7 +377,7 @@ async def create_default_admin(db):
         
         admin_data = {
             **admin_user.dict(),
-            "password": admin_password_hash
+            "hashed_password": admin_password_hash
         }
         
         prepared_admin = prepare_user_for_mongo(admin_data)
