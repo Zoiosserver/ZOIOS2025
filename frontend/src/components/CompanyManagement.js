@@ -767,8 +767,7 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
                   </div>
                 ))}
               </div>
-            </div>
-
+              
               {accounts.length === 0 && (
                 <div className="p-8 text-center">
                   <p className="text-gray-500">No accounts found for this company</p>
