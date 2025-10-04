@@ -264,7 +264,7 @@ class SpecificEndpointsTester:
         }
         
         try:
-            response = self.session.get(f"{API_BASE}/companies/{self.company_id}/chart-of-accounts", headers=headers)
+            response = self.session.get(f"{API_BASE}/company/{self.company_id}/chart-of-accounts", headers=headers)
             self.log(f"Chart of Accounts response status: {response.status_code}")
             self.log(f"Chart of Accounts response: {response.text}")
             
