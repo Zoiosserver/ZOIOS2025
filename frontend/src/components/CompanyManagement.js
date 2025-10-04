@@ -1706,10 +1706,10 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
                   </table>
                 </div>
 
-                {/* Mobile Card View */}
+                {/* Mobile Consolidated Card View */}
                 <div className="md:hidden divide-y divide-gray-200">
-                  {accounts.map((account) => (
-                    <div key={`${account.company_id}-${account.id}`} className="p-4 hover:bg-gray-50">
+                  {accounts.map((account, index) => (
+                    <div key={`${account.account_code}-${index}`} className="p-4 hover:bg-gray-50">
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-col space-y-1">
@@ -1717,26 +1717,31 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
                               {account.account_name || 'N/A'}
                             </div>
                             <div className="text-xs text-gray-500">
-                              Code: {account.account_code || 'N/A'}
+                              Code: {account.account_code || 'N/A'} • Type: {account.account_type || 'N/A'}
                             </div>
                           </div>
                         </div>
-                        <div className="text-sm font-medium text-gray-900 ml-4">
-                          {account.current_balance || 0}
+                        <div className="text-sm font-bold text-blue-600 ml-4">
+                          Total: {Number(account.total_balance || 0).toFixed(2)}
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div>
-                          <span className="text-gray-500">Company:</span> 
-                          <span className="ml-1 break-words">{account.company_name || 'N/A'}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-500">Type:</span> 
-                          <span className="ml-1 capitalize">{account.account_type || 'N/A'}</span>
-                        </div>
-                        <div className="col-span-2">
-                          <span className="text-gray-500">Category:</span> 
-                          <span className="ml-1 capitalize">{account.category?.replace('_', ' ') || 'N/A'}</span>
+                      
+                      {/* Company Balances */}
+                      <div className="space-y-2 mt-3">
+                        <div className="text-xs font-medium text-gray-700 uppercase tracking-wide">Company Balances:</div>
+                        <div className="grid grid-cols-1 gap-2">
+                          {companyNames.map((companyName) => (
+                            <div key={companyName} className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-lg">
+                              <span className="text-sm text-gray-600 truncate">
+                                {companyName.length > 20 ? companyName.substring(0, 20) + '...' : companyName}
+                              </span>
+                              <span className="text-sm font-medium text-gray-900">
+                                {account.companies && account.companies[companyName] !== undefined 
+                                  ? Number(account.companies[companyName]).toFixed(2) 
+                                  : '0.00'}
+                              </span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
