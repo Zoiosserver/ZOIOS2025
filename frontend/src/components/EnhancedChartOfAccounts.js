@@ -493,10 +493,10 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
                 {getFilteredAccounts().map((account) => (
                   <tr key={account.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {account.code}
+                      {account.account_code}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {account.name}
+                      {account.account_name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
