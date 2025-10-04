@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { BarChart3, ArrowLeft, Mail, CheckCircle, AlertCircle } from 'lucide-react';
-import { toast } from 'sonner';
-import axios from 'axios';
+import ZoiosLogo from './ZoiosLogo';
 
 const BACKEND_URL = window.location.origin.replace(':3000', '');
 const API = `${BACKEND_URL}/api`;
