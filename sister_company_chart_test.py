@@ -248,6 +248,102 @@ class SisterCompanyChartTester:
             self.log(f"❌ Sister company investigation error: {str(e)}")
             return False
     
+    def create_fresh_test_account(self):
+        """Create a fresh test account with Group Company and sister companies"""
+        self.log("Creating fresh test account with Group Company setup...")
+        
+        # Generate unique test credentials
+        timestamp = str(int(time.time()))
+        test_email = f"charttest{timestamp}@example.com"
+        test_password = "charttest123"
+        
+        # Sign up new user
+        signup_data = {
+            "email": test_email,
+            "password": test_password,
+            "name": "Chart Test User",
+            "company": "Chart Test Company"
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            self.log(f"Fresh user signup response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.auth_token = data.get('access_token')
+                self.user_data = data.get('user')
+                self.log(f"✅ Fresh user created: {test_email}")
+                
+                # Create Group Company with sister companies
+                return self.setup_group_company_with_sisters()
+            else:
+                self.log(f"❌ Fresh user signup failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Fresh user creation error: {str(e)}")
+            return False
+    
+    def setup_group_company_with_sisters(self):
+        """Setup Group Company with sister companies"""
+        self.log("Setting up Group Company with sister companies...")
+        
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        setup_data = {
+            "company_name": "Chart Test Group Company",
+            "country_code": "US",
+            "base_currency": "USD",
+            "additional_currencies": ["EUR", "GBP"],
+            "business_type": "Group Company",
+            "industry": "Technology",
+            "address": "123 Test Street",
+            "city": "Test City",
+            "state": "CA",
+            "postal_code": "12345",
+            "phone": "+1-555-123-4567",
+            "email": self.user_data.get('email'),
+            "website": "https://testcompany.com",
+            "tax_number": "123456789",
+            "registration_number": "REG123456",
+            "sister_companies": [
+                {
+                    "company_name": "Chart Test Sister Alpha",
+                    "country": "US",
+                    "base_currency": "USD",
+                    "business_type": "Private Limited Company",
+                    "industry": "Technology"
+                },
+                {
+                    "company_name": "Chart Test Sister Beta",
+                    "country": "GB",
+                    "base_currency": "GBP",
+                    "business_type": "Limited Company",
+                    "industry": "Technology"
+                }
+            ]
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            self.log(f"Group Company setup response status: {response.status_code}")
+            self.log(f"Group Company setup response: {response.text}")
+            
+            if response.status_code == 200:
+                self.log("✅ Group Company with sister companies created successfully")
+                return True
+            else:
+                self.log(f"❌ Group Company setup failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Group Company setup error: {str(e)}")
+            return False
+
     def test_create_fresh_group_company_with_sister(self):
         """Create a fresh Group Company with sister companies to test the setup process"""
         self.log("Testing fresh Group Company creation with sister companies...")
