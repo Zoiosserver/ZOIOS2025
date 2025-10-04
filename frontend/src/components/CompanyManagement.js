@@ -745,7 +745,10 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
               <span className="hidden sm:inline">Export </span>PDF
             </button>
             <button
-              onClick={() => setShowAddModal(true)}
+              onClick={() => {
+                setShowAddModal(true);
+                fetchNextAccountCode('asset'); // Auto-fetch code for default asset type
+              }}
               className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 sm:px-4 py-2 rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 font-medium text-sm"
             >
               <span className="hidden sm:inline">Add </span>Account
