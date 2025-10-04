@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
 """
-ZOIOS ERP Consolidated Accounts Investigation Script
-Specifically tests the consolidated accounts functionality issue reported by user:
-- Consolidated accounts not showing other companies
-- Not displaying accounts from all companies (main + sister companies) together
+ZOIOS ERP Consolidated Accounts Testing Script
+Tests the TRUE consolidated accounts implementation as requested in review:
+
+The user correctly pointed out that consolidated accounts should show one row per account 
+with columns for each company amount.
+
+VERIFICATION NEEDED:
+1. Test the new consolidated accounts format
+2. Verify it returns the new format with:
+   - One entry per unique account code/name
+   - Each entry has 'companies' object with company_name: balance pairs
+   - Each entry has 'total_balance' field summing all companies
+3. Test with Group Company account
+4. Verify the data structure matches expected format
 """
 
 import requests
