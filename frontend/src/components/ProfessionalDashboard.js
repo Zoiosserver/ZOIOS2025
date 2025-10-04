@@ -273,11 +273,11 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
       <div className="text-gray-600 text-sm font-medium">{kpi.title}</div>
       <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
         <div 
-          className={`h-2 rounded-full bg-gradient-to-r ${
-            kpi.color === 'green' ? 'from-green-500 to-emerald-500' :
-            kpi.color === 'blue' ? 'from-blue-500 to-indigo-500' :
-            kpi.color === 'purple' ? 'from-purple-500 to-violet-500' :
-            'from-orange-500 to-red-500'
+          className={`h-2 rounded-full ${
+            kpi.color === 'green' ? 'bg-green-500' :
+            kpi.color === 'blue' ? 'bg-blue-500' :
+            kpi.color === 'purple' ? 'bg-purple-500' :
+            'bg-orange-500'
           }`}
           style={{ width: `${Math.min(Math.abs(kpi.change) * 10, 100)}%` }}
         ></div>
