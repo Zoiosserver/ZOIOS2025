@@ -1740,6 +1740,489 @@ async def get_contact_email_responses(contact_id: str, current_user: UserInDB = 
     email_responses = await db.email_responses.find({**user_filter, "contact_id": contact_id}).sort("date", -1).to_list(length=None)
     return [EmailResponse(**parse_from_mongo(email_response)) for email_response in email_responses]
 
+# =================================================================================
+# COMPANY MANAGEMENT API ENDPOINTS
+# =================================================================================
+
+@api_router.get("/companies/management", response_model=List[CompanySetup])
+async def get_all_companies(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get all companies for management purposes"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    companies = await db_to_use.company_setups.find().to_list(length=None)
+    return [CompanySetup(**company) for company in companies]
+
+@api_router.get("/companies/management/{company_id}", response_model=CompanySetup)
+async def get_company_details(company_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Get detailed company information by ID"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    company = await db_to_use.company_setups.find_one({"id": company_id})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    return CompanySetup(**company)
+
+@api_router.put("/companies/management/{company_id}")
+async def update_company(
+    company_id: str, 
+    company_data: CompanyUpdate, 
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Update company information"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Only update fields that are provided
+    update_data = {k: v for k, v in company_data.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db_to_use.company_setups.update_one(
+        {"id": company_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    return {"success": True, "message": "Company updated successfully"}
+
+@api_router.delete("/companies/management/{company_id}")
+async def delete_company(company_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Delete a company"""
+    # Only admin users can delete companies
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
+    
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Check if company exists
+    company = await db_to_use.company_setups.find_one({"id": company_id})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    # Delete company and related data
+    await db_to_use.company_setups.delete_one({"id": company_id})
+    await db_to_use.chart_of_accounts.delete_many({"company_id": company_id})
+    await db_to_use.sister_companies.delete_many({"parent_company_id": company_id})
+    
+    return {"success": True, "message": "Company deleted successfully"}
+
+# =================================================================================
+# ENHANCED CHART OF ACCOUNTS API ENDPOINTS
+# =================================================================================
+
+@api_router.get("/companies/{company_id}/accounts/enhanced")
+async def get_enhanced_chart_of_accounts(company_id: str, current_user: UserInDB = Depends(get_current_active_user)):
+    """Get enhanced chart of accounts with additional features"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Get company information
+    company = await db_to_use.company_setups.find_one({"id": company_id})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    # Get chart of accounts
+    accounts = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
+    
+    # Group accounts by type and category
+    grouped_accounts = {}
+    for account in accounts:
+        account_type = account.get('account_type', 'Other')
+        category = account.get('category', 'Other')
+        
+        if account_type not in grouped_accounts:
+            grouped_accounts[account_type] = {}
+        
+        if category not in grouped_accounts[account_type]:
+            grouped_accounts[account_type][category] = []
+        
+        grouped_accounts[account_type][category].append(account)
+    
+    return {
+        "company_info": company,
+        "accounts": accounts,
+        "grouped_accounts": grouped_accounts,
+        "total_accounts": len(accounts),
+        "summary": {
+            "assets": len([a for a in accounts if a.get('account_type') == 'asset']),
+            "liabilities": len([a for a in accounts if a.get('account_type') == 'liability']),
+            "equity": len([a for a in accounts if a.get('account_type') == 'equity']),
+            "revenue": len([a for a in accounts if a.get('account_type') == 'revenue']),
+            "expense": len([a for a in accounts if a.get('account_type') == 'expense'])
+        }
+    }
+
+@api_router.get("/companies/consolidated-accounts/enhanced")
+async def get_enhanced_consolidated_accounts(current_user: UserInDB = Depends(get_current_active_user)):
+    """Get enhanced consolidated chart of accounts for all companies"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Get all companies
+    companies = await db_to_use.company_setups.find().to_list(length=None)
+    
+    consolidated_data = []
+    total_accounts = 0
+    
+    for company in companies:
+        company_id = company.get('id')
+        accounts = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
+        
+        # Add company name to each account
+        for account in accounts:
+            account['company_name'] = company.get('company_name', 'Unknown')
+            account['company_id'] = company_id
+        
+        consolidated_data.extend(accounts)
+        total_accounts += len(accounts)
+    
+    # Group by account type
+    grouped_accounts = {}
+    for account in consolidated_data:
+        account_type = account.get('account_type', 'Other')
+        if account_type not in grouped_accounts:
+            grouped_accounts[account_type] = []
+        grouped_accounts[account_type].append(account)
+    
+    return {
+        "companies": companies,
+        "consolidated_accounts": consolidated_data,
+        "grouped_accounts": grouped_accounts,
+        "total_companies": len(companies),
+        "total_accounts": total_accounts,
+        "summary": {
+            "assets": len([a for a in consolidated_data if a.get('account_type') == 'asset']),
+            "liabilities": len([a for a in consolidated_data if a.get('account_type') == 'liability']),
+            "equity": len([a for a in consolidated_data if a.get('account_type') == 'equity']),
+            "revenue": len([a for a in consolidated_data if a.get('account_type') == 'revenue']),
+            "expense": len([a for a in consolidated_data if a.get('account_type') == 'expense'])
+        }
+    }
+
+@api_router.post("/companies/{company_id}/accounts/enhanced")
+async def create_account(
+    company_id: str,
+    account_data: AccountCreate,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Create a new account in the chart of accounts"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Check if account code already exists
+    existing_account = await db_to_use.chart_of_accounts.find_one({
+        "company_id": company_id,
+        "account_code": account_data.account_code
+    })
+    
+    if existing_account:
+        raise HTTPException(status_code=400, detail="Account code already exists")
+    
+    # Create new account
+    new_account = {
+        "id": str(uuid.uuid4()),
+        "company_id": company_id,
+        "account_name": account_data.account_name,
+        "account_code": account_data.account_code,
+        "account_type": account_data.account_type,
+        "category": account_data.category,
+        "parent_account_id": account_data.parent_account_id,
+        "description": account_data.description,
+        "opening_balance": account_data.opening_balance or 0.0,
+        "current_balance": account_data.opening_balance or 0.0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db_to_use.chart_of_accounts.insert_one(new_account)
+    
+    return {"success": True, "message": "Account created successfully", "account_id": new_account["id"]}
+
+@api_router.put("/companies/{company_id}/accounts/{account_id}/enhanced")
+async def update_account(
+    company_id: str,
+    account_id: str,
+    account_data: AccountUpdate,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Update an existing account"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Check if account exists
+    existing_account = await db_to_use.chart_of_accounts.find_one({
+        "id": account_id,
+        "company_id": company_id
+    })
+    
+    if not existing_account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    
+    # Check if new account code conflicts with existing accounts (if account_code is being changed)
+    if account_data.account_code and account_data.account_code != existing_account.get('account_code'):
+        code_conflict = await db_to_use.chart_of_accounts.find_one({
+            "company_id": company_id,
+            "account_code": account_data.account_code,
+            "id": {"$ne": account_id}
+        })
+        
+        if code_conflict:
+            raise HTTPException(status_code=400, detail="Account code already exists")
+    
+    # Update account
+    update_data = {k: v for k, v in account_data.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db_to_use.chart_of_accounts.update_one(
+        {"id": account_id, "company_id": company_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Account not found")
+    
+    return {"success": True, "message": "Account updated successfully"}
+
+@api_router.delete("/companies/{company_id}/accounts/{account_id}/enhanced")
+async def delete_account(
+    company_id: str,
+    account_id: str,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Delete an account from the chart of accounts"""
+    # Only admin users can delete accounts
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Access denied. Admin role required.")
+    
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Check if account exists
+    account = await db_to_use.chart_of_accounts.find_one({
+        "id": account_id,
+        "company_id": company_id
+    })
+    
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+    
+    # Check if account has child accounts
+    child_accounts = await db_to_use.chart_of_accounts.find({"parent_account_id": account_id}).to_list(length=1)
+    if child_accounts:
+        raise HTTPException(status_code=400, detail="Cannot delete account with child accounts")
+    
+    # Delete the account
+    result = await db_to_use.chart_of_accounts.delete_one({"id": account_id, "company_id": company_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Account not found")
+    
+    return {"success": True, "message": "Account deleted successfully"}
+
+# =================================================================================
+# EXPORT AND PRINT API ENDPOINTS
+# =================================================================================
+
+@api_router.post("/companies/{company_id}/accounts/export")
+async def export_chart_of_accounts(
+    company_id: str,
+    export_request: ExportRequest,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Export chart of accounts to PDF or Excel format"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Get company information
+    company = await db_to_use.company_setups.find_one({"id": company_id})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    # Get chart of accounts
+    accounts = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
+    
+    if export_request.format.lower() == "excel":
+        # Create Excel export data
+        excel_data = {
+            "company_name": company.get('company_name', 'Unknown Company'),
+            "export_date": datetime.now(timezone.utc).isoformat(),
+            "accounts": accounts,
+            "total_accounts": len(accounts)
+        }
+        
+        return {
+            "success": True,
+            "format": "excel",
+            "data": excel_data,
+            "filename": f"{company.get('company_name', 'company')}_chart_of_accounts.xlsx"
+        }
+    
+    elif export_request.format.lower() == "pdf":
+        # Create PDF export data
+        pdf_data = {
+            "company_name": company.get('company_name', 'Unknown Company'),
+            "company_address": f"{company.get('address', '')}, {company.get('city', '')}, {company.get('state', '')} {company.get('postal_code', '')}",
+            "export_date": datetime.now(timezone.utc).strftime("%B %d, %Y"),
+            "accounts": accounts,
+            "total_accounts": len(accounts),
+            "summary": {
+                "assets": len([a for a in accounts if a.get('account_type') == 'asset']),
+                "liabilities": len([a for a in accounts if a.get('account_type') == 'liability']),
+                "equity": len([a for a in accounts if a.get('account_type') == 'equity']),
+                "revenue": len([a for a in accounts if a.get('account_type') == 'revenue']),
+                "expense": len([a for a in accounts if a.get('account_type') == 'expense'])
+            }
+        }
+        
+        return {
+            "success": True,
+            "format": "pdf",
+            "data": pdf_data,
+            "filename": f"{company.get('company_name', 'company')}_chart_of_accounts.pdf"
+        }
+    
+    else:
+        raise HTTPException(status_code=400, detail="Invalid export format. Use 'pdf' or 'excel'")
+
+@api_router.post("/companies/consolidated-accounts/export")
+async def export_consolidated_accounts(
+    export_request: ExportRequest,
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """Export consolidated chart of accounts for all companies"""
+    # Get tenant database for user
+    tenant_service = await get_tenant_service(mongo_url)
+    tenant_db = await tenant_service.get_user_tenant_database(current_user.email)
+    
+    if tenant_db is None:
+        db_to_use = db
+    else:
+        db_to_use = tenant_db
+    
+    # Get all companies
+    companies = await db_to_use.company_setups.find().to_list(length=None)
+    
+    consolidated_accounts = []
+    for company in companies:
+        company_id = company.get('id')
+        accounts = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
+        
+        # Add company information to each account
+        for account in accounts:
+            account['company_name'] = company.get('company_name', 'Unknown')
+            account['company_id'] = company_id
+        
+        consolidated_accounts.extend(accounts)
+    
+    if export_request.format.lower() == "excel":
+        excel_data = {
+            "title": "Consolidated Chart of Accounts",
+            "export_date": datetime.now(timezone.utc).isoformat(),
+            "companies": companies,
+            "accounts": consolidated_accounts,
+            "total_companies": len(companies),
+            "total_accounts": len(consolidated_accounts)
+        }
+        
+        return {
+            "success": True,
+            "format": "excel",
+            "data": excel_data,
+            "filename": "consolidated_chart_of_accounts.xlsx"
+        }
+    
+    elif export_request.format.lower() == "pdf":
+        pdf_data = {
+            "title": "Consolidated Chart of Accounts",
+            "export_date": datetime.now(timezone.utc).strftime("%B %d, %Y"),
+            "companies": companies,
+            "accounts": consolidated_accounts,
+            "total_companies": len(companies),
+            "total_accounts": len(consolidated_accounts),
+            "summary": {
+                "assets": len([a for a in consolidated_accounts if a.get('account_type') == 'asset']),
+                "liabilities": len([a for a in consolidated_accounts if a.get('account_type') == 'liability']),
+                "equity": len([a for a in consolidated_accounts if a.get('account_type') == 'equity']),
+                "revenue": len([a for a in consolidated_accounts if a.get('account_type') == 'revenue']),
+                "expense": len([a for a in consolidated_accounts if a.get('account_type') == 'expense'])
+            }
+        }
+        
+        return {
+            "success": True,
+            "format": "pdf",
+            "data": pdf_data,
+            "filename": "consolidated_chart_of_accounts.pdf"
+        }
+    
+    else:
+        raise HTTPException(status_code=400, detail="Invalid export format. Use 'pdf' or 'excel'")
+
 # Include the router in the main app
 app.include_router(api_router)
 
