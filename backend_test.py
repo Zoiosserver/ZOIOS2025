@@ -2588,7 +2588,7 @@ class BackendTester:
                 self.log(f"  {test_name.replace('_', ' ').title()}: {status}")
         
         # Critical assessment
-        critical_tests = ['user_registration', 'auth_me_endpoint', 'company_setup_address', 'currency_rates_undefined_fix', 'company_management_endpoints', 'enhanced_chart_of_accounts', 'export_and_print_endpoints']
+        critical_tests = ['user_registration', 'auth_me_endpoint', 'sister_company_setup', 'sister_companies_api', 'company_management_integration', 'company_setup_address', 'currency_rates_undefined_fix', 'company_management_endpoints', 'enhanced_chart_of_accounts', 'export_and_print_endpoints']
         critical_passed = all(test_results.get(test, False) for test in critical_tests if test in test_results)
         
         total_tests = len([t for t in test_results.values() if t is not None])
