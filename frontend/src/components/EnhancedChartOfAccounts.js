@@ -133,8 +133,9 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
     if (!window.confirm('Are you sure you want to delete this account?')) return;
 
     try {
-      const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts/${accountId}/enhanced`, {
+      // Use environment variable for backend URL
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const response = await fetch(`${backendUrl}/api/company/${selectedCompany.id}/chart-of-accounts/${accountId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
