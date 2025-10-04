@@ -40,32 +40,102 @@ class ConsolidatedAccountsTester:
         print(f"[{timestamp}] {level}: {message}")
         
     def test_login_with_group_company_account(self):
-        """Login with existing Group Company account"""
-        self.log("Testing login with Group Company account...")
+        """Create fresh account and setup Group Company with sister companies"""
+        self.log("Creating fresh account and Group Company setup...")
         
-        login_data = {
+        # First create a fresh account
+        signup_data = {
             "email": TEST_EMAIL,
-            "password": TEST_PASSWORD
+            "password": TEST_PASSWORD,
+            "name": "Consolidated Test User",
+            "company": "Consolidated Test Company"
         }
         
         try:
-            response = self.session.post(f"{API_BASE}/auth/login", json=login_data)
-            self.log(f"Login response status: {response.status_code}")
+            # Sign up
+            response = self.session.post(f"{API_BASE}/auth/signup", json=signup_data)
+            self.log(f"Signup response status: {response.status_code}")
             
             if response.status_code == 200:
                 data = response.json()
                 self.auth_token = data.get('access_token')
                 self.user_data = data.get('user')
-                self.log("✅ Login successful with Group Company account")
-                self.log(f"User ID: {self.user_data.get('id')}")
-                self.log(f"Email: {self.user_data.get('email')}")
-                return True
+                self.log("✅ Account created successfully")
+                
+                # Now setup Group Company with sister companies
+                return self.setup_group_company_with_sisters()
             else:
-                self.log(f"❌ Login failed: {response.text}")
+                self.log(f"❌ Signup failed: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log(f"❌ Login error: {str(e)}")
+            self.log(f"❌ Signup error: {str(e)}")
+            return False
+    
+    def setup_group_company_with_sisters(self):
+        """Setup Group Company with sister companies"""
+        self.log("Setting up Group Company with sister companies...")
+        
+        if not self.auth_token:
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Setup Group Company with 2 sister companies
+        setup_data = {
+            "company_name": "Main Group Company",
+            "country_code": "US",
+            "base_currency": "USD",
+            "additional_currencies": ["EUR", "GBP"],
+            "business_type": "Group Company",
+            "industry": "Technology",
+            "address": "123 Main Street",
+            "city": "Test City",
+            "state": "CA",
+            "postal_code": "12345",
+            "phone": "+1-555-123-4567",
+            "email": TEST_EMAIL,
+            "website": "https://testcompany.com",
+            "tax_number": "123456789",
+            "registration_number": "REG123456",
+            "sister_companies": [
+                {
+                    "company_name": "Sister Company Alpha",
+                    "country": "US",
+                    "base_currency": "USD",
+                    "business_type": "Private Limited Company",
+                    "industry": "Technology"
+                },
+                {
+                    "company_name": "Sister Company Beta",
+                    "country": "GB",
+                    "base_currency": "GBP",
+                    "business_type": "Limited Company",
+                    "industry": "Technology"
+                }
+            ]
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            self.log(f"Group Company setup response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log("✅ Group Company with sister companies created successfully")
+                self.log(f"Main Company ID: {data.get('id')}")
+                self.log(f"Company Name: {data.get('company_name')}")
+                self.log(f"Business Type: {data.get('business_type')}")
+                return True
+            else:
+                self.log(f"❌ Group Company setup failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Group Company setup error: {str(e)}")
             return False
     
     def test_get_companies_management(self):
