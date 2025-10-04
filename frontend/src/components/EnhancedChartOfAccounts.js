@@ -214,7 +214,7 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
     doc.save(`chart-of-accounts-${selectedCompany?.company_name || 'all'}-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     try {
       console.log('DEBUG: Excel export started');
       const filteredAccounts = getFilteredAccounts();
@@ -224,6 +224,10 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
         alert('No accounts to export');
         return;
       }
+      
+      // Dynamic import of XLSX
+      const XLSX = await import('xlsx');
+      console.log('DEBUG: XLSX library loaded');
       
       // Prepare data for Excel
       const excelData = filteredAccounts.map(account => ({
