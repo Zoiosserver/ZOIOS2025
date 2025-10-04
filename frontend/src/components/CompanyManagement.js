@@ -5,7 +5,8 @@ const CompanyManagement = ({ user, onBack }) => {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddCompanyModal, setShowAddCompanyModal] = useState(false);
+  const [showAddSisterModal, setShowAddSisterModal] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [activeTab, setActiveTab] = useState('companies'); // companies, accounts, consolidated
