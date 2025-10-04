@@ -1931,8 +1931,17 @@ async def get_enhanced_chart_of_accounts(company_id: str, current_user: UserInDB
     # Get chart of accounts
     accounts_raw = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
     
-    # Parse accounts to remove MongoDB ObjectIds
-    accounts = [parse_from_mongo(account) for account in accounts_raw]
+    # Parse accounts to remove MongoDB ObjectIds and map field names for frontend compatibility
+    accounts = []
+    for account_raw in accounts_raw:
+        account = parse_from_mongo(account_raw)
+        # Map backend field names to frontend expected names
+        mapped_account = {
+            **account,
+            'account_code': account.get('code', ''),  # Map 'code' to 'account_code'
+            'account_name': account.get('name', ''),  # Map 'name' to 'account_name'
+        }
+        accounts.append(mapped_account)
     
     # Group accounts by type and category
     grouped_accounts = {}
