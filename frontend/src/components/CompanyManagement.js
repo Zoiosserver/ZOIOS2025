@@ -92,11 +92,11 @@ const CompanyManagement = ({ user, onBack }) => {
   };
 
   const handleDelete = async (companyId) => {
-    if (!window.confirm('Are you sure you want to delete this company?')) return;
+    if (!window.confirm('Are you sure you want to delete this company? This will also delete all related chart of accounts and sister companies.')) return;
 
     try {
       const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies/${companyId}`, {
+      const response = await fetch(`${backendUrl}/api/companies/management/${companyId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -106,7 +106,8 @@ const CompanyManagement = ({ user, onBack }) => {
       if (response.ok) {
         await fetchCompanies();
       } else {
-        setError('Failed to delete company');
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.detail || 'Failed to delete company');
       }
     } catch (err) {
       setError('Connection failed: ' + err.message);
