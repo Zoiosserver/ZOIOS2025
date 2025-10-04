@@ -1919,6 +1919,7 @@ class BackendTester:
         company_tests = ['company_setup_address', 'auth_me_after_setup', 'multi_tenancy']
         currency_tests = ['chart_of_accounts', 'currency_rates_undefined_fix', 'currency_conversion', 'manual_currency_rate']
         user_mgmt_tests = ['admin_login', 'granular_permissions', 'user_deletion']
+        erp_tests = ['company_management_endpoints', 'enhanced_chart_of_accounts', 'export_and_print_endpoints', 'authentication_requirements', 'data_validation']
         
         self.log("\n🔐 AUTHENTICATION SYSTEM:")
         for test_name in auth_tests:
