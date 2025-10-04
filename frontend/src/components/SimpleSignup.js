@@ -107,7 +107,7 @@ const SimpleSignup = ({ onSignup, onSwitchToLogin }) => {
         <div className="text-center mb-8">
           <div className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 p-4 rounded-2xl shadow-lg mb-6">
             <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              <path d="M3 6l3 1v13l-3-1V6zm6 0l3 1v13l-3-1V6zm6 0l3 1v13l-3-1V6zm3-3v2H6V3h12zM6 21h12v2H6v-2z"/>
             </svg>
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
