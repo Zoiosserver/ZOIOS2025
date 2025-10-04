@@ -140,16 +140,47 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
           </button>
         </div>
         
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded">
-              {error}
+        {/* Main Setup Card */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-100/50 p-8">
+          <form className="space-y-8" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg animate-shake">
+                <div className="flex">
+                  <svg className="w-5 h-5 text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+                  </svg>
+                  <span className="text-red-700 text-sm">{error}</span>
+                </div>
+              </div>
+            )}
+            
+            {/* Step Indicator */}
+            <div className="flex items-center justify-center mb-8">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    1
+                  </div>
+                  <span className="ml-2 text-sm font-medium text-green-600">Company Details</span>
+                </div>
+                <div className="w-8 h-0.5 bg-green-500"></div>
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    2
+                  </div>
+                  <span className="ml-2 text-sm font-medium text-green-600">Address & Completion</span>
+                </div>
+              </div>
             </div>
-          )}
-          
-          {/* Basic Info */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-medium mb-4">Company Information</h3>
+            
+            {/* Basic Info */}
+            <div className="bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-2xl border border-blue-200">
+              <div className="flex items-center mb-4">
+                <svg className="w-6 h-6 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd"/>
+                </svg>
+                <h3 className="text-xl font-semibold text-gray-900">Company Information</h3>
+              </div>
             
             <div className="space-y-4">
               <div>
