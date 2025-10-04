@@ -12,36 +12,40 @@ const ZoiosLogo = ({ size = "large", className = "" }) => {
 
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
-      {/* ZOIOS Icon - Blue curved segments */}
+      {/* ZOIOS Icon - Accurate recreation of the original logo */}
       <div className={`${width} ${height} flex items-center justify-center`}>
         <svg viewBox="0 0 100 100" className="w-full h-full" fill="none">
-          {/* Curved segments creating the dynamic ZOIOS icon */}
+          {/* Outer curved arc */}
           <path
-            d="M20 20 C30 15, 50 15, 60 20 C70 25, 80 35, 80 50 C80 65, 70 75, 60 80 C50 85, 30 85, 20 80"
-            stroke="#3B82F6"
-            strokeWidth="8"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <path
-            d="M30 30 C35 27, 45 27, 50 30 C55 33, 65 40, 65 50 C65 60, 55 67, 50 70 C45 73, 35 73, 30 70"
-            stroke="#3B82F6"
+            d="M15 25 C25 15, 55 15, 75 25 C85 35, 85 50, 75 75 C65 85, 35 85, 25 75 C15 65, 15 50, 15 35"
+            stroke="#2563EB"
             strokeWidth="6"
             strokeLinecap="round"
             fill="none"
           />
+          {/* Middle curved arc */}
           <path
-            d="M40 40 C42 39, 47 39, 49 40 C51 41, 55 44, 55 50 C55 56, 51 59, 49 60 C47 61, 42 61, 40 60"
-            stroke="#3B82F6"
+            d="M25 35 C35 25, 55 25, 65 35 C70 40, 70 50, 65 65 C55 75, 35 75, 30 65 C25 55, 25 45, 25 40"
+            stroke="#2563EB"
+            strokeWidth="5"
+            strokeLinecap="round"
+            fill="none"
+          />
+          {/* Inner curved arc */}
+          <path
+            d="M35 45 C40 40, 55 40, 60 45 C62 47, 62 50, 60 55 C55 60, 40 60, 38 55 C35 52, 35 48, 35 47"
+            stroke="#2563EB"
             strokeWidth="4"
             strokeLinecap="round"
             fill="none"
           />
+          {/* Innermost dot/circle */}
+          <circle cx="50" cy="50" r="3" fill="#2563EB"/>
         </svg>
       </div>
       
-      {/* ZOIOS Text */}
-      <span className={`font-bold text-black ${text} tracking-wide`}>
+      {/* ZOIOS Text - Matching the original font weight and style */}
+      <span className={`font-bold text-black ${text} tracking-normal`}>
         Zoiios
       </span>
     </div>
