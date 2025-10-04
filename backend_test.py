@@ -1945,8 +1945,14 @@ class BackendTester:
                 status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
                 self.log(f"  {test_name.replace('_', ' ').title()}: {status}")
         
+        self.log("\n🏢 ERP FUNCTIONALITY:")
+        for test_name in erp_tests:
+            if test_name in test_results:
+                status = "✅ PASS" if test_results[test_name] else "❌ FAIL"
+                self.log(f"  {test_name.replace('_', ' ').title()}: {status}")
+        
         # Critical assessment
-        critical_tests = ['user_registration', 'auth_me_endpoint', 'company_setup_address', 'currency_rates_undefined_fix']
+        critical_tests = ['user_registration', 'auth_me_endpoint', 'company_setup_address', 'currency_rates_undefined_fix', 'company_management_endpoints', 'enhanced_chart_of_accounts', 'export_and_print_endpoints']
         critical_passed = all(test_results.get(test, False) for test in critical_tests if test in test_results)
         
         total_tests = len([t for t in test_results.values() if t is not None])
