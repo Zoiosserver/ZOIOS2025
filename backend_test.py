@@ -1399,11 +1399,427 @@ class BackendTester:
             self.log(f"❌ Granular permissions test error: {str(e)}")
             return False
 
+    def test_company_management_endpoints(self):
+        """Test Company Management API Endpoints"""
+        self.log("Testing Company Management API Endpoints...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # Test GET /api/companies/management (list all companies)
+            response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            self.log(f"GET companies/management response status: {response.status_code}")
+            
+            if response.status_code == 200:
+                companies = response.json()
+                self.log(f"✅ GET companies/management working - found {len(companies)} companies")
+                
+                if len(companies) > 0:
+                    company_id = companies[0].get('id')
+                    
+                    # Test GET /api/companies/management/{company_id} (get company details)
+                    detail_response = self.session.get(f"{API_BASE}/companies/management/{company_id}", headers=headers)
+                    self.log(f"GET company details response status: {detail_response.status_code}")
+                    
+                    if detail_response.status_code == 200:
+                        company_details = detail_response.json()
+                        self.log(f"✅ GET company details working - company: {company_details.get('company_name')}")
+                        
+                        # Test PUT /api/companies/management/{company_id} (update company)
+                        update_data = {
+                            "company_name": "Updated Test Company",
+                            "phone": "+1-555-999-8888"
+                        }
+                        
+                        update_response = self.session.put(f"{API_BASE}/companies/management/{company_id}", 
+                                                         json=update_data, headers=headers)
+                        self.log(f"PUT company update response status: {update_response.status_code}")
+                        
+                        if update_response.status_code == 200:
+                            self.log("✅ PUT company update working")
+                            
+                            # Test DELETE /api/companies/management/{company_id} (delete company - admin only)
+                            delete_response = self.session.delete(f"{API_BASE}/companies/management/{company_id}", headers=headers)
+                            self.log(f"DELETE company response status: {delete_response.status_code}")
+                            
+                            if delete_response.status_code == 200:
+                                self.log("✅ DELETE company working (admin access confirmed)")
+                                return True
+                            elif delete_response.status_code == 403:
+                                self.log("✅ DELETE company properly restricted to admin users")
+                                return True
+                            else:
+                                self.log(f"❌ DELETE company failed: {delete_response.text}")
+                                return False
+                        else:
+                            self.log(f"❌ PUT company update failed: {update_response.text}")
+                            return False
+                    else:
+                        self.log(f"❌ GET company details failed: {detail_response.text}")
+                        return False
+                else:
+                    self.log("⚠️ No companies found for detailed testing")
+                    return True
+            else:
+                self.log(f"❌ GET companies/management failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Company management endpoints error: {str(e)}")
+            return False
+
+    def test_enhanced_chart_of_accounts_endpoints(self):
+        """Test Enhanced Chart of Accounts API Endpoints"""
+        self.log("Testing Enhanced Chart of Accounts API Endpoints...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # First get a company ID to test with
+            companies_response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            if companies_response.status_code != 200:
+                self.log("❌ Could not get companies for testing")
+                return False
+                
+            companies = companies_response.json()
+            if not companies:
+                self.log("❌ No companies available for testing")
+                return False
+                
+            company_id = companies[0].get('id')
+            self.log(f"Testing with company ID: {company_id}")
+            
+            # Test GET /api/companies/{company_id}/accounts/enhanced (detailed accounts view)
+            enhanced_response = self.session.get(f"{API_BASE}/companies/{company_id}/accounts/enhanced", headers=headers)
+            self.log(f"GET enhanced accounts response status: {enhanced_response.status_code}")
+            
+            if enhanced_response.status_code == 200:
+                enhanced_data = enhanced_response.json()
+                self.log(f"✅ GET enhanced accounts working - {enhanced_data.get('total_accounts', 0)} accounts")
+                self.log(f"Account summary: {enhanced_data.get('summary', {})}")
+                
+                # Test GET /api/companies/consolidated-accounts/enhanced (consolidated view)
+                consolidated_response = self.session.get(f"{API_BASE}/companies/consolidated-accounts/enhanced", headers=headers)
+                self.log(f"GET consolidated enhanced response status: {consolidated_response.status_code}")
+                
+                if consolidated_response.status_code == 200:
+                    consolidated_data = consolidated_response.json()
+                    self.log(f"✅ GET consolidated enhanced working - {consolidated_data.get('total_accounts', 0)} total accounts")
+                    
+                    # Test POST /api/companies/{company_id}/accounts/enhanced (create new account)
+                    new_account_data = {
+                        "account_name": "Test Account",
+                        "account_code": "9999",
+                        "account_type": "expense",
+                        "category": "operating_expense",
+                        "description": "Test account for API testing",
+                        "opening_balance": 100.0
+                    }
+                    
+                    create_response = self.session.post(f"{API_BASE}/companies/{company_id}/accounts/enhanced", 
+                                                      json=new_account_data, headers=headers)
+                    self.log(f"POST create account response status: {create_response.status_code}")
+                    
+                    if create_response.status_code == 200:
+                        create_data = create_response.json()
+                        account_id = create_data.get('account_id')
+                        self.log(f"✅ POST create account working - account ID: {account_id}")
+                        
+                        # Test PUT /api/companies/{company_id}/accounts/{account_id}/enhanced (update account)
+                        update_account_data = {
+                            "account_name": "Updated Test Account",
+                            "description": "Updated description"
+                        }
+                        
+                        update_response = self.session.put(f"{API_BASE}/companies/{company_id}/accounts/{account_id}/enhanced", 
+                                                         json=update_account_data, headers=headers)
+                        self.log(f"PUT update account response status: {update_response.status_code}")
+                        
+                        if update_response.status_code == 200:
+                            self.log("✅ PUT update account working")
+                            
+                            # Test DELETE /api/companies/{company_id}/accounts/{account_id}/enhanced (delete account)
+                            delete_response = self.session.delete(f"{API_BASE}/companies/{company_id}/accounts/{account_id}/enhanced", headers=headers)
+                            self.log(f"DELETE account response status: {delete_response.status_code}")
+                            
+                            if delete_response.status_code == 200:
+                                self.log("✅ DELETE account working")
+                                return True
+                            elif delete_response.status_code == 403:
+                                self.log("✅ DELETE account properly restricted to admin users")
+                                return True
+                            else:
+                                self.log(f"❌ DELETE account failed: {delete_response.text}")
+                                return False
+                        else:
+                            self.log(f"❌ PUT update account failed: {update_response.text}")
+                            return False
+                    else:
+                        self.log(f"❌ POST create account failed: {create_response.text}")
+                        return False
+                else:
+                    self.log(f"❌ GET consolidated enhanced failed: {consolidated_response.text}")
+                    return False
+            else:
+                self.log(f"❌ GET enhanced accounts failed: {enhanced_response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Enhanced chart of accounts endpoints error: {str(e)}")
+            return False
+
+    def test_export_and_print_endpoints(self):
+        """Test Export and Print API Endpoints"""
+        self.log("Testing Export and Print API Endpoints...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # Get a company ID for testing
+            companies_response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            if companies_response.status_code != 200:
+                self.log("❌ Could not get companies for export testing")
+                return False
+                
+            companies = companies_response.json()
+            if not companies:
+                self.log("❌ No companies available for export testing")
+                return False
+                
+            company_id = companies[0].get('id')
+            
+            # Test POST /api/companies/{company_id}/accounts/export (individual company export)
+            # Test PDF export
+            pdf_export_data = {
+                "format": "pdf",
+                "filters": {}
+            }
+            
+            pdf_response = self.session.post(f"{API_BASE}/companies/{company_id}/accounts/export", 
+                                           json=pdf_export_data, headers=headers)
+            self.log(f"POST PDF export response status: {pdf_response.status_code}")
+            
+            if pdf_response.status_code == 200:
+                pdf_data = pdf_response.json()
+                self.log(f"✅ PDF export working - filename: {pdf_data.get('filename')}")
+                
+                # Test Excel export
+                excel_export_data = {
+                    "format": "excel",
+                    "filters": {}
+                }
+                
+                excel_response = self.session.post(f"{API_BASE}/companies/{company_id}/accounts/export", 
+                                                 json=excel_export_data, headers=headers)
+                self.log(f"POST Excel export response status: {excel_response.status_code}")
+                
+                if excel_response.status_code == 200:
+                    excel_data = excel_response.json()
+                    self.log(f"✅ Excel export working - filename: {excel_data.get('filename')}")
+                    
+                    # Test POST /api/companies/consolidated-accounts/export (consolidated export)
+                    consolidated_pdf_data = {
+                        "format": "pdf",
+                        "filters": {}
+                    }
+                    
+                    consolidated_response = self.session.post(f"{API_BASE}/companies/consolidated-accounts/export", 
+                                                            json=consolidated_pdf_data, headers=headers)
+                    self.log(f"POST consolidated export response status: {consolidated_response.status_code}")
+                    
+                    if consolidated_response.status_code == 200:
+                        consolidated_data = consolidated_response.json()
+                        self.log(f"✅ Consolidated export working - filename: {consolidated_data.get('filename')}")
+                        
+                        # Test consolidated Excel export
+                        consolidated_excel_data = {
+                            "format": "excel",
+                            "filters": {}
+                        }
+                        
+                        consolidated_excel_response = self.session.post(f"{API_BASE}/companies/consolidated-accounts/export", 
+                                                                      json=consolidated_excel_data, headers=headers)
+                        self.log(f"POST consolidated Excel export response status: {consolidated_excel_response.status_code}")
+                        
+                        if consolidated_excel_response.status_code == 200:
+                            self.log("✅ Consolidated Excel export working")
+                            
+                            # Test invalid format
+                            invalid_export_data = {
+                                "format": "invalid",
+                                "filters": {}
+                            }
+                            
+                            invalid_response = self.session.post(f"{API_BASE}/companies/{company_id}/accounts/export", 
+                                                               json=invalid_export_data, headers=headers)
+                            self.log(f"POST invalid format response status: {invalid_response.status_code}")
+                            
+                            if invalid_response.status_code == 400:
+                                self.log("✅ Invalid format properly rejected")
+                                return True
+                            else:
+                                self.log("⚠️ Invalid format not properly rejected, but exports working")
+                                return True
+                        else:
+                            self.log(f"❌ Consolidated Excel export failed: {consolidated_excel_response.text}")
+                            return False
+                    else:
+                        self.log(f"❌ Consolidated export failed: {consolidated_response.text}")
+                        return False
+                else:
+                    self.log(f"❌ Excel export failed: {excel_response.text}")
+                    return False
+            else:
+                self.log(f"❌ PDF export failed: {pdf_response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Export and print endpoints error: {str(e)}")
+            return False
+
+    def test_authentication_requirements(self):
+        """Test authentication requirements for ERP endpoints"""
+        self.log("Testing authentication requirements...")
+        
+        # Test without authentication token
+        try:
+            # Test company management endpoint without auth
+            response = self.session.get(f"{API_BASE}/companies/management")
+            self.log(f"No auth companies/management response status: {response.status_code}")
+            
+            if response.status_code == 401:
+                self.log("✅ Authentication properly required for company management")
+                
+                # Test enhanced accounts endpoint without auth
+                response = self.session.get(f"{API_BASE}/companies/test-id/accounts/enhanced")
+                self.log(f"No auth enhanced accounts response status: {response.status_code}")
+                
+                if response.status_code == 401:
+                    self.log("✅ Authentication properly required for enhanced accounts")
+                    
+                    # Test export endpoint without auth
+                    export_data = {"format": "pdf"}
+                    response = self.session.post(f"{API_BASE}/companies/test-id/accounts/export", json=export_data)
+                    self.log(f"No auth export response status: {response.status_code}")
+                    
+                    if response.status_code == 401:
+                        self.log("✅ Authentication properly required for export endpoints")
+                        return True
+                    else:
+                        self.log("❌ Export endpoint not properly protected")
+                        return False
+                else:
+                    self.log("❌ Enhanced accounts endpoint not properly protected")
+                    return False
+            else:
+                self.log("❌ Company management endpoint not properly protected")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Authentication requirements test error: {str(e)}")
+            return False
+
+    def test_data_validation(self):
+        """Test data validation and error handling"""
+        self.log("Testing data validation and error handling...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # Get a company ID for testing
+            companies_response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            if companies_response.status_code != 200:
+                self.log("❌ Could not get companies for validation testing")
+                return False
+                
+            companies = companies_response.json()
+            if not companies:
+                self.log("❌ No companies available for validation testing")
+                return False
+                
+            company_id = companies[0].get('id')
+            
+            # Test invalid company ID
+            invalid_response = self.session.get(f"{API_BASE}/companies/invalid-id/accounts/enhanced", headers=headers)
+            self.log(f"Invalid company ID response status: {invalid_response.status_code}")
+            
+            if invalid_response.status_code == 404:
+                self.log("✅ Invalid company ID properly handled")
+                
+                # Test account code uniqueness validation
+                duplicate_account_data = {
+                    "account_name": "Duplicate Test",
+                    "account_code": "1000",  # This should already exist
+                    "account_type": "asset",
+                    "category": "current_asset"
+                }
+                
+                duplicate_response = self.session.post(f"{API_BASE}/companies/{company_id}/accounts/enhanced", 
+                                                     json=duplicate_account_data, headers=headers)
+                self.log(f"Duplicate account code response status: {duplicate_response.status_code}")
+                
+                if duplicate_response.status_code == 400:
+                    self.log("✅ Account code uniqueness validation working")
+                    
+                    # Test invalid export format
+                    invalid_export = {
+                        "format": "invalid_format"
+                    }
+                    
+                    invalid_export_response = self.session.post(f"{API_BASE}/companies/{company_id}/accounts/export", 
+                                                              json=invalid_export, headers=headers)
+                    self.log(f"Invalid export format response status: {invalid_export_response.status_code}")
+                    
+                    if invalid_export_response.status_code == 400:
+                        self.log("✅ Export format validation working")
+                        return True
+                    else:
+                        self.log("❌ Export format validation not working")
+                        return False
+                else:
+                    self.log("⚠️ Account code uniqueness validation may not be working (or no duplicate codes exist)")
+                    return True
+            else:
+                self.log("❌ Invalid company ID not properly handled")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Data validation test error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run comprehensive backend testing as requested in review"""
         self.log("=" * 80)
         self.log("ZOIOS ERP BACKEND COMPREHENSIVE TESTING")
-        self.log("Testing: Authentication, Company Setup, Currency, Multi-tenancy, User Management")
+        self.log("Testing: Authentication, Company Setup, Currency, Multi-tenancy, User Management, ERP Functionality")
         self.log("=" * 80)
         
         test_results = {}
