@@ -1992,16 +1992,22 @@ async def get_enhanced_consolidated_accounts(current_user: UserInDB = Depends(ge
     
     for company in companies:
         company_id = company.get('id')
-        accounts_raw = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("account_code", 1).to_list(length=None)
-        accounts = [parse_from_mongo(account) for account in accounts_raw]
+        accounts_raw = await db_to_use.chart_of_accounts.find({"company_id": company_id}).sort("code", 1).to_list(length=None)
         
-        # Add company name to each account
-        for account in accounts:
-            account['company_name'] = company.get('company_name', 'Unknown')
-            account['company_id'] = company_id
+        # Parse accounts and map field names for frontend compatibility
+        for account_raw in accounts_raw:
+            account = parse_from_mongo(account_raw)
+            # Map backend field names to frontend expected names
+            mapped_account = {
+                **account,
+                'account_code': account.get('code', ''),  # Map 'code' to 'account_code'
+                'account_name': account.get('name', ''),  # Map 'name' to 'account_name'
+                'company_name': company.get('company_name', 'Unknown'),
+                'company_id': company_id
+            }
+            consolidated_data.append(mapped_account)
         
-        consolidated_data.extend(accounts)
-        total_accounts += len(accounts)
+        total_accounts += len(accounts_raw)
     
     # Group by account type
     grouped_accounts = {}
