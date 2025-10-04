@@ -35,7 +35,7 @@ const CompanyManagement = ({ user, onBack }) => {
   const fetchCompanies = async () => {
     try {
       const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies`, {
+      const response = await fetch(`${backendUrl}/api/companies/management`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
