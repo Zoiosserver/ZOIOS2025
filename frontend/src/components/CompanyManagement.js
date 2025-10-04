@@ -1384,6 +1384,7 @@ const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => 
 
 const ConsolidatedAccountsTab = ({ companies, user }) => {
   const [consolidatedAccounts, setConsolidatedAccounts] = useState([]);
+  const [companyNames, setCompanyNames] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [groupBy, setGroupBy] = useState('account_type'); // account_type, company, category
@@ -1395,20 +1396,30 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
   const fetchConsolidatedAccounts = async () => {
     setLoading(true);
     try {
-      const backendUrl = window.location.origin;
+      // Use environment variable for backend URL
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
       const response = await fetch(`${backendUrl}/api/companies/consolidated-accounts/enhanced`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
+      console.log('DEBUG: Consolidated accounts API response status:', response.status);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('DEBUG: Consolidated accounts API data:', data);
+        
         setConsolidatedAccounts(data.consolidated_accounts || []);
+        setCompanyNames(data.company_names || []);
+        setError(''); // Clear any previous errors
       } else {
-        setError('Failed to load consolidated accounts');
+        const errorData = await response.json().catch(() => ({}));
+        console.log('DEBUG: Consolidated accounts API error:', errorData);
+        setError(errorData.detail || 'Failed to load consolidated accounts');
       }
     } catch (err) {
+      console.log('DEBUG: Consolidated accounts exception:', err);
       setError('Connection failed: ' + err.message);
     } finally {
       setLoading(false);
