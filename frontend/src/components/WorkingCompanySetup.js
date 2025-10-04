@@ -12,7 +12,7 @@ const WorkingCompanySetup = ({ user, onComplete }) => {
     country: 'IN',
     business_type: 'Private Limited Company',
     industry: 'Technology',
-    fiscal_year_start: '2024-04-01',
+    fiscal_year_start: '01/04/2024', // dd/mm/yyyy format
     accounting_system: 'indian_gaap',
     base_currency: 'INR',
     additional_currencies: [],
