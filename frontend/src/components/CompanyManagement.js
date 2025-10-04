@@ -217,27 +217,45 @@ const CompanyManagement = ({ user, onBack }) => {
   };
 
   const handleConvertToGroupCompany = async () => {
-    if (!window.confirm('Convert your company to Group Company? This will enable you to add sister companies.')) return;
+    console.log('DEBUG: handleConvertToGroupCompany called');
+    
+    if (!window.confirm('Convert your company to Group Company? This will enable you to add sister companies.')) {
+      console.log('DEBUG: User cancelled conversion');
+      return;
+    }
+
+    console.log('DEBUG: User confirmed conversion, proceeding...');
 
     try {
       // Use environment variable for backend URL to ensure correct API calls
       const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-      const response = await fetch(`${backendUrl}/api/setup/company/convert-to-group`, {
+      const apiUrl = `${backendUrl}/api/setup/company/convert-to-group`;
+      
+      console.log('DEBUG: Calling API URL:', apiUrl);
+      console.log('DEBUG: Token available:', localStorage.getItem('token') ? 'Yes' : 'No');
+      
+      const response = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
+      console.log('DEBUG: API response status:', response.status);
+      console.log('DEBUG: API response ok:', response.ok);
+
       if (response.ok) {
         const result = await response.json();
+        console.log('DEBUG: API response data:', result);
         await fetchCompanies(); // Refresh the companies list
         alert('Company successfully converted to Group Company! You can now add sister companies.');
       } else {
         const errorData = await response.json().catch(() => ({}));
+        console.log('DEBUG: API error response:', errorData);
         setError(errorData.detail || 'Failed to convert company to Group Company');
       }
     } catch (err) {
+      console.log('DEBUG: Exception caught:', err);
       setError('Connection failed: ' + err.message);
     }
   };
