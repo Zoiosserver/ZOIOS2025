@@ -38,20 +38,40 @@ const EnhancedChartOfAccounts = ({ selectedCompany, companies, onSelectCompany }
 
     setLoading(true);
     try {
-      const backendUrl = window.location.origin;
-      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts/enhanced`, {
+      // Use environment variable for backend URL
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
+      const response = await fetch(`${backendUrl}/api/company/${selectedCompany.id}/chart-of-accounts`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
+      console.log('DEBUG: Fetching chart of accounts for company:', selectedCompany.company_name, 'ID:', selectedCompany.id);
+      console.log('DEBUG: API response status:', response.status);
+
       if (response.ok) {
         const data = await response.json();
-        setAccounts(data.accounts || []);
+        console.log('DEBUG: Chart of accounts data received:', data);
+        
+        // Extract accounts from the response structure
+        const allAccounts = [];
+        if (data.accounts_by_category) {
+          // Flatten accounts from all categories
+          Object.values(data.accounts_by_category).forEach(categoryAccounts => {
+            allAccounts.push(...categoryAccounts);
+          });
+        }
+        
+        console.log('DEBUG: Total accounts loaded:', allAccounts.length);
+        setAccounts(allAccounts);
+        setError(''); // Clear any previous errors
       } else {
-        setError('Failed to load accounts');
+        const errorData = await response.json().catch(() => ({}));
+        console.log('DEBUG: API error response:', errorData);
+        setError(errorData.detail || 'Failed to load accounts');
       }
     } catch (err) {
+      console.log('DEBUG: Exception caught:', err);
       setError('Connection failed: ' + err.message);
     } finally {
       setLoading(false);
