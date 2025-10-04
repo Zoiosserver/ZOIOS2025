@@ -18,7 +18,7 @@ import time
 import random
 
 # Get backend URL from environment
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://finance-hub-176.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://zoios-erp-1.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 # Generate unique test credentials for fresh testing
