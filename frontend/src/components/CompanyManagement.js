@@ -435,6 +435,7 @@ const CompanyManagement = ({ user, onBack }) => {
               onDelete={handleDelete}
               onSelectCompany={setSelectedCompany}
               onConvertToGroup={handleConvertToGroupCompany}
+              onSwitchToAccountsTab={() => setActiveTab('accounts')}
             />
           )}
           
