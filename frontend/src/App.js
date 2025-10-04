@@ -122,7 +122,7 @@ function App() {
 
   if (currentView === 'dashboard') {
     return (
-      <SimpleDashboard 
+      <EnhancedDashboard 
         user={user}
         onLogout={handleLogout}
         onNavigateToCompanyManagement={() => setCurrentView('company-management')}
