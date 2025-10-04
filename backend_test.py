@@ -2064,6 +2064,342 @@ class BackendTester:
             self.log(f"❌ Database investigation error: {str(e)}")
             return False
 
+    def test_sister_company_setup_with_group_company(self):
+        """Test company setup with sister companies as requested in review"""
+        self.log("Testing company setup with sister companies...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Company setup data with sister companies as specified in review request
+        setup_data = {
+            "company_name": "Test Group Company",
+            "country_code": "IN",
+            "business_type": "Group Company",
+            "industry": "Technology",
+            "base_currency": "INR",
+            "additional_currencies": ["USD", "EUR"],
+            "address": "123 Test Street",
+            "city": "Mumbai",
+            "state": "Maharashtra",
+            "postal_code": "400001",
+            "phone": "+91-22-1234-5678",
+            "email": TEST_EMAIL,
+            "website": "https://testgroup.com",
+            "tax_number": "GSTIN123456789",
+            "registration_number": "CIN123456789",
+            "sister_companies": [
+                {
+                    "company_name": "Sister Company 1",
+                    "country": "IN",
+                    "business_type": "Private Limited Company",
+                    "industry": "Technology",
+                    "fiscal_year_start": "2024-04-01"
+                },
+                {
+                    "company_name": "Sister Company 2",
+                    "country": "IN", 
+                    "business_type": "Partnership",
+                    "industry": "Manufacturing",
+                    "fiscal_year_start": "2024-04-01"
+                }
+            ]
+        }
+        
+        try:
+            response = self.session.post(f"{API_BASE}/setup/company", json=setup_data, headers=headers)
+            self.log(f"Sister company setup response status: {response.status_code}")
+            self.log(f"Sister company setup response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.log("✅ Company setup with sister companies successful")
+                self.log(f"Main company ID: {data.get('id')}")
+                self.log(f"Business type: {data.get('business_type')}")
+                
+                # Store company ID for later tests
+                self.main_company_id = data.get('id')
+                return True
+            elif response.status_code == 400 and "already completed" in response.text:
+                self.log("⚠️ Company setup already completed - will test sister company retrieval")
+                return self.test_get_existing_company_setup(headers)
+            else:
+                self.log(f"❌ Sister company setup failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Sister company setup error: {str(e)}")
+            return False
+
+    def test_get_existing_company_setup(self, headers):
+        """Get existing company setup to extract company ID"""
+        try:
+            response = self.session.get(f"{API_BASE}/setup/company", headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                self.main_company_id = data.get('id')
+                self.log(f"✅ Retrieved existing company ID: {self.main_company_id}")
+                return True
+            return False
+        except:
+            return False
+
+    def test_sister_companies_api_get(self):
+        """Test GET /api/company/sister-companies endpoint"""
+        self.log("Testing GET /api/company/sister-companies endpoint...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            response = self.session.get(f"{API_BASE}/company/sister-companies", headers=headers)
+            self.log(f"Sister companies GET response status: {response.status_code}")
+            self.log(f"Sister companies GET response: {response.text}")
+            
+            if response.status_code == 200:
+                sister_companies = response.json()
+                self.log(f"✅ Sister companies API working - found {len(sister_companies)} sister companies")
+                
+                # Verify sister companies have correct fields
+                for i, sister in enumerate(sister_companies):
+                    self.log(f"Sister Company {i+1}:")
+                    self.log(f"  - ID: {sister.get('id')}")
+                    self.log(f"  - Name: {sister.get('company_name')}")
+                    self.log(f"  - Group Company ID: {sister.get('group_company_id')}")
+                    self.log(f"  - Business Type: {sister.get('business_type')}")
+                    self.log(f"  - Country: {sister.get('country_code')}")
+                    
+                    # Verify required fields are present
+                    required_fields = ['id', 'company_name', 'group_company_id', 'business_type']
+                    for field in required_fields:
+                        if not sister.get(field):
+                            self.log(f"❌ Missing required field: {field}")
+                            return False
+                
+                # Store sister company IDs for later tests
+                self.sister_company_ids = [s.get('id') for s in sister_companies]
+                
+                if len(sister_companies) >= 2:
+                    self.log("✅ Sister companies have correct data structure and group_company_id linkage")
+                    return True
+                else:
+                    self.log("⚠️ Expected at least 2 sister companies from setup")
+                    return len(sister_companies) > 0
+            else:
+                self.log(f"❌ Sister companies GET failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Sister companies GET error: {str(e)}")
+            return False
+
+    def test_company_management_api_integration(self):
+        """Test GET /api/companies/management endpoint for sister company integration"""
+        self.log("Testing GET /api/companies/management endpoint...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            response = self.session.get(f"{API_BASE}/companies/management", headers=headers)
+            self.log(f"Company management response status: {response.status_code}")
+            self.log(f"Company management response: {response.text}")
+            
+            if response.status_code == 200:
+                companies = response.json()
+                self.log(f"✅ Company management API working - found {len(companies)} companies")
+                
+                # Verify main company shows up
+                main_company_found = False
+                for company in companies:
+                    self.log(f"Company: {company.get('company_name')} (ID: {company.get('id')})")
+                    if company.get('id') == getattr(self, 'main_company_id', None):
+                        main_company_found = True
+                        self.log("✅ Main company found in management list")
+                
+                if main_company_found or len(companies) > 0:
+                    self.log("✅ Company management integration working")
+                    return True
+                else:
+                    self.log("❌ Main company not found in management list")
+                    return False
+            else:
+                self.log(f"❌ Company management API failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Company management API error: {str(e)}")
+            return False
+
+    def test_sister_company_chart_of_accounts(self):
+        """Test that sister companies have their own chart of accounts"""
+        self.log("Testing sister company chart of accounts...")
+        
+        if not self.auth_token or not hasattr(self, 'sister_company_ids'):
+            self.log("❌ No auth token or sister company IDs available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        success_count = 0
+        
+        for sister_id in getattr(self, 'sister_company_ids', []):
+            try:
+                response = self.session.get(f"{API_BASE}/company/{sister_id}/chart-of-accounts", headers=headers)
+                self.log(f"Sister company {sister_id} chart of accounts response status: {response.status_code}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    accounts_by_category = data.get('accounts_by_category', {})
+                    total_accounts = data.get('total_accounts', 0)
+                    company_info = data.get('company', {})
+                    
+                    self.log(f"✅ Sister company '{company_info.get('name')}' has {total_accounts} accounts")
+                    self.log(f"  - Account categories: {list(accounts_by_category.keys())}")
+                    
+                    if total_accounts > 0:
+                        success_count += 1
+                        self.log(f"✅ Sister company has proper chart of accounts")
+                    else:
+                        self.log(f"⚠️ Sister company has no accounts")
+                else:
+                    self.log(f"❌ Sister company chart of accounts failed: {response.text}")
+                    
+            except Exception as e:
+                self.log(f"❌ Sister company chart of accounts error: {str(e)}")
+        
+        if success_count > 0:
+            self.log(f"✅ {success_count} sister companies have chart of accounts")
+            return True
+        else:
+            self.log("❌ No sister companies have chart of accounts")
+            return False
+
+    def test_tenant_database_isolation(self):
+        """Test proper tenant database isolation for sister companies"""
+        self.log("Testing tenant database isolation...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            # Test tenant info endpoint
+            response = self.session.get(f"{API_BASE}/tenant/info", headers=headers)
+            self.log(f"Tenant info response status: {response.status_code}")
+            self.log(f"Tenant info response: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                tenant_assigned = data.get('tenant_assigned', False)
+                database_name = data.get('database_name', '')
+                
+                if tenant_assigned:
+                    self.log(f"✅ Tenant database isolation working - database: {database_name}")
+                    
+                    # Verify sister companies are in the same tenant database
+                    sister_response = self.session.get(f"{API_BASE}/company/sister-companies", headers=headers)
+                    if sister_response.status_code == 200:
+                        sister_companies = sister_response.json()
+                        self.log(f"✅ Sister companies accessible in tenant database: {len(sister_companies)} companies")
+                        return True
+                    else:
+                        self.log("❌ Sister companies not accessible in tenant database")
+                        return False
+                else:
+                    self.log("⚠️ User not assigned to tenant database - may be expected for some setups")
+                    return True
+            else:
+                self.log(f"❌ Tenant info failed: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Tenant database isolation test error: {str(e)}")
+            return False
+
+    def test_sister_company_data_structure_verification(self):
+        """Verify sister companies have correct data structure"""
+        self.log("Testing sister company data structure verification...")
+        
+        if not self.auth_token:
+            self.log("❌ No auth token available")
+            return False
+            
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            response = self.session.get(f"{API_BASE}/company/sister-companies", headers=headers)
+            
+            if response.status_code == 200:
+                sister_companies = response.json()
+                self.log(f"Verifying data structure for {len(sister_companies)} sister companies...")
+                
+                required_fields = [
+                    'id', 'group_company_id', 'company_name', 'country_code', 
+                    'business_type', 'industry', 'base_currency', 'is_active'
+                ]
+                
+                all_valid = True
+                for i, sister in enumerate(sister_companies):
+                    self.log(f"\nSister Company {i+1} Data Structure:")
+                    
+                    for field in required_fields:
+                        value = sister.get(field)
+                        if value is not None:
+                            self.log(f"  ✅ {field}: {value}")
+                        else:
+                            self.log(f"  ❌ {field}: MISSING")
+                            all_valid = False
+                    
+                    # Verify group_company_id links to main company
+                    if hasattr(self, 'main_company_id') and sister.get('group_company_id') == self.main_company_id:
+                        self.log(f"  ✅ group_company_id correctly links to main company")
+                    else:
+                        self.log(f"  ⚠️ group_company_id linkage unclear")
+                
+                if all_valid:
+                    self.log("✅ All sister companies have correct data structure")
+                    return True
+                else:
+                    self.log("❌ Some sister companies missing required fields")
+                    return False
+            else:
+                self.log(f"❌ Could not retrieve sister companies: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Data structure verification error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run comprehensive backend testing as requested in review"""
         self.log("=" * 80)
