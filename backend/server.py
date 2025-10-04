@@ -604,12 +604,17 @@ async def setup_company(
     await tenant_service.assign_user_to_tenant(current_user.email, company_setup.id)
     
     # Save company setup to tenant database
+    print(f"DEBUG: Saving main company setup: {company_setup.company_name} (ID: {company_setup.id})")
     prepared_company = prepare_for_mongo(company_setup.dict())
-    await tenant_db.company_setups.insert_one(prepared_company)
+    print(f"DEBUG: Prepared company data for MongoDB: {prepared_company.get('company_name')}")
+    company_insert_result = await tenant_db.company_setups.insert_one(prepared_company)
+    print(f"DEBUG: Main company saved with MongoDB ID: {company_insert_result.inserted_id}")
     
     # Also save user to tenant database
+    print(f"DEBUG: Saving user to tenant database: {current_user.email}")
     prepared_user = prepare_user_for_mongo(current_user.dict())
-    await tenant_db.users.insert_one(prepared_user)
+    user_insert_result = await tenant_db.users.insert_one(prepared_user)
+    print(f"DEBUG: User saved with MongoDB ID: {user_insert_result.inserted_id}")
     
     # Create chart of accounts based on accounting system in tenant database
     chart_template = get_chart_of_accounts(accounting_system["chart_of_accounts"])
