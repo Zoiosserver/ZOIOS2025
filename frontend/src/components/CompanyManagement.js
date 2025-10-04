@@ -341,7 +341,7 @@ const CompanyManagement = ({ user, onBack }) => {
               companies={companies}
               loading={loading}
               error={error}
-              onAdd={() => setShowAddModal(true)}
+              onAdd={() => setShowAddCompanyModal(true)}
               onEdit={startEdit}
               onDelete={handleDelete}
               onSelectCompany={setSelectedCompany}
