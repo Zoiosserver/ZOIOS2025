@@ -697,9 +697,9 @@ agent_communication:
           agent: "testing"
           comment: "✅ USER DELETION SYSTEM FULLY VERIFIED: Cross-database user deletion working perfectly. Successfully tested deletion of test user with admin credentials. DELETE /api/users/{user_id} endpoint properly searches both tenant and main databases for user lookup. Returns proper success response. User deletion functionality is production-ready with proper security protections in place."
 
-  - task: "Consolidated Accounts Functionality Investigation"
+  - task: "Consolidated Accounts Sister Companies Fix"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
@@ -707,10 +707,10 @@ agent_communication:
     status_history:
         - working: false
           agent: "user"
-          comment: "User reports that consolidated accounts is not showing other companies - it's not displaying accounts from all companies (main + sister companies) together. Expected behavior: Consolidated accounts should show accounts from ALL companies in one unified view."
-        - working: false
+          comment: "Test the consolidated accounts fix I just implemented. I fixed the backend endpoint to include sister companies in the consolidated view. VERIFICATION NEEDED: 1) Test GET /api/companies/consolidated-accounts/enhanced endpoint, 2) Verify it now returns accounts from ALL companies (main + sister companies), 3) Check that total_companies shows the correct count (should be 3: 1 main + 2 sister), 4) Verify consolidated data structure includes accounts from sister companies, 5) Check that each account has proper company_name field showing which company it belongs to, 6) Verify total_accounts reflects accounts from all companies (should be ~78 accounts: 26x3 companies)."
+        - working: true
           agent: "testing"
-          comment: "❌ CONSOLIDATED ACCOUNTS ISSUE CONFIRMED: Comprehensive investigation reveals a critical discrepancy between two consolidated accounts endpoints. **ISSUE DETAILS**: 1) **GET /api/companies/consolidated-accounts/enhanced** - ❌ NOT WORKING: Only shows 26 accounts from 1 company (main company only), missing accounts from sister companies, total_companies: 1 instead of expected 3 2) **GET /api/company/consolidated-accounts** - ✅ WORKING CORRECTLY: Shows 26 accounts with sister_companies_data including all 3 companies (Main Group Company, Sister Company Alpha, Sister Company Beta) 3) **Individual Company Verification**: ✅ All companies have proper chart of accounts (Main: 26 accounts, Sister Alpha: 26 accounts, Sister Beta: 26 accounts = 78 total accounts expected) 4) **Expected vs Actual**: Expected consolidated view should show ~78 accounts from 3 companies, but enhanced endpoint only shows 26 accounts from 1 company. **ROOT CAUSE**: The enhanced consolidated accounts endpoint is not properly including sister company accounts in the consolidated view, while the regular endpoint works correctly. **USER REPORT CONFIRMED**: The user's report is accurate - consolidated accounts functionality is not showing accounts from all companies together. The issue is specifically with the enhanced endpoint that's likely being used by the frontend."
+          comment: "🎉 CONSOLIDATED ACCOUNTS FIX COMPLETELY VERIFIED - ALL REQUIREMENTS MET! Comprehensive testing confirms the consolidated accounts fix is working perfectly. **PERFECT TEST RESULTS**: 7/7 tests passed with 100% success rate. **DETAILED VERIFICATION**: ✅ **Company Structure**: Created fresh Group Company with 3 companies (1 main + 2 sisters) - Main Group Company, Sister Company Alpha, Sister Company Beta ✅ **Total Companies**: GET /api/companies/consolidated-accounts/enhanced returns total_companies: 3 (exactly as expected) ✅ **Total Accounts**: Returns total_accounts: 78 (26 accounts × 3 companies = perfect match) ✅ **Sister Company Inclusion**: All 3 companies properly included in consolidated view with accounts from each company ✅ **Company Attribution**: Every account has proper company_name field showing which company it belongs to (78/78 accounts with company attribution) ✅ **Data Structure**: Complete and correct response structure with companies array, consolidated_accounts array, grouped_accounts, summary statistics ✅ **Perfect Match**: Individual accounts total (78) exactly matches consolidated accounts total (78) - no missing accounts. **BEFORE vs AFTER FIX**: Before: Only main company accounts (26 accounts, 1 company), After: All companies accounts (78 accounts, 3 companies). **ACCOUNT DISTRIBUTION**: Main Group Company: 26 accounts, Sister Company Alpha: 26 accounts, Sister Company Beta: 26 accounts. The user's consolidated accounts fix is working flawlessly - sister companies are now fully included in the consolidated view with proper attribution and complete data structure."
 
   - task: "Granular Permission System Implementation"
     implemented: true
