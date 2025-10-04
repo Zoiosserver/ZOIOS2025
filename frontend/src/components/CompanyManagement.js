@@ -1499,7 +1499,7 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
     }
   };
 
-  const generateConsolidatedPDF = async (pdfData) => {
+  const generateConsolidatedPDF = async () => {
     try {
       const { jsPDF } = await import('jspdf');
       const doc = new jsPDF();
@@ -1520,15 +1520,21 @@ const ConsolidatedAccountsTab = ({ companies, user }) => {
       
       let yPos = 50;
       const leftMargin = 10;
-      const colWidths = [25, 60, 25, 25, 25, 30]; // Column widths
       let xPos = leftMargin;
+      
+      // Calculate column widths dynamically based on number of companies
+      const baseColumns = 3; // Code, Name, Type
+      const totalCompanies = companyNames ? companyNames.length : 0;
+      const totalColumns = baseColumns + totalCompanies + 1; // +1 for Total
+      const availableWidth = pageWidth - 20; // Margins
+      const dynamicColWidth = availableWidth / totalColumns;
       
       // Header row
       const headers = ['Code', 'Account Name', 'Type'];
       
       // Add company columns dynamically
-      if (pdfData && pdfData.company_names) {
-        headers.push(...pdfData.company_names.map(name => name.substring(0, 8)));
+      if (companyNames) {
+        headers.push(...companyNames.map(name => name.length > 8 ? name.substring(0, 8) + '...' : name));
       }
       headers.push('Total');
       
