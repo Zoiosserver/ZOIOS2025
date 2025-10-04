@@ -592,6 +592,21 @@ agent_communication:
           agent: "testing"
           comment: "✅ GRANULAR PERMISSIONS BACKEND FULLY VERIFIED: Complete testing of permissions system confirms all functionality working perfectly. Permissions can be set via POST /api/users/{user_id}/permissions endpoint and are immediately reflected in /auth/me response. Tested comprehensive permission structure (dashboard, crm_contacts, crm_companies, crm_call_logs, crm_email_responses, currency_management, consolidated_accounts, company_accounts, user_management, company_assignments). All permissions correctly saved and retrieved. Backend permissions system is production-ready."
 
+  - task: "Complete Database Cleanup and System Reset"
+    implemented: true
+    working: true
+    file: "/app/database_cleanup_test.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "user"
+          comment: "COMPLETE DATABASE CLEANUP AND SYSTEM RESET - The user wants to start completely fresh. Please: 1) DELETE ALL DATABASE DATA (All user accounts, All company setups and sister companies, All chart of accounts data, All currency configurations, All tenant databases, Any other application data), 2) RESET ALL COLLECTIONS (users, company_setups, sister_companies, accounts, Any other application collections), 3) CLEAN TENANT DATABASES (Remove all tenant-specific databases, Reset multi-tenant isolation), 4) VERIFY CLEAN STATE (Confirm no users exist, Confirm no companies exist, Confirm database is in fresh/empty state, Test that signup/registration still works), 5) TEST FRESH SYSTEM (Create one new test account to verify system works, Verify clean authentication system, Confirm fresh company setup process works). The user wants to test everything from the very beginning - account creation, company setup, sister companies, etc. - with a completely clean database."
+        - working: true
+          agent: "testing"
+          comment: "🎉 COMPLETE DATABASE CLEANUP AND SYSTEM RESET SUCCESSFULLY COMPLETED! Performed comprehensive database cleanup as requested: 1) ✅ DELETED ALL DATABASE DATA: Successfully removed 68 user accounts (including admin@2mholding.com, admin@zoios.com, all test accounts), 0 company setups, 0 sister companies, 0 chart of accounts, 0 currency configurations, 0 tenant databases, 0 CRM data (contacts, companies, call_logs, email_responses), 0 password reset tokens. 2) ✅ RESET ALL COLLECTIONS: All collections are completely empty - users (0), company_setups (0), sister_companies (0), chart_of_accounts (0), exchange_rates (0), contacts (0), companies (0), call_logs (0), email_responses (0), password_reset_tokens (0). 3) ✅ CLEAN TENANT DATABASES: No tenant databases remaining (0 tenant databases found). 4) ✅ VERIFIED CLEAN STATE: Database is in completely fresh/empty state with 0 documents in all collections. Confirmed no users exist, no companies exist, database is completely clean. 5) ✅ TESTED FRESH SYSTEM: Created new test account (freshtest17595826497535@example.com), verified clean authentication system working, completed fresh company setup process successfully, confirmed chart of accounts creation (26 US GAAP accounts), tested currency management system (2 rates updated), verified multi-tenancy functionality. Final verification with additional test account (finaltest17595826761455@example.com) confirms system works perfectly from the very beginning with onboarding_completed properly updated. All 7/7 fresh system tests passed (registration ✅, login ✅, authentication ✅, company_setup ✅, chart_of_accounts ✅, currency_system ✅, multi_tenancy ✅). User can now test everything from scratch - account creation, company setup, sister companies, etc. - with a completely clean database. Database cleanup and system reset: 100% SUCCESS!"
+
   - task: "Beautiful Professional Login/Signup UI Enhancement"
     implemented: true
     working: true
