@@ -1287,29 +1287,38 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <button 
             onClick={onNavigateToCompanyManagement}
-            className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 text-left hover:from-blue-100 hover:to-indigo-100 transition-all duration-200 group"
+            className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left hover:bg-blue-100 transition-all duration-200 group"
           >
             <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">🏢</div>
             <div className="font-semibold text-blue-700">Company Management</div>
             <div className="text-blue-600 text-sm">Manage companies & accounts</div>
           </button>
 
-          <button className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 text-left hover:from-green-100 hover:to-emerald-100 transition-all duration-200 group">
+          <button 
+            onClick={() => handleModuleNavigation('financial-reports')}
+            className="bg-green-50 border border-green-200 rounded-xl p-4 text-left hover:bg-green-100 transition-all duration-200 group"
+          >
             <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📊</div>
             <div className="font-semibold text-green-700">Financial Reports</div>
             <div className="text-green-600 text-sm">P&L, Balance Sheet, Cash Flow</div>
           </button>
 
-          <button className="bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-200 rounded-xl p-4 text-left hover:from-purple-100 hover:to-violet-100 transition-all duration-200 group">
+          <button 
+            onClick={() => handleModuleNavigation('crm-dashboard')}
+            className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-left hover:bg-purple-100 transition-all duration-200 group"
+          >
             <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">👥</div>
             <div className="font-semibold text-purple-700">CRM Dashboard</div>
             <div className="text-purple-600 text-sm">Leads, customers, pipeline</div>
           </button>
 
-          <button className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-4 text-left hover:from-orange-100 hover:to-red-100 transition-all duration-200 group">
-            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">📦</div>
-            <div className="font-semibold text-orange-700">Inventory Control</div>
-            <div className="text-orange-600 text-sm">Stock levels & movements</div>
+          <button 
+            onClick={() => handleModuleNavigation('project-dashboard')}
+            className="bg-orange-50 border border-orange-200 rounded-xl p-4 text-left hover:bg-orange-100 transition-all duration-200 group"
+          >
+            <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">🏗️</div>
+            <div className="font-semibold text-orange-700">Project Management</div>
+            <div className="text-orange-600 text-sm">Installation & maintenance</div>
           </button>
         </div>
       </div>
