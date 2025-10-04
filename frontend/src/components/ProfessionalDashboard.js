@@ -64,23 +64,79 @@ const ProfessionalDashboard = ({ user, onLogout, onNavigateToCompanyManagement }
     try {
       const backendUrl = window.location.origin;
       
-      const response = await fetch(`${backendUrl}/api/setup/company`, {
+      // Fetch business intelligence data
+      const biResponse = await fetch(`${backendUrl}/api/dashboard/business-intelligence`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setCompanySetup(data);
+      if (biResponse.ok) {
+        const biData = await biResponse.json();
+        const businessData = biData.data;
+        
+        // Update all dashboard data with real values from API
         setDashboardData({
-          currency: data.base_currency || 'USD',
-          companyName: data.company_name || 'Your Company',
-          businessType: data.business_type || 'Business'
+          currency: businessData.company_overview.primary_currency || 'USD',
+          companyName: businessData.company_overview.company_name || 'Your Company',
+          businessType: 'Enterprise'
         });
+        
+        // Update KPI data
+        kpiData.splice(0, kpiData.length, ...businessData.kpis.map(kpi => ({
+          ...kpi,
+          change: parseFloat(kpi.change.toFixed(1))
+        })));
+        
+        // Update revenue data
+        revenueData.splice(0, revenueData.length, ...businessData.revenue_trend);
+        
+        // Update expense breakdown
+        expenseBreakdown.splice(0, expenseBreakdown.length, ...businessData.expense_breakdown.map(item => ({
+          name: item.name,
+          value: item.percentage,
+          amount: item.amount
+        })));
+        
+        // Update accounts data
+        accountsData.splice(0, accountsData.length, ...businessData.account_distribution.map(item => ({
+          category: item.category,
+          current: item.current,
+          previous: Math.round(item.current * 0.9) // Mock previous value
+        })));
+        
+        setCompanySetup({
+          company_name: businessData.company_overview.company_name,
+          base_currency: businessData.company_overview.primary_currency,
+          business_type: businessData.company_overview.total_companies > 1 ? 'Group Company' : 'Single Company'
+        });
+        
+      } else {
+        // Fallback to company setup data only
+        const companyResponse = await fetch(`${backendUrl}/api/setup/company`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (companyResponse.ok) {
+          const data = await companyResponse.json();
+          setCompanySetup(data);
+          setDashboardData({
+            currency: data.base_currency || 'USD',
+            companyName: data.company_name || 'Your Company',
+            businessType: data.business_type || 'Business'
+          });
+        }
       }
     } catch (err) {
-      console.error('Failed to load company data:', err);
+      console.error('Failed to load dashboard data:', err);
+      // Set default values on error
+      setDashboardData({
+        currency: 'USD',
+        companyName: 'Demo Company',
+        businessType: 'Business'
+      });
     } finally {
       setLoading(false);
     }
