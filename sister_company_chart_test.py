@@ -368,10 +368,12 @@ class SisterCompanyChartTester:
         """Run comprehensive investigation of sister company chart of accounts issue"""
         self.log("=== SISTER COMPANY CHART OF ACCOUNTS INVESTIGATION ===")
         
-        # Step 1: Login with working account
+        # Step 1: Try to login with working account, if fails create fresh account
         if not self.login_with_working_account():
-            self.log("❌ Could not login with any working account")
-            return False
+            self.log("⚠️ Could not login with existing accounts, creating fresh test account...")
+            if not self.create_fresh_test_account():
+                self.log("❌ Could not create fresh test account")
+                return False
         
         # Step 2: Get companies data
         if not self.get_companies_management():
