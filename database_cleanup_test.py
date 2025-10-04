@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
-ZOIOS ERP Database Cleanup and System Reset Testing Script
-Tests complete database cleanup and fresh system verification as requested:
-1. DELETE ALL DATABASE DATA (users, companies, accounts, currencies, tenant databases)
-2. RESET ALL COLLECTIONS 
-3. CLEAN TENANT DATABASES
-4. VERIFY CLEAN STATE
-5. TEST FRESH SYSTEM
+ZOIOS ERP Complete Database Cleanup and System Reset Test
+This script performs comprehensive database cleanup as requested:
+1. Delete ALL user accounts
+2. Delete ALL company setups and sister companies  
+3. Delete ALL chart of accounts data
+4. Delete ALL currency configurations
+5. Delete ALL tenant databases
+6. Reset system to completely clean state
+7. Verify system readiness for fresh user flow
 """
 
 import requests
@@ -16,38 +18,27 @@ from datetime import datetime
 import sys
 import time
 import random
-from motor.motor_asyncio import AsyncIOMotorClient
-import asyncio
+from pymongo import MongoClient
 
 # Get backend URL from environment
 BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://zoios-erp-2.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
-# MongoDB connection details
-MONGO_URL = "mongodb://localhost:27017"
-DB_NAME = "zoios_crm"
-
-# Generate unique test credentials for fresh testing
-timestamp = str(int(time.time()))
-random_suffix = str(random.randint(1000, 9999))
-TEST_EMAIL = f"freshtest{timestamp}{random_suffix}@example.com"
-TEST_PASSWORD = "freshpass123"
-TEST_NAME = "Fresh Test User"
-TEST_COMPANY = "Fresh Test Company Inc"
+# MongoDB connection for direct database operations
+MONGO_URL = os.getenv('MONGO_URL', 'mongodb://localhost:27017')
+DB_NAME = os.getenv('DB_NAME', 'zoios_crm')
 
 class DatabaseCleanupTester:
     def __init__(self):
         self.session = requests.Session()
-        self.auth_token = None
-        self.user_data = None
         self.mongo_client = None
-        self.db = None
+        self.main_db = None
         
     def log(self, message, level="INFO"):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"[{timestamp}] {level}: {message}")
         
-    async def connect_to_mongodb(self):
+    def connect_to_mongodb(self):
         """Connect to MongoDB for direct database operations"""
         try:
             self.mongo_client = AsyncIOMotorClient(MONGO_URL)
