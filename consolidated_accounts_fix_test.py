@@ -24,9 +24,10 @@ import random
 BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://zoios-erp-2.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
-# Test credentials - using existing Group Company account as mentioned in review request
-TEST_EMAIL = "usertestsister@example.com"
-TEST_PASSWORD = "testsister123"
+# Test credentials - create fresh account for testing
+timestamp = str(int(time.time()))
+TEST_EMAIL = f"consolidatedtest{timestamp}@example.com"
+TEST_PASSWORD = "consolidatedtest123"
 
 class ConsolidatedAccountsTester:
     def __init__(self):
