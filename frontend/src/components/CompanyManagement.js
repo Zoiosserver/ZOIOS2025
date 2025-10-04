@@ -403,13 +403,430 @@ const CompaniesTab = ({ companies, loading, error, onAdd, onEdit, onDelete, onSe
   </div>
 );
 
-const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => (
-  <div>
-    <h2 className="text-2xl font-bold text-gray-900 mb-6">Chart of Accounts</h2>
-    {/* Chart of accounts content will be implemented */}
-    <p className="text-gray-600">Chart of accounts functionality will be implemented here</p>
-  </div>
-);
+const ChartOfAccountsTab = ({ companies, selectedCompany, onSelectCompany }) => {
+  const [accounts, setAccounts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingAccount, setEditingAccount] = useState(null);
+  const [accountForm, setAccountForm] = useState({
+    account_name: '',
+    account_code: '',
+    account_type: 'asset',
+    category: 'current_asset',
+    description: '',
+    opening_balance: 0
+  });
+
+  const accountTypes = {
+    asset: ['current_asset', 'fixed_asset', 'other_asset'],
+    liability: ['current_liability', 'long_term_liability', 'other_liability'],
+    equity: ['equity'],
+    revenue: ['revenue'],
+    expense: ['operating_expense', 'other_expense']
+  };
+
+  useEffect(() => {
+    if (selectedCompany) {
+      fetchAccounts();
+    }
+  }, [selectedCompany]);
+
+  const fetchAccounts = async () => {
+    if (!selectedCompany) return;
+    
+    setLoading(true);
+    try {
+      const backendUrl = window.location.origin;
+      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts/enhanced`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAccounts(data.accounts || []);
+      } else {
+        setError('Failed to load accounts');
+      }
+    } catch (err) {
+      setError('Connection failed: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitAccount = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const backendUrl = window.location.origin;
+      const url = editingAccount 
+        ? `${backendUrl}/api/companies/${selectedCompany.id}/accounts/${editingAccount.id}/enhanced`
+        : `${backendUrl}/api/companies/${selectedCompany.id}/accounts/enhanced`;
+      
+      const method = editingAccount ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(accountForm)
+      });
+
+      if (response.ok) {
+        await fetchAccounts();
+        setShowAddModal(false);
+        setEditingAccount(null);
+        resetAccountForm();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.detail || 'Failed to save account');
+      }
+    } catch (err) {
+      setError('Connection failed: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async (accountId) => {
+    if (!window.confirm('Are you sure you want to delete this account?')) return;
+
+    try {
+      const backendUrl = window.location.origin;
+      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts/${accountId}/enhanced`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        await fetchAccounts();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.detail || 'Failed to delete account');
+      }
+    } catch (err) {
+      setError('Connection failed: ' + err.message);
+    }
+  };
+
+  const resetAccountForm = () => {
+    setAccountForm({
+      account_name: '',
+      account_code: '',
+      account_type: 'asset',
+      category: 'current_asset',
+      description: '',
+      opening_balance: 0
+    });
+  };
+
+  const startEditAccount = (account) => {
+    setEditingAccount(account);
+    setAccountForm({ ...account });
+    setShowAddModal(true);
+  };
+
+  const exportAccounts = async (format) => {
+    if (!selectedCompany) return;
+
+    try {
+      const backendUrl = window.location.origin;
+      const response = await fetch(`${backendUrl}/api/companies/${selectedCompany.id}/accounts/export`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ format })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (format === 'excel') {
+          // Create Excel file from data
+          const workbook = XLSX.utils.book_new();
+          const worksheet = XLSX.utils.json_to_sheet(data.data.accounts);
+          XLSX.utils.book_append_sheet(workbook, worksheet, 'Chart of Accounts');
+          XLSX.writeFile(workbook, data.filename);
+        } else if (format === 'pdf') {
+          // Create PDF from data (simplified version)
+          window.print(); // This will print the current view
+        }
+      } else {
+        setError('Failed to export accounts');
+      }
+    } catch (err) {
+      setError('Export failed: ' + err.message);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Chart of Accounts</h2>
+          {selectedCompany && (
+            <p className="text-gray-600">Managing accounts for {selectedCompany.company_name}</p>
+          )}
+        </div>
+        
+        {selectedCompany && (
+          <div className="flex space-x-3">
+            <button
+              onClick={() => exportAccounts('excel')}
+              className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-2 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-200 font-medium text-sm"
+            >
+              Export Excel
+            </button>
+            <button
+              onClick={() => exportAccounts('pdf')}
+              className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 rounded-xl hover:from-red-600 hover:to-pink-600 transition-all duration-200 font-medium text-sm"
+            >
+              Export PDF
+            </button>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all duration-200 font-medium text-sm"
+            >
+              Add Account
+            </button>
+          </div>
+        )}
+      </div>
+
+      {!selectedCompany ? (
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-8 text-center">
+          <div className="text-gray-400 mb-4">
+            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-700 mb-2">Select a Company</h3>
+          <p className="text-gray-500 mb-6">Choose a company from the Companies tab to view its chart of accounts</p>
+          
+          {companies.length > 0 && (
+            <div className="max-w-md mx-auto">
+              <select
+                onChange={(e) => {
+                  const company = companies.find(c => c.id === e.target.value);
+                  if (company) onSelectCompany(company);
+                }}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select a company...</option>
+                {companies.map(company => (
+                  <option key={company.id} value={company.id}>{company.company_name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+      ) : (
+        <>
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+              <span className="text-red-700 text-sm">{error}</span>
+            </div>
+          )}
+
+          {loading ? (
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 p-8 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="text-gray-600 mt-4">Loading accounts...</p>
+            </div>
+          ) : (
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100/50 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account Code</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account Name</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {accounts.map((account) => (
+                      <tr key={account.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{account.account_code}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{account.account_name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{account.account_type}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{account.category?.replace('_', ' ')}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{account.current_balance || 0}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                          <button
+                            onClick={() => startEditAccount(account)}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteAccount(account.id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {accounts.length === 0 && (
+                <div className="p-8 text-center">
+                  <p className="text-gray-500">No accounts found for this company</p>
+                </div>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Add/Edit Account Modal */}
+      {showAddModal && selectedCompany && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {editingAccount ? 'Edit Account' : 'Add New Account'}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setEditingAccount(null);
+                    resetAccountForm();
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmitAccount} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Account Name</label>
+                  <input
+                    type="text"
+                    value={accountForm.account_name}
+                    onChange={(e) => setAccountForm({ ...accountForm, account_name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Account Code</label>
+                  <input
+                    type="text"
+                    value={accountForm.account_code}
+                    onChange={(e) => setAccountForm({ ...accountForm, account_code: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Account Type</label>
+                  <select
+                    value={accountForm.account_type}
+                    onChange={(e) => {
+                      const type = e.target.value;
+                      setAccountForm({ 
+                        ...accountForm, 
+                        account_type: type,
+                        category: accountTypes[type][0]
+                      });
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="asset">Asset</option>
+                    <option value="liability">Liability</option>
+                    <option value="equity">Equity</option>
+                    <option value="revenue">Revenue</option>
+                    <option value="expense">Expense</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <select
+                    value={accountForm.category}
+                    onChange={(e) => setAccountForm({ ...accountForm, category: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {accountTypes[accountForm.account_type]?.map(category => (
+                      <option key={category} value={category}>
+                        {category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Opening Balance</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={accountForm.opening_balance}
+                    onChange={(e) => setAccountForm({ ...accountForm, opening_balance: parseFloat(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <textarea
+                    value={accountForm.description}
+                    onChange={(e) => setAccountForm({ ...accountForm, description: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows="2"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setEditingAccount(null);
+                      resetAccountForm();
+                    }}
+                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg hover:from-blue-600 hover:to-indigo-600 disabled:opacity-50"
+                  >
+                    {loading ? 'Saving...' : editingAccount ? 'Update Account' : 'Create Account'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ConsolidatedAccountsTab = ({ companies, user }) => (
   <div>
